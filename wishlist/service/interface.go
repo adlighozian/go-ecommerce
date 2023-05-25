@@ -1,9 +1,12 @@
-package  service
+package service
+
+import (
+	"wishlist-go/model"
+)
 
 type Servicer interface {
-	Get(..., err error)
-	GetDetail(..., err error)
-	Create(..., err error)
-	Update(..., err error)
-	Delete(..., err error)
+	Get() (res []model.Wishlist, err error)
+	GetDetail(id int) (res model.Wishlist, err error)
+	Create(req []model.WishlistRequest) (res []model.Wishlist, err error)
+	Delete(id int) (err error)
 }

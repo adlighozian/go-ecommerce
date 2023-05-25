@@ -1,37 +1,43 @@
-package  service
+package service
 
 import (
-	"net/http"
-	"github.com/gin-gonic/gin"
-	"auth-go/repository"
+	"errors"
+	"cart-go/model"
+	"cart-go/repository"
 )
 
 type service struct {
 	repo repository.Repositorier
 }
 
-func NewService(repo repository.Repositorier) *Servicer {
+func NewService(repo repository.Repositorier) Servicer {
 	return &service{
 		repo: repo,
 	}
 }
 
-func (svc *service) Get(ctx *gin.Context) {
-	svc.repo.Get()
+func (svc *service) Get() (res []model.Cart, err error) {
+	return svc.repo.Get()
 }
 
-func (svc *service) GetDetail(ctx *gin.Context) {
-	svc.repo.GetDetail()
+func (svc *service) GetDetail(id int) (res model.Cart, err error) {
+	res, err = svc.repo.GetDetail(id)
+	if err != nil {
+		return
+	}
+
+	emptyStruct := model.Cart{}
+	if res == emptyStruct {
+		err = errors.New("cart not found")
+		return
+	}
+	return
 }
 
-func (svc *service) Create(ctx *gin.Context) {
-	svc.repo.Create()
+func (svc *service) Create(req []model.CartRequest) (res []model.Cart, err error) {
+	return svc.repo.Create(req)
 }
 
-func (svc *service) Update(ctx *gin.Context) {
-	svc.repo.Update()
-}
-
-func (svc *service) Delete(ctx *gin.Context) {
-	svc.repo.Delete()
+func (svc *service) Delete(id int) (err error) {
+	return svc.repo.Delete(id)
 }
