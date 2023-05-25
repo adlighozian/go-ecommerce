@@ -5,8 +5,8 @@ import (
 )
 
 type Handlerer interface {
-	Get(c *gin.Context)
-	GetDetail(c *gin.Context)
-	Create(c *gin.Context)
-	Delete(c *gin.Context)
+	Get(ctx *gin.Context)
+	GetDetail(ctx *gin.Context)
+	Create(ctx *gin.Context)
+	Delete(ctx *gin.Context)
 }
