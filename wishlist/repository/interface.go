@@ -1,4 +1,4 @@
-package repositoy
+package repository
 
 import (
 	"wishlist-go/model"
@@ -7,6 +7,6 @@ import (
 type Repositorier interface {
 	Get() (res []model.Wishlist, err error)
 	GetDetail(id int) (res model.Wishlist, err error)
-	Create(req []model.WishlistRequest) (err error)
+	Create(req []model.WishlistRequest) (res []model.Wishlist, err error)
 	Delete(id int) (err error)
 }
