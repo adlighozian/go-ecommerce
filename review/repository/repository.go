@@ -1,12 +1,10 @@
 package repository
 
 import (
-	"review-go/db"
 	"context"
 	"database/sql"
-	"github.com/gin-gonic/gin"
-	"review-go/model"
 	"time"
+	"review-go/model"
 )
 
 type repository struct {
@@ -19,7 +17,7 @@ func NewRepository(db *sql.DB) Repositorier {
 	}
 }
 
-func (repo *repository) GetDetail(id int) (res model.Review, err error) {
+func (repo *repository) GetDetail(id int) (res []model.Review, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 

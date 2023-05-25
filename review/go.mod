@@ -1,4 +1,4 @@
-module cart-go
+module go-review
 
 go 1.19
 

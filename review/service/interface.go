@@ -1,9 +1,10 @@
-package  service
+package service
+
+import (
+	"review-go/model"
+)
 
 type Servicer interface {
-	Get(..., err error)
-	GetDetail(..., err error)
-	Create(..., err error)
-	Update(..., err error)
-	Delete(..., err error)
+	GetByProductID(productID int) (res []model.Wishlist, err error)
+	Create(productID int, req []model.WishlistRequest) (res []model.Wishlist, err error)
 }
