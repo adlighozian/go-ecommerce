@@ -3,11 +3,12 @@ package config
 import (
 	"errors"
 	"fmt"
+
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Database 	string `mapStructure:"DATABASE"`
+	Database string `mapStructure:"DATABASE"`
 }
 
 func LoadConfig() (*Config, error) {

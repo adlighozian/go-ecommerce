@@ -1,33 +1,39 @@
-package  repository
+package repository
 
 import (
 	"database/sql"
-	"net/http"
-	"github.com/gin-gonic/gin"
-	"auth-go/db"
+	"product-go/model"
 )
 
-type  repository struct {
+type repository struct {
 	db *sql.DB
 }
 
-func NewRepository(db *sql.DB) *Repositorier {
+func NewRepository(db *sql.DB) Repositorier {
 	return &repository{
 		db: db,
 	}
 }
 
-func (repo *repository) Get(ctx *gin.Context) {
+func (repo *repository) GetProduct(req model.ProductSearch) ([]model.Product, error) {
+
+	searchProduct := ""
+
+	return []model.Product{}, nil
 }
 
-func (repo *repository) GetDetail(ctx *gin.Context) {
+func (repo *repository) ShowProduct(id int) (model.Product, error) {
+	return model.Product{}, nil
 }
 
-func (repo *repository) Create(ctx *gin.Context) {
+func (repo *repository) CreateProduct(req model.ProductReq) ([]model.Product, error) {
+	return []model.Product{}, nil
 }
 
-func (repo *repository) Update(ctx *gin.Context) {
+func (repo *repository) UpdateProduct(id int) error {
+	return nil
 }
 
-func (repo *repository) Delete(ctx *gin.Context) {
+func (repo *repository) DeleteProduct(id int) error {
+	return nil
 }
