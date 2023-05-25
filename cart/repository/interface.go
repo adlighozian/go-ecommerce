@@ -1,4 +1,4 @@
-package repositoy
+package repository
 
 import (
 	"cart-go/model"
@@ -7,6 +7,6 @@ import (
 type Repositorier interface {
 	Get() (res []model.Cart, err error)
 	GetDetail(id int) (res model.Cart, err error)
-	Create(req []model.CartRequest) (err error)
+	Create(req []model.CartRequest) (res []model.Cart, err error)
 	Delete(id int) (err error)
 }
