@@ -18,8 +18,6 @@ func NewHandler(svc service.Servicer) Handlerer {
 
 func (h *handler) GetProduct(ctx *gin.Context) {
 
-
-	
 }
 
 func (h *handler) ShowProduct(ctx *gin.Context) {

@@ -17,7 +17,9 @@ func NewRepository(db *sql.DB) Repositorier {
 
 func (repo *repository) GetProduct(req model.ProductSearch) ([]model.Product, error) {
 
-	searchProduct := ""
+	searchProduct := `SELECT * FROM products WHERE name LIKE '%%' `
+
+	tx := db.Begin()
 
 	return []model.Product{}, nil
 }
