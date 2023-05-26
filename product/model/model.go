@@ -23,6 +23,7 @@ type Product struct {
 }
 
 type ProductReq struct {
+	Id          int
 	StoreID     int
 	CategoryID  int
 	SizeID      int
@@ -31,16 +32,15 @@ type ProductReq struct {
 	Subtitle    string
 	Description string
 	UnitPrice   float64
-	Status      bool
+	Status      *bool
 	Stock       int
 	Sku         string
 	Weight      float64
 }
 
 type Respon struct {
-	Status  int
-	Message string
-	Data    any
+	Status int
+	Data   any
 }
 
 type ProductSearch struct {

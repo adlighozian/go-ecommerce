@@ -1,15 +1,16 @@
 package repository
 
 import (
-	"database/sql"
 	"product-go/model"
+
+	"gorm.io/gorm"
 )
 
 type repository struct {
-	db *sql.DB
+	db *gorm.DB
 }
 
-func NewRepository(db *sql.DB) Repositorier {
+func NewRepository(db *gorm.DB) Repositorier {
 	return &repository{
 		db: db,
 	}
@@ -17,9 +18,7 @@ func NewRepository(db *sql.DB) Repositorier {
 
 func (repo *repository) GetProduct(req model.ProductSearch) ([]model.Product, error) {
 
-	searchProduct := `SELECT * FROM products WHERE name LIKE '%%' `
-
-	tx := db.Begin()
+	// searchProduct := `select * from products p join store st on st.id = p.id join category c on c.id = p.id join sizez s on si.id = p.id join color co on co.id = p.id where st.names like '%?%' and where c.names like '%?%' and where s.names like '%?%' and where co.names like '%?%' `
 
 	return []model.Product{}, nil
 }
@@ -28,11 +27,11 @@ func (repo *repository) ShowProduct(id int) (model.Product, error) {
 	return model.Product{}, nil
 }
 
-func (repo *repository) CreateProduct(req model.ProductReq) ([]model.Product, error) {
+func (repo *repository) CreateProduct(req []model.ProductReq) ([]model.Product, error) {
 	return []model.Product{}, nil
 }
 
-func (repo *repository) UpdateProduct(id int) error {
+func (repo *repository) UpdateProduct(req model.ProductReq) error {
 	return nil
 }
 

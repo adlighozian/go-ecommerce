@@ -4,8 +4,8 @@ import "product-go/model"
 
 type Servicer interface {
 	GetProduct(req model.ProductSearch) (model.Respon, error)
-	ShowDetail(id int) (model.Respon, error)
-	Create(req model.ProductReq) (model.Respon, error)
-	Update(id int) (model.Respon, error)
-	Delete(id int) (model.Respon, error)
+	ShowProduct(id int) (model.Respon, error)
+	CreateProduct(req []model.ProductReq) (model.Respon, error)
+	UpdateProduct(req model.ProductReq) (model.Respon, error)
+	DeleteProduct(id int) (model.Respon, error)
 }

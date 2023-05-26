@@ -1,16 +1,22 @@
 package main
 
 import (
-	"fmt"
 	"product-go/handler"
+	"product-go/package/db"
+	"product-go/repository"
+	"product-go/service"
 
 	"github.com/gin-gonic/gin"
-	"github.com/labstack/echo/middleware"
 )
 
 func main() {
-	fmt.Println("hallo ini product")
+	db := db.GetConnection()
 
+	repoProduct := repository.NewRepository(db)
+	product := service.NewService(repoProduct)
+	Handler := handler.NewHandler(product)
+
+	NewServer(Handler)
 }
 
 func NewServer(hand handler.Handlerer) {
@@ -18,7 +24,7 @@ func NewServer(hand handler.Handlerer) {
 	r := gin.New()
 
 	// middleware
-	r.Use(middleware.Logger())
+	// r.Use(middleware.Logger())
 
 	r.GET("/products", hand.GetProduct)
 	r.GET("/products/details", hand.ShowProduct)

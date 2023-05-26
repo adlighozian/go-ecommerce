@@ -6,24 +6,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ResponseSuccess(ctx *gin.Context, status int, message string, data interface{}) {
-	if message == "" {
-		message = http.StatusText(status)
-	}
+func ResponseSuccess(ctx *gin.Context, status int, data any) {
 	ctx.JSON(status, map[string]interface{}{
-		"status":  status,
-		"message": message,
 		"data":    data,
+		"message": http.StatusText(status),
+		"status":  status,
 	})
 }
 
-func ResponseError(ctx *gin.Context, status int, message string, err error) {
-	if message == "" {
-		message = http.StatusText(status)
-	}
+func ResponseError(ctx *gin.Context, status int, err error) {
 	ctx.JSON(status, map[string]interface{}{
-		"status":  status,
-		"message": message,
 		"error":   err.Error(),
+		"message": http.StatusText(status),
+		"status":  status,
 	})
 }
