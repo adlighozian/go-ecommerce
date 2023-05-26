@@ -33,6 +33,11 @@ func (h *handler) Get(ctx *gin.Context) {
 		return
 	}
 
+	if userID <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("userID must be positive number"))
+		return
+	}
+
 	res, err := h.svc.Get(userID)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
@@ -66,6 +71,16 @@ func (h *handler) GetDetail(ctx *gin.Context) {
 		return
 	}
 
+	if userID <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("userID must be positive number"))
+		return
+	}
+
+	if cartID <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("cartID must be positive number"))
+		return
+	}
+
 	res, err := h.svc.GetDetail(userID, cartID)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
@@ -81,6 +96,23 @@ func (h *handler) Create(ctx *gin.Context) {
 	if err != nil {
 		response.ResponseError(ctx, http.StatusBadRequest, err)
 		return
+	}
+
+	for _, v := range req {
+		if v.UserID <= 0 {
+			response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("userID must be positive number"))
+			return
+		}
+	
+		if v.ProductID <= 0 {
+			response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("cartID must be positive number"))
+			return
+		}
+
+		if v.Quantity <= 0 {
+			response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("cartID must be positive number"))
+			return
+		}
 	}
 
 	res, err := h.svc.Create(req)
