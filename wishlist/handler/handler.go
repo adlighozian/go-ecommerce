@@ -33,6 +33,11 @@ func (h *handler) Get(ctx *gin.Context) {
 		return
 	}
 
+	if userID <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("userID must be positive number"))
+		return
+	}
+
 	res, err := h.svc.Get(userID)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
@@ -65,14 +70,18 @@ func (h *handler) GetDetail(ctx *gin.Context) {
 		response.ResponseError(ctx, http.StatusBadRequest, err)
 		return
 	}
-
-	id, err := strconv.Atoi(userID, wishlistID)
-	if err != nil {
-		response.ResponseError(ctx, http.StatusBadRequest, err)
+		
+	if userID <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("userID must be positive number"))
 		return
 	}
 
-	res, err := h.svc.GetDetail(id)
+	if wishlistID <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("wishlistID must be positive number"))
+		return
+	}
+
+	res, err := h.svc.GetDetail(userID, wishlistID)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
@@ -87,6 +96,18 @@ func (h *handler) Create(ctx *gin.Context) {
 	if err != nil {
 		response.ResponseError(ctx, http.StatusBadRequest, err)
 		return
+	}
+
+	for _, v := range req {
+		if v.ProductID <= 0 {
+			response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("producID must be positive number"))
+			return
+		}
+
+		if v.UserID <= 0 {
+			response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("producID must be positive number"))
+			return
+		}
 	}
 
 	res, err := h.svc.Create(req)
@@ -119,6 +140,16 @@ func (h *handler) Delete(ctx *gin.Context) {
 	wishlistID, err := strconv.Atoi(wishlistIDString)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	if userID <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("userID must be positive number"))
+		return
+	}
+
+	if wishlistID <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("wishlistID must be positive number"))
 		return
 	}
 
