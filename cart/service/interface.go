@@ -5,8 +5,8 @@ import (
 )
 
 type Servicer interface {
-	Get() (res []model.Cart, err error)
-	GetDetail(id int) (res model.Cart, err error)
+	Get(userID int) (res []model.Cart, err error)
+	GetDetail(userID, cartID int) (res model.Cart, err error)
 	Create(req []model.CartRequest) (res []model.Cart, err error)
-	Delete(id int) (err error)
+	Delete(userID, cartID int) (err error)
 }

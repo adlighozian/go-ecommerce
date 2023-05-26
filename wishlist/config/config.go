@@ -7,7 +7,11 @@ import (
 )
 
 type Config struct {
-	Database 	string `mapStructure:"DATABASE"`
+	DatabaseURL string `mapStructure:"DATABASE_URL"`
+    Database    string `mapStructure:"PGDATABASE"`
+    Host        string `mapStructure:"PGHOST"`
+    User        string `mapStructure:"PGUSER"`
+    Password    string `mapStructure:"PGPASSWORD"`
 }
 
 func LoadConfig() (*Config, error) {

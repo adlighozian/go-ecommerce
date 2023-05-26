@@ -12,24 +12,18 @@ type Response struct {
 	Error	error		`json:"error,omniempty"`
 }
 
-func ResponseSuccess(ctx *gin.Context, status int, message string, data interface{}) {
-	if message == "" {
-		message = http.StatusText(status)
-	}
+func ResponseSuccess(ctx *gin.Context, status int, data interface{}) {
 	ctx.JSON(status, Response{
 		Status: 	status,
-		Message: 	message,
+		Message: 	http.StatusText(status),
 		Data:		data,
 	})
 }
 
-func ResponseError(ctx *gin.Context, status int, message string, err error) {
-	if message == "" {
-		message = http.StatusText(status)
-	}
+func ResponseError(ctx *gin.Context, status int, err error) {
 	ctx.JSON(status, Response{
 		Status: 	status,
-		Message: 	message,
+		Message: 	http.StatusText(status),
 		Error:		err,
 	})
 }
