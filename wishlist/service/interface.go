@@ -1,3 +1,4 @@
+//go:generate mockery --output=../mocks --name Servicer
 package service
 
 import (

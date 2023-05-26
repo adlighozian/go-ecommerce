@@ -1,9 +1,11 @@
-package  handler
+package handler
+
+import (
+	"github.com/gin-gonic/gin"
+)
 
 type Handlerer interface {
-	Get(..., err error)
-	GetDetail(..., err error)
-	Create(..., err error)
-	Update(..., err error)
-	Delete(..., err error)
+	GetPaymentMethod(ctx *gin.Context)
+	CreatePaymentMethod(ctx *gin.Context)
+	CreatePaymentLog(ctx *gin.Context)
 }

@@ -51,6 +51,8 @@ paths:
           description: Bad Request
         '401':
           description: Not Authorized
+        '404':
+          description: Not Found
         '500':
           description: Internal Server Error
     post:

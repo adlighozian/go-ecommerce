@@ -1,37 +1,28 @@
-package  service
+package service
 
 import (
-	"net/http"
-	"github.com/gin-gonic/gin"
-	"auth-go/repository"
+	"payment-go/model"
+	"payment-go/repository"
 )
 
 type service struct {
 	repo repository.Repositorier
 }
 
-func NewService(repo repository.Repositorier) *Servicer {
+func NewService(repo repository.Repositorier) Servicer {
 	return &service{
 		repo: repo,
 	}
 }
 
-func (svc *service) Get(ctx *gin.Context) {
-	svc.repo.Get()
+func (svc *service) GetPaymentMethod() (res []model.PaymentMethod, err error) {
+	return svc.repo.GetPaymentMethod()
 }
 
-func (svc *service) GetDetail(ctx *gin.Context) {
-	svc.repo.GetDetail()
+func (svc *service) CreatePaymentMethod(req []model.PaymentMethodRequest) (res []model.PaymentMethod, err error) {
+	return svc.repo.CreatePaymentMethod(req)
 }
 
-func (svc *service) Create(ctx *gin.Context) {
-	svc.repo.Create()
-}
-
-func (svc *service) Update(ctx *gin.Context) {
-	svc.repo.Update()
-}
-
-func (svc *service) Delete(ctx *gin.Context) {
-	svc.repo.Delete()
+func (svc *service) CreatePaymentLog(req []model.PaymentLogsRequest) (res []model.PaymentLogsRequest, err error) {
+	return svc.repo.CreatePaymentLog(req)
 }

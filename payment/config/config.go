@@ -1,31 +1,33 @@
 package config
 
 import (
-	"errors"
-	"fmt"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Database 	string `mapStructure:"DATABASE"`
+	Debug bool   `mapstructure:"DEBUG"`
+	Port  string `mapstructure:"PORT"`
+
+	Database `mapstructure:",squash"`
+}
+
+type Database struct {
+	Driver string `mapstructure:"DATABASE_DRIVER"`
+	URL    string `mapstructure:"DATABASE_URL"`
 }
 
 func LoadConfig() (*Config, error) {
 	viper.SetConfigFile(".env")
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		_, ok := err.(viper.ConfigFileNotFoundError)
-		if ok {
-			return nil, errors.New(".env not found")
-		}
-		return nil, fmt.Errorf("fatal error config file %s", err)
+	errRead := viper.ReadInConfig()
+	if errRead != nil {
+		return nil, errRead
 	}
 
-	config := Config{}
-	err = viper.Unmarshal(&config)
-	if err != nil {
-		return nil, fmt.Errorf("fatal error decode : %s", err)
+	config := new(Config)
+	errUn := viper.Unmarshal(&config)
+	if errUn != nil {
+		return nil, errUn
 	}
-	return &config, nil
+	return config, nil
 }
