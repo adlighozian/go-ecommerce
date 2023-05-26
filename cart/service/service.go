@@ -16,12 +16,12 @@ func NewService(repo repository.Repositorier) Servicer {
 	}
 }
 
-func (svc *service) Get() (res []model.Cart, err error) {
-	return svc.repo.Get()
+func (svc *service) Get(userID int) (res []model.Cart, err error) {
+	return svc.repo.Get(userID)
 }
 
-func (svc *service) GetDetail(id int) (res model.Cart, err error) {
-	res, err = svc.repo.GetDetail(id)
+func (svc *service) GetDetail(userID, cartID int) (res model.Cart, err error) {
+	res, err = svc.repo.GetDetail(userID,cartID)
 	if err != nil {
 		return
 	}
@@ -38,6 +38,6 @@ func (svc *service) Create(req []model.CartRequest) (res []model.Cart, err error
 	return svc.repo.Create(req)
 }
 
-func (svc *service) Delete(id int) (err error) {
-	return svc.repo.Delete(id)
+func (svc *service) Delete(userID, cartID int) (err error) {
+	return svc.repo.Delete(userID, cartID)
 }

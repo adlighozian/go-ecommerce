@@ -17,17 +17,17 @@ func NewRepository(db *sql.DB) Repositorier {
 	}
 }
 
-func (repo *repository) Get() (res []model.Cart, err error) {
+func (repo *repository) Get(userID int) (res []model.Cart, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, product_id, quantity FROM Carts`
+	query := `SELECT id, user_id, product_id, quantity FROM Carts WHERE user_id = ?`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	result, err := stmt.QueryContext(ctx)
+	result, err := stmt.QueryContext(ctx, userID)
 	if err != nil {
 		return
 	}
@@ -41,17 +41,17 @@ func (repo *repository) Get() (res []model.Cart, err error) {
 	return
 }
 
-func (repo *repository) GetDetail(id int) (res model.Cart, err error) {
+func (repo *repository) GetDetail(userID, cartID int) (res model.Cart, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, product_id, quantity FROM Carts WHERE = ?`
+	query := `SELECT id, user_id, product_id, quantity FROM Carts WHERE user_id = ? AND WHERE cart_id = ?`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	result, err := stmt.QueryContext(ctx, id)
+	result, err := stmt.QueryContext(ctx, userID, cartID)
 	if err != nil {
 		return
 	}
@@ -68,19 +68,19 @@ func (repo *repository) Create(req []model.CartRequest) (res []model.Cart, err e
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
-	query := `INSERT INTO Carts (user_id, product_id, quantity) value (?, ?,?)`
+	query := `INSERT INTO Carts (user_id, product_id, quantity) value (?, ?, ?)`
 	trx, err := repo.db.BeginTx(ctx, nil)
 	if err != nil {
 		return
 	}
 
-	stmt, err := repo.db.PrepareContext(ctx, query)
+	stmt, err := trx.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
 	for _, v := range req {
-		result, err := stmt.ExecContext(ctx, v.UserID, v.ProductID)
+		result, err := stmt.ExecContext(ctx, v.UserID, v.ProductID, v.Quantity)
 		if err != nil {
 			trx.Rollback()
 			return []model.Cart{}, err
@@ -95,6 +95,7 @@ func (repo *repository) Create(req []model.CartRequest) (res []model.Cart, err e
 			Id:   		int(lastID),
 			UserID: 	v.UserID,
 			ProductID: 	v.ProductID,
+			Quantity:	v.Quantity,
 		})
 	}
 
@@ -103,17 +104,17 @@ func (repo *repository) Create(req []model.CartRequest) (res []model.Cart, err e
 	return
 }
 
-func (repo *repository) Delete(id int) (err error) {
+func (repo *repository) Delete(userID, cartID int) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `DELETE FROM Carts WHERE id = ?`
+	query := `DELETE FROM Carts WHERE user_id = ? AND WHERE cart_id = ?`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	_, err = stmt.ExecContext(ctx, id)
+	_, err = stmt.ExecContext(ctx, userID, cartID)
 	if err != nil {
 		return
 	}

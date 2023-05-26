@@ -17,17 +17,17 @@ func NewRepository(db *sql.DB) Repositorier {
 	}
 }
 
-func (repo *repository) Get() (res []model.Wishlist, err error) {
+func (repo *repository) Get(userID int) (res []model.Wishlist, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, product_id, quantity FROM wishlists`
+	query := `SELECT id, user_id, product_id FROM wishlists WHERE user_id = ?`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	result, err := stmt.QueryContext(ctx)
+	result, err := stmt.QueryContext(ctx, userID)
 	if err != nil {
 		return
 	}
@@ -41,17 +41,17 @@ func (repo *repository) Get() (res []model.Wishlist, err error) {
 	return
 }
 
-func (repo *repository) GetDetail(id int) (res model.Wishlist, err error) {
+func (repo *repository) GetDetail(userID, wishlistID int) (res model.Wishlist, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, product_id, quantity FROM wishlists WHERE = ?`
+	query := `SELECT id, user_id, product_id FROM wishlists WHERE userID = ? AND WHERE wishlist_id = ?`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	result, err := stmt.QueryContext(ctx, id)
+	result, err := stmt.QueryContext(ctx, userID, wishlistID)
 	if err != nil {
 		return
 	}
@@ -68,13 +68,13 @@ func (repo *repository) Create(req []model.WishlistRequest) (res []model.Wishlis
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
-	query := `INSERT INTO wishlists (user_id, product_id, quantity) value (?, ?,?)`
+	query := `INSERT INTO wishlists (user_id, product_id) value (?, ?)`
 	trx, err := repo.db.BeginTx(ctx, nil)
 	if err != nil {
 		return
 	}
 
-	stmt, err := repo.db.PrepareContext(ctx, query)
+	stmt, err := trx.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -103,7 +103,7 @@ func (repo *repository) Create(req []model.WishlistRequest) (res []model.Wishlis
 	return
 }
 
-func (repo *repository) Delete(id int) (err error) {
+func (repo *repository) Delete(userID, wishlistID int) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -113,7 +113,7 @@ func (repo *repository) Delete(id int) (err error) {
 		return
 	}
 
-	_, err = stmt.ExecContext(ctx, id)
+	_, err = stmt.ExecContext(ctx, userID, wishlistID)
 	if err != nil {
 		return
 	}

@@ -5,8 +5,8 @@ import (
 )
 
 type Repositorier interface {
-	Get() (res []model.Wishlist, err error)
-	GetDetail(id int) (res model.Wishlist, err error)
+	Get(userID int) (res []model.Wishlist, err error)
+	GetDetail(userID, wishlistID int) (res model.Wishlist, err error)
 	Create(req []model.WishlistRequest) (res []model.Wishlist, err error)
-	Delete(id int) (err error)
+	Delete(userID, wishlistID int) (err error)
 }

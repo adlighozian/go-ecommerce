@@ -23,22 +23,22 @@ func NewHandler(svc service.Servicer) Handlerer {
 func (h *handler) GetByProductID(ctx *gin.Context) {
 	idStr, ok := ctx.GetQuery("Review_id")	
 	if !ok {
-		response.ResponseError(ctx, http.StatusBadRequest, "", fmt.Errorf("query param Review_id should not be empty"))
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param Review_id should not be empty"))
 		return
 	}
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		response.ResponseError(ctx, http.StatusBadRequest, "", err)
+		response.ResponseError(ctx, http.StatusBadRequest, err)
 		return
 	}
 
-	res, err := h.svc.GetDetail(id)
+	res, err := h.svc.GetByProductID(id)
 	if err != nil {
-		response.ResponseError(ctx, http.StatusInternalServerError, "", err)
+		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
 	}
-	response.ResponseSuccess(ctx, http.StatusOK, "", res)
+	response.ResponseSuccess(ctx, http.StatusOK, res)
 }
 
 func (h *handler) Create(ctx *gin.Context) {
@@ -46,14 +46,14 @@ func (h *handler) Create(ctx *gin.Context) {
 
 	err := ctx.ShouldBind(&req)
 	if err != nil {
-		response.ResponseError(ctx, http.StatusBadRequest, "", err)
+		response.ResponseError(ctx, http.StatusBadRequest, err)
 		return
 	}
 
 	res, err := h.svc.Create(req)
 	if err != nil {
-		response.ResponseError(ctx, http.StatusInternalServerError, "", err)
+		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
 	}
-	response.ResponseSuccess(ctx, http.StatusOK, "", res)
+	response.ResponseSuccess(ctx, http.StatusOK, res)
 }
