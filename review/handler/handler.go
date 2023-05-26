@@ -1,37 +1,59 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"github.com/gin-gonic/gin"
-	"auth-go/service"
+	"strconv"
+	"review-go/helper/response"
+	"review-go/model"
+	"review-go/service"
 )
 
 type handler struct {
 	svc service.Servicer
 }
 
-func NewHandler(svc service.Servicer) *Handlerer {
+func NewHandler(svc service.Servicer) Handlerer {
 	return &handler{
 		svc: svc,
 	}
 }
 
-func (h *handler) Get(ctx *gin.Context) {
-	h.svc.GetList()
-}
+func (h *handler) GetByProductID(ctx *gin.Context) {
+	idStr, ok := ctx.GetQuery("Review_id")	
+	if !ok {
+		response.ResponseError(ctx, http.StatusBadRequest, "", fmt.Errorf("query param Review_id should not be empty"))
+		return
+	}
 
-func (h *handler) GetDetail(ctx *gin.Context) {
-	h.svc.GetDetail()
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		response.ResponseError(ctx, http.StatusBadRequest, "", err)
+		return
+	}
+
+	res, err := h.svc.GetDetail(id)
+	if err != nil {
+		response.ResponseError(ctx, http.StatusInternalServerError, "", err)
+		return
+	}
+	response.ResponseSuccess(ctx, http.StatusOK, "", res)
 }
 
 func (h *handler) Create(ctx *gin.Context) {
-	h.svc.Create()
-}
+	req := []model.ReviewRequest{}
 
-func (h *handler) Update(ctx *gin.Context) {
-	h.svc.Update()
-}
+	err := ctx.ShouldBind(&req)
+	if err != nil {
+		response.ResponseError(ctx, http.StatusBadRequest, "", err)
+		return
+	}
 
-func (h *handler) Delete(ctx *gin.Context) {
-	h.svc.Delete()
+	res, err := h.svc.Create(req)
+	if err != nil {
+		response.ResponseError(ctx, http.StatusInternalServerError, "", err)
+		return
+	}
+	response.ResponseSuccess(ctx, http.StatusOK, "", res)
 }
