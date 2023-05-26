@@ -6,6 +6,7 @@ import (
 	"api-gateway-go/helper/logging"
 	"api-gateway-go/helper/middleware"
 	"api-gateway-go/package/db"
+	"api-gateway-go/package/redisclient"
 	"api-gateway-go/repository"
 	"api-gateway-go/server"
 	"api-gateway-go/service"
@@ -32,14 +33,25 @@ func main() {
 	}
 	logger.Debug().Msg("db connected")
 
+	redisClient, errRedis := redisclient.NewRedisClient(config.Redis.Addr, config.Redis.Password, config.Redis.DB)
+	if errDB != nil {
+		logger.Fatal().Err(errRedis).Msg("redis failed to connect")
+	}
+	logger.Debug().Msg("redis connected")
+
 	defer func() {
 		logger.Debug().Msg("closing db")
 		_ = sqlDB.Close()
+		logger.Debug().Msg("db closed")
+
+		logger.Debug().Msg("closing redis")
+		_ = redisClient.Close()
+		logger.Debug().Msg("redis closed")
 	}()
 
 	pingHandler := handler.NewPingGinHandler()
 
-	shortenRepo := repository.NewShortenRepo(sqlDB.SQLDB)
+	shortenRepo := repository.NewShortenRepo(sqlDB.SQLDB, redisClient.Redis)
 	shortenSvc := service.NewShortenService(shortenRepo)
 	shortenHandler := handler.NewShortenHandler(shortenSvc)
 

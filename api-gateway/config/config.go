@@ -9,11 +9,18 @@ type Config struct {
 	Port  string `mapstructure:"PORT"`
 
 	Database `mapstructure:",squash"`
+	Redis    `mapstructure:",squash"`
 }
 
 type Database struct {
 	Driver string `mapstructure:"DATABASE_DRIVER"`
 	URL    string `mapstructure:"DATABASE_URL"`
+}
+
+type Redis struct {
+	Addr     string `mapstructure:"REDIS_ADDR"`
+	Password string `mapstructure:"REDIS_PASSWORD"`
+	DB       int    `mapstructure:"REDIS_DB"`
 }
 
 func LoadConfig() (*Config, error) {

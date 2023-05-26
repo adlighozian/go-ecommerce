@@ -49,3 +49,8 @@ func Logger(logger *zerolog.Logger) gin.HandlerFunc {
 		}
 	}
 }
+
+// ! not implemented
+// func RateLimit(redis *redis.Client) gin.HandlerFunc {
+// 	return
+// }
