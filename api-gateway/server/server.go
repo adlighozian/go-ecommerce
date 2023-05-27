@@ -14,7 +14,10 @@ import (
 func Run(srv *http.Server, logger *zerolog.Logger) error {
 	// note:
 	// Graceful restarts or stops are important
-	// allow us to safely shut down the server while it is still processing requests. This ensures that no ongoing requests are abruptly terminated, preventing data inconsistencies or loss, and the server can complete the processing of any requests in progress before shutting down.
+	// allow us to safely shut down the server while it is still processing requests.
+	// This ensures that no ongoing requests are abruptly terminated,
+	// preventing data inconsistencies or loss,
+	// and the server can complete the processing of any requests in progress before shutting down.
 	// credit: https://gin-gonic.com/docs/examples/graceful-restart-or-stop/
 	errChan := make(chan error, 1)
 

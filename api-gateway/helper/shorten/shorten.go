@@ -22,6 +22,7 @@ type Shorten interface {
 	EnforceHTTP(url string) string
 }
 
+// credit: https://dev.to/mahadevans87/building-a-fast-url-shortener-with-go-and-redis-31b9
 func (s *shorten) generateUniqueID(str string) *big.Int {
 	shorten := fnv.New64a()
 	shorten.Write([]byte(str))

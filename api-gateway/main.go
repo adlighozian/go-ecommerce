@@ -57,8 +57,14 @@ func main() {
 
 	router := gin.New()
 	router.Use(cors.Default())
-	router.Use(requestid.New())
 	router.Use(middleware.Logger(logger))
+
+	router.Use(middleware.HashedURLConverter(shortenSvc))
+	allowedPaths := []string{"login", "admin/login", "ping"}
+	router.Use(middleware.AuthMiddleware(allowedPaths))
+
+	router.Use(requestid.New())
+	router.Use(middleware.RequestCounter(redisClient.Redis))
 	router.Use(gin.Recovery())
 	// if config.Debug {
 	// 	pprof.Register(router)

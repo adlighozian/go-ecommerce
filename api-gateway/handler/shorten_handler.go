@@ -6,12 +6,9 @@ import (
 	"api-gateway-go/helper/timeout"
 	"api-gateway-go/model"
 	"api-gateway-go/service"
-	"database/sql"
 	"encoding/json"
-	"errors"
 	"io"
 	"net/http"
-	"net/url"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,38 +26,25 @@ func NewShortenHandler(svc service.ShortenServiceI) ShortenHandlerI {
 }
 
 func (h *shortenHandler) Get(ctx *gin.Context) {
-	hashedURL := ctx.Param("hash")
-	if hashedURL == "" {
-		response.NewJSONResErr(ctx, http.StatusBadRequest, "", "")
-		return
-	}
+	var url string
+	urlCtx, _ := ctx.Get("url")
+	url, _ = urlCtx.(string)
 
-	apiManagement, errSvc := h.svc.Get(hashedURL)
-	if errSvc != nil {
-		if errors.Is(errSvc, sql.ErrNoRows) {
-			response.NewJSONResErr(ctx, http.StatusNotFound, "", "")
-			return
-		}
-		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errSvc.Error())
-		return
-	}
+	// var userID, userRole string
+	// userIDCtx, exist := ctx.Get("userID")
+	// if exist {
+	// 	userID, _ = userIDCtx.(string)
+	// }
 
-	path := apiManagement.EndpointURL
-	rawQuery := ctx.Request.URL.RawQuery
-	if rawQuery != "" {
-		path = path + "?" + rawQuery
-	}
-
-	_, errParsed := url.Parse(path)
-	if errParsed != nil {
-		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errParsed.Error())
-		return
-	}
+	// userRoleCtx, _ := ctx.Get("userRole")
+	// if exist {
+	// 	userRole, _ = userRoleCtx.(string)
+	// }
 
 	timeoutCtx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
-	req, errReq := http.NewRequestWithContext(timeoutCtx, ctx.Request.Method, path, ctx.Request.Body)
+	req, errReq := http.NewRequestWithContext(timeoutCtx, ctx.Request.Method, url, ctx.Request.Body)
 	if errReq != nil {
 		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errReq.Error())
 		return
