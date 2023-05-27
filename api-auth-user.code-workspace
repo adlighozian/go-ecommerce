@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "api-gateway"
+		},
+		{
+			"path": "auth"
+		},
+		{
+			"path": "docs"
+		}
+	],
+	"settings": {}
+}
