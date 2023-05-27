@@ -8,6 +8,8 @@ type Config struct {
 	Debug bool   `mapstructure:"DEBUG"`
 	Port  string `mapstructure:"PORT"`
 
+	JWTSecretKey string `mapstructure:"JWT_SECRET_KEY"`
+
 	Database `mapstructure:",squash"`
 	Redis    `mapstructure:",squash"`
 }
@@ -15,6 +17,7 @@ type Config struct {
 type Database struct {
 	Driver string `mapstructure:"DATABASE_DRIVER"`
 	URL    string `mapstructure:"DATABASE_URL"`
+	DBName string `mapstructure:"PGDATABASE"`
 }
 
 type Redis struct {

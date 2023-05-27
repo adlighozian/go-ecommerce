@@ -30,28 +30,24 @@ func (h *shortenHandler) Get(ctx *gin.Context) {
 	urlCtx, _ := ctx.Get("url")
 	url, _ = urlCtx.(string)
 
-	// var userID, userRole string
-	// userIDCtx, exist := ctx.Get("userID")
-	// if exist {
-	// 	userID, _ = userIDCtx.(string)
-	// }
-
-	// userRoleCtx, _ := ctx.Get("userRole")
-	// if exist {
-	// 	userRole, _ = userRoleCtx.(string)
-	// }
+	var userID string
+	userIDCtx, _ := ctx.Get("userID")
+	userID, _ = userIDCtx.(string)
 
 	timeoutCtx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
 	req, errReq := http.NewRequestWithContext(timeoutCtx, ctx.Request.Method, url, ctx.Request.Body)
 	if errReq != nil {
+		_ = ctx.Error(errReq)
 		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errReq.Error())
 		return
 	}
+	req.Header.Add("user-id", userID)
 
 	resp, errResp := http.DefaultClient.Do(req)
 	if errResp != nil {
+		_ = ctx.Error(errResp)
 		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errResp.Error())
 		return
 	}
@@ -63,15 +59,17 @@ func (h *shortenHandler) Get(ctx *gin.Context) {
 	// Set the status code
 	ctx.Writer.WriteHeader(resp.StatusCode)
 
-	body, readErr := io.ReadAll(resp.Body)
-	if readErr != nil {
-		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", readErr.Error())
+	body, errRead := io.ReadAll(resp.Body)
+	if errRead != nil {
+		_ = ctx.Error(errRead)
+		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errRead.Error())
 		return
 	}
 
 	var jsonRes response.JSONRes
-	if jsonUErr := json.Unmarshal(body, &jsonRes); jsonUErr != nil {
-		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", jsonUErr.Error())
+	if errJSONUn := json.Unmarshal(body, &jsonRes); errJSONUn != nil {
+		_ = ctx.Error(errJSONUn)
+		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errJSONUn.Error())
 		return
 	}
 
@@ -107,6 +105,7 @@ func (h *shortenHandler) Shorten(ctx *gin.Context) {
 
 	apiManagement, errSvc := h.svc.Create(apiManagement)
 	if errSvc != nil {
+		_ = ctx.Error(errSvc)
 		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errSvc.Error())
 		return
 	}

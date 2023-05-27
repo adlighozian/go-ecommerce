@@ -14,6 +14,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/casbin/casbin/v2"
+	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
@@ -39,6 +41,14 @@ func main() {
 	}
 	logger.Debug().Msg("redis connected")
 
+	// Initialize Gorm adapter and the Casbin enforcer with the model
+	adapter, _ := gormadapter.NewAdapter(config.Database.Driver, config.Database.URL, config.Database.DBName, true)
+	enforcer, errEnforcer := casbin.NewEnforcer("./model.conf", adapter)
+	if errDB != nil {
+		logger.Fatal().Err(errEnforcer).Msg("enforcer failed")
+	}
+	logger.Debug().Msg("enforcer connected")
+
 	defer func() {
 		logger.Debug().Msg("closing db")
 		_ = sqlDB.Close()
@@ -57,15 +67,37 @@ func main() {
 
 	router := gin.New()
 	router.Use(cors.Default())
-	router.Use(middleware.Logger(logger))
 
+	// 9. Error and panic handling
+	router.Use(middleware.Logger(logger))
+	router.Use(gin.Recovery())
+
+	// 1. Paramater validation,
+	// 6. Dynamic routing using path parameters,
+	// 7. Service discovery using database,
 	router.Use(middleware.HashedURLConverter(shortenSvc))
-	allowedPaths := []string{"login", "admin/login", "ping"}
-	router.Use(middleware.AuthMiddleware(allowedPaths))
+
+	// 2. Allow-path
+	allowedPaths := []string{
+		// "ping",
+		"register",
+		"login", "login/cms",
+	}
+	// 3. Authentication
+	router.Use(middleware.AuthMiddleware(config.JWTSecretKey, allowedPaths))
+	// 4. Authorization
+	router.Use(middleware.AuthzMiddleware(enforcer, allowedPaths))
 
 	router.Use(requestid.New())
+	// 5. Request counter
 	router.Use(middleware.RequestCounter(redisClient.Redis))
-	router.Use(gin.Recovery())
+
+	// things outside my capabilities:
+	// 2. Allow-list based on IPs
+	// 10. Circuit Breaker
+	// 11. Monitoring
+	// 12. Cache
+
 	// if config.Debug {
 	// 	pprof.Register(router)
 	// }
