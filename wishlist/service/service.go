@@ -36,6 +36,7 @@ func (svc *service) GetDetail(userID, productID int) (res model.Wishlist, err er
 }
 
 func (svc *service) Create(req []model.WishlistRequest) (res []model.Wishlist, err error) {
+	// check in each userID, ProductID already exist in wishlist or not
 	for _, v := range req {
 		_, err := svc.GetDetail(v.UserID, v.ProductID)
 		if err != nil {
@@ -49,6 +50,14 @@ func (svc *service) Create(req []model.WishlistRequest) (res []model.Wishlist, e
 	return svc.repo.Create(req)
 }
 
-func (svc *service) Delete(userID, wishlistID int) (err error) {
-	return svc.repo.Delete(userID, wishlistID)
+func (svc *service) Delete(wishlistID int) (err error) {
+	// check wishlist id exist or not
+	emptyStruct := model.Wishlist{}
+	cart, _ := svc.repo.GetByID(wishlistID)
+	if cart == emptyStruct {
+		return fmt.Errorf("item with id %d not found", wishlistID)
+	}
+	fmt.Println("WISHLIST :", wishlist)
+
+	return svc.repo.Delete(wishlistID)
 }

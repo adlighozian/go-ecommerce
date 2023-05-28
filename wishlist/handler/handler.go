@@ -119,21 +119,9 @@ func (h *handler) Create(ctx *gin.Context) {
 }
 
 func (h *handler) Delete(ctx *gin.Context) {
-	userIDString, ok := ctx.GetQuery("user_id")	
+	wishlistIDString, ok := ctx.GetQuery("wishlist_id")	
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param user_id should not be empty"))
-		return
-	}
-
-	wishlistIDString, ok := ctx.GetQuery("user_id")	
-	if !ok {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param wishlist_id should not be empty"))
-		return
-	}
-
-	userID, err := strconv.Atoi(userIDString)
-	if err != nil {
-		response.ResponseError(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -143,17 +131,12 @@ func (h *handler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if userID <= 0 {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("userID must be positive number"))
-		return
-	}
-
 	if wishlistID <= 0 {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("wishlistID must be positive number"))
 		return
 	}
 
-	if err = h.svc.Delete(userID, wishlistID); err != nil {
+	if err = h.svc.Delete(wishlistID); err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
 	}

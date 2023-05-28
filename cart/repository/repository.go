@@ -26,7 +26,7 @@ func (repo *repository) Get(userID int) (res []model.Cart, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, product_id, quantity FROM Carts WHERE user_id = $1`
+	query := `SELECT id, user_id, product_id, quantity FROM carts WHERE user_id = $1`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
@@ -43,6 +43,27 @@ func (repo *repository) Get(userID int) (res []model.Cart, err error) {
 		res = append(res, temp)
 	}
 
+	return
+}
+
+func (repo *repository) GetByID(cartID int) (res model.Cart, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT id, user_id, product_id, quantity FROM carts WHERE id = $1`
+	stmt, err := repo.db.PrepareContext(ctx, query)
+	if err != nil {
+		return
+	}
+
+	result, err := stmt.QueryContext(ctx, cartID)
+	if err != nil {
+		return
+	}
+
+	for result.Next() {
+		result.Scan(&res.Id, &res.UserID, &res.ProductID, &res.Quantity)
+	}
 	return
 }
 

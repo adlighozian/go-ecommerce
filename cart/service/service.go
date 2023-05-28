@@ -36,6 +36,7 @@ func (svc *service) GetDetail(userID, productID int) (res model.Cart, err error)
 }
 
 func (svc *service) Create(req []model.CartRequest) (res []model.Cart, err error) {
+	// check in each userID, ProductID already exist in cart or not
 	for _, v := range req {
 		_, err := svc.GetDetail(v.UserID, v.ProductID)
 		if err != nil {
@@ -50,5 +51,11 @@ func (svc *service) Create(req []model.CartRequest) (res []model.Cart, err error
 }
 
 func (svc *service) Delete(cartID int) (err error) {
+	// check cart id exist or not
+	emptyStruct := model.Cart{}
+	res, _ := svc.repo.GetByID(cartID)
+	if res == emptyStruct {
+		return fmt.Errorf("item with id %d not found", cartID)
+	}
 	return svc.repo.Delete(cartID)
 }
