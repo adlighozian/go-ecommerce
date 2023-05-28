@@ -42,10 +42,11 @@ func main() {
 	router.Use(middleware.Logger(logger))
 	router.Use(gin.Recovery())
 
-	review := router.Group("/cart")
-	review.GET("/", handler.GetDetail)
-	review.POST("/", handler.Create)
-	review.DELETE("/", handler.Delete)
+	paymentMethod := router.Group("/payments/methods")
+	paymentLog := router.Group("/payments/logs")
+	paymentMethod.GET("/", handler.GetPaymentMethod)
+	paymentMethod.POST("/", handler.CreatePaymentLog)
+	paymentLog.POST("/", handler.CreatePaymentMethod)
 
 	srv := &http.Server{
 		Addr:         ":" + config.Port,

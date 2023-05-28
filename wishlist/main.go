@@ -1,18 +1,20 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"time"
-	"wishlist-go/package/db"
 	"wishlist-go/config"
 	"wishlist-go/handler"
 	"wishlist-go/helper/logging"
 	"wishlist-go/helper/middleware"
-	"wishlist-go/service"
-	"wishlist-go/server"
+	"wishlist-go/package/db"
+	"wishlist-go/publisher"
 	"wishlist-go/repository"
+	"wishlist-go/server"
+	"wishlist-go/service"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -34,7 +36,8 @@ func main() {
 		_ = sqlDB.Close()
 	}()
 
-	repo := repository.NewRepository(sqlDB.SQLDB)
+	publisher := publisher.NewPublisher()
+	repo := repository.NewRepository(sqlDB.SQLDB, publisher)
 	svc := service.NewService(repo)
 	handler := handler.NewHandler(svc)
 
@@ -42,8 +45,8 @@ func main() {
 	router.Use(middleware.Logger(logger))
 	router.Use(gin.Recovery())
 
-	review := router.Group("/wishlist")
-	review.GET("/", handler.GetDetail)
+	review := router.Group("/wishlists")
+	review.GET("/", handler.Get)
 	review.POST("/", handler.Create)
 	review.DELETE("/", handler.Delete)
 

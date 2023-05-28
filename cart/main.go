@@ -1,18 +1,20 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"github.com/gin-gonic/gin"
-	"cart-go/package/db"
 	"cart-go/config"
 	"cart-go/handler"
 	"cart-go/helper/logging"
 	"cart-go/helper/middleware"
-	"cart-go/service"
-	"cart-go/server"
+	"cart-go/package/db"
+	"cart-go/publisher"
 	"cart-go/repository"
+	"cart-go/server"
+	"cart-go/service"
+	"log"
+	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -34,7 +36,8 @@ func main() {
 		_ = sqlDB.Close()
 	}()
 
-	repo := repository.NewRepository(sqlDB.SQLDB)
+	publisher := publisher.NewPublisher()
+	repo := repository.NewRepository(sqlDB.SQLDB, publisher)
 	svc := service.NewService(repo)
 	handler := handler.NewHandler(svc)
 
@@ -42,8 +45,8 @@ func main() {
 	router.Use(middleware.Logger(logger))
 	router.Use(gin.Recovery())
 
-	review := router.Group("/cart")
-	review.GET("/", handler.GetDetail)
+	review := router.Group("/carts")
+	review.GET("/", handler.Get)
 	review.POST("/", handler.Create)
 	review.DELETE("/", handler.Delete)
 

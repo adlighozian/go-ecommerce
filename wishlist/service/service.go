@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"wishlist-go/model"
 	"wishlist-go/repository"
 )
@@ -20,8 +21,8 @@ func (svc *service) Get(userID int) (res []model.Wishlist, err error) {
 	return svc.repo.Get(userID)
 }
 
-func (svc *service) GetDetail(userID, wishlistID int) (res model.Wishlist, err error) {
-	res, err = svc.repo.GetDetail(userID, wishlistID)
+func (svc *service) GetDetail(userID, productID int) (res model.Wishlist, err error) {
+	res, err = svc.repo.GetDetail(userID, productID)
 	if err != nil {
 		return
 	}
@@ -35,6 +36,16 @@ func (svc *service) GetDetail(userID, wishlistID int) (res model.Wishlist, err e
 }
 
 func (svc *service) Create(req []model.WishlistRequest) (res []model.Wishlist, err error) {
+	for _, v := range req {
+		_, err := svc.GetDetail(v.UserID, v.ProductID)
+		if err != nil {
+			continue
+		} else {
+			err = fmt.Errorf("wishlist with product_id %d in user_id %d already exist", v.ProductID, v.UserID)
+			return []model.Wishlist{}, err
+		}
+	}
+
 	return svc.repo.Create(req)
 }
 

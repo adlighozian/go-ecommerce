@@ -5,8 +5,9 @@ import (
 )
 
 type Config struct {
-	Debug bool   `mapstructure:"DEBUG"`
-	Port  string `mapstructure:"PORT"`
+	Debug 		bool   `mapstructure:"DEBUG"`
+	Port  		string `mapstructure:"PORT"`
+	RabbitMQURL string `mapstructure:"RABBITMQURL"`
 
 	Database `mapstructure:",squash"`
 }

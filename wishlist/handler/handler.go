@@ -21,7 +21,7 @@ func NewHandler(svc service.Servicer) Handlerer {
 }
 
 func (h *handler) Get(ctx *gin.Context) {
-	userIDString, ok := ctx.GetQuery("user_ID")	
+	userIDString, ok := ctx.GetQuery("user_id")	
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param user_id should not be empty"))
 		return
@@ -47,13 +47,13 @@ func (h *handler) Get(ctx *gin.Context) {
 }
 
 func (h *handler) GetDetail(ctx *gin.Context) {
-	userIDString, ok := ctx.GetQuery("user_ID")	
+	userIDString, ok := ctx.GetQuery("user_id")	
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param user_id should not be empty"))
 		return
 	}
 
-	wishlistIDString, ok := ctx.GetQuery("user_ID")	
+	wishlistIDString, ok := ctx.GetQuery("user_id")	
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param wishlist_id should not be empty"))
 		return
@@ -119,13 +119,13 @@ func (h *handler) Create(ctx *gin.Context) {
 }
 
 func (h *handler) Delete(ctx *gin.Context) {
-	userIDString, ok := ctx.GetQuery("user_ID")	
+	userIDString, ok := ctx.GetQuery("user_id")	
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param user_id should not be empty"))
 		return
 	}
 
-	wishlistIDString, ok := ctx.GetQuery("user_ID")	
+	wishlistIDString, ok := ctx.GetQuery("user_id")	
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param wishlist_id should not be empty"))
 		return
