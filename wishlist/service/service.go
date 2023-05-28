@@ -53,11 +53,10 @@ func (svc *service) Create(req []model.WishlistRequest) (res []model.Wishlist, e
 func (svc *service) Delete(wishlistID int) (err error) {
 	// check wishlist id exist or not
 	emptyStruct := model.Wishlist{}
-	cart, _ := svc.repo.GetByID(wishlistID)
-	if cart == emptyStruct {
+	res, _ := svc.repo.GetByID(wishlistID)
+	if res == emptyStruct {
 		return fmt.Errorf("item with id %d not found", wishlistID)
 	}
-	fmt.Println("WISHLIST :", wishlist)
-
+	
 	return svc.repo.Delete(wishlistID)
 }

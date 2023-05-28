@@ -9,6 +9,7 @@ import (
 	"review-go/handler"
 	"review-go/helper/logging"
 	"review-go/helper/middleware"
+	"review-go/publisher"
 	"review-go/service"
 	"review-go/server"
 	"review-go/repository"
@@ -34,7 +35,8 @@ func main() {
 		_ = sqlDB.Close()
 	}()
 
-	repo := repository.NewRepository(sqlDB.SQLDB)
+	publisher := publisher.NewPublisher()
+	repo := repository.NewRepository(sqlDB.SQLDB, publisher)
 	svc := service.NewService(repo)
 	handler := handler.NewHandler(svc)
 
@@ -42,7 +44,7 @@ func main() {
 	router.Use(middleware.Logger(logger))
 	router.Use(gin.Recovery())
 
-	review := router.Group("/review")
+	review := router.Group("/reviews")
 	review.GET("/", handler.GetByProductID)
 	review.POST("/", handler.Create)
 
