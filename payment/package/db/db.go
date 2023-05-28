@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"time"
-	"review-go/helper/timeout"
+	"payment-go/helper/timeout"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

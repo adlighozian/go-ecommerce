@@ -17,7 +17,7 @@ func NewRepository(db *sql.DB) Repositorier {
 	}
 }
 
-func (svc *service) GetPaymentMethod() (res []model.PaymentMethod, err error) { {
+func (repo *repository) GetPaymentMethod() (res []model.PaymentMethod, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -27,7 +27,7 @@ func (svc *service) GetPaymentMethod() (res []model.PaymentMethod, err error) { 
 		return
 	}
 
-	result, err := stmt.QueryContext(ctx, productID)
+	result, err := stmt.QueryContext(ctx)
 	if err != nil {
 		return
 	}
@@ -41,11 +41,55 @@ func (svc *service) GetPaymentMethod() (res []model.PaymentMethod, err error) { 
 	return
 }
 
-func (repo *repository) CreatePaymentMethod(req []model.PaymentMethodRequest) (res []model.PaymentMethod, err error) {
+func (repo *repository) GetPaymentMethodByID(paymentMethodID int) (res model.PaymentMethod, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT id, payment_gateway_id, name FROM payment_methods WHERE id = $1`
+	stmt, err := repo.db.PrepareContext(ctx, query)
+	if err != nil {
+		return
+	}
+
+	result, err := stmt.QueryContext(ctx, paymentMethodID)
+	if err != nil {
+		return
+	}
+
+	for result.Next() {
+		result.Scan(&res.Id, &res.PaymentGatewayID, &res.Name)
+	}
+
+	return
+}
+
+func (repo *repository) GetPaymentMethodByName(name string) (res model.PaymentMethod, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT id, payment_gateway_id, name FROM payment_methods WHERE name = $1`
+	stmt, err := repo.db.PrepareContext(ctx, query)
+	if err != nil {
+		return
+	}
+
+	result, err := stmt.QueryContext(ctx, name)
+	if err != nil {
+		return
+	}
+
+	for result.Next() {
+		result.Scan(&res.Id, &res.PaymentGatewayID, &res.Name)
+	}
+
+	return
+}
+
+func (repo *repository) CreatePaymentMethod(req []model.PaymentMethodRequest) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
-	query := `INSERT INTO payment_methods(payment_gateway_id, name) value (?, ?)`
+	query := `INSERT INTO payment_methods(payment_gateway_id, name) values ($1, $2)`
 	trx, err := repo.db.BeginTx(ctx, nil)
 	if err != nil {
 		return
@@ -57,22 +101,11 @@ func (repo *repository) CreatePaymentMethod(req []model.PaymentMethodRequest) (r
 	}
 
 	for _, v := range req {
-		result, err := stmt.ExecContext(ctx, v.PaymentGatewayID, v.Name)
+		_, err = stmt.ExecContext(ctx, v.PaymentGatewayID, v.Name)
 		if err != nil {
 			trx.Rollback()
-			return []model.Review{}, err
+			return err
 		}
-
-		lastID, err := result.LastInsertId()
-		if err != nil {
-			return []model.Review{}, err
-		}
-
-		res = append(res, model.PaymentMethod{
-			Id:   				int(lastID),
-			PaymentGatewayID: 	v.PaymentGatewayID,
-			Name: 				v.Name,
-		})
 	}
 
 	trx.Commit()
@@ -80,41 +113,51 @@ func (repo *repository) CreatePaymentMethod(req []model.PaymentMethodRequest) (r
 	return
 }
 
-func (repo *repository) CreatePaymentLogs(req []model.PaymentLogsRequest) (res []model.PaymentLogs, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res model.PaymentLog, err error) {
+	// ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	// defer cancel()
+
+	// query := `INSERT INTO payment_logs (user_id, order_id, payment_method_id) values ($1, $2, $3)`
+	// trx, err := repo.db.BeginTx(ctx, nil)
+	// if err != nil {
+	// 	return
+	// }
+
+	// stmt, err := trx.PrepareContext(ctx, query)
+	// if err != nil {
+	// 	return
+	// }
+
+	// _, err = stmt.ExecContext(ctx, v.UserID, v.OrderID, v.PaymentMethodID)
+	// if err != nil {
+	// 	trx.Rollback()
+	// 	return model.PaymentLog{}, err
+	// }
+
+	// 	// res = append(res, model.PaymentMethod{
+	// 	// 	Id:   				int(lastID),
+	// 	// 	PaymentGatewayID: 	v.PaymentGatewayID,
+	// 	// 	Name: 				v.Name,
+	// 	// })
+
+	// trx.Commit()
+	return
+}
+
+func (repo *repository) DeletePaymentMethod(paymentMethodID int) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `INSERT INTO payment_logs(user_id, order_id, payment_method_id) value (?, ?, ?)`
-	trx, err := repo.db.BeginTx(ctx, nil)
+	query := `DELETE FROM payment_methods WHERE id = $1`
+	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	stmt, err := trx.PrepareContext(ctx, query)
+	_, err = stmt.QueryContext(ctx, paymentMethodID)
 	if err != nil {
 		return
 	}
-
-	for _, v := range req {
-		result, err := stmt.ExecContext(ctx, v.UserID, v.OrderID, v.PaymentMethod)
-		if err != nil {
-			trx.Rollback()
-			return []model.Review{}, err
-		}
-
-		lastID, err := result.LastInsertId()
-		if err != nil {
-			return []model.Review{}, err
-		}
-
-		res = append(res, model.PaymentMethod{
-			Id:   				int(lastID),
-			PaymentGatewayID: 	v.PaymentGatewayID,
-			Name: 				v.Name,
-		})
-	}
-
-	trx.Commit()
 
 	return
 }

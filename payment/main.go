@@ -3,16 +3,17 @@ package main
 import (
 	"log"
 	"net/http"
-	"github.com/gin-gonic/gin"
-	"payment-go/package/db"
 	"payment-go/config"
 	"payment-go/handler"
 	"payment-go/helper/logging"
 	"payment-go/helper/middleware"
-	"payment-go/service"
-	"payment-go/server"
+	"payment-go/package/db"
 	"payment-go/repository"
+	"payment-go/server"
+	"payment-go/service"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -45,8 +46,9 @@ func main() {
 	paymentMethod := router.Group("/payments/methods")
 	paymentLog := router.Group("/payments/logs")
 	paymentMethod.GET("/", handler.GetPaymentMethod)
-	paymentMethod.POST("/", handler.CreatePaymentLog)
-	paymentLog.POST("/", handler.CreatePaymentMethod)
+	paymentMethod.POST("/", handler.CreatePaymentMethod)
+	paymentMethod.DELETE("/", handler.DeletePaymentMethod)
+	paymentLog.POST("/", handler.CreatePaymentLog)
 
 	srv := &http.Server{
 		Addr:         ":" + config.Port,
