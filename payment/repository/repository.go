@@ -1,161 +1,66 @@
 package repository
 
 import (
-	"context"
 	"database/sql"
-	"time"
+	"fmt"
+	midtransrepo "payment-go/midtrans"
 	"payment-go/model"
+	"payment-go/publisher"
+
+	"github.com/midtrans/midtrans-go"
+	"github.com/midtrans/midtrans-go/coreapi"
+	"github.com/midtrans/midtrans-go/snap"
 )
 
 type repository struct {
-	db *sql.DB
+	db        *sql.DB
+	midtrans  midtransrepo.MidtransInterface
+	publisher publisher.PublisherInterface
 }
 
-func NewRepository(db *sql.DB) Repositorier {
+func NewRepository(db *sql.DB, midtrans midtransrepo.MidtransInterface, publisher publisher.PublisherInterface) Repositorier {
 	return &repository{
-		db: db,
+		db:        db,
+		midtrans:  midtrans,
+		publisher: publisher,
 	}
 }
 
-func (repo *repository) GetPaymentMethod() (res []model.PaymentMethod, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	query := `SELECT id, payment_gateway_id, name FROM payment_methods`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx)
-	if err != nil {
-		return
-	}
-
-	for result.Next() {
-		var temp model.PaymentMethod
-		result.Scan(&temp.Id, &temp.PaymentGatewayID, &temp.Name)
-		res = append(res, temp)
-	}
-
-	return
+func (repo *repository) ApprovePayment(orderID string) (res *coreapi.ChargeResponse, err error) {
+	return repo.midtrans.ApprovePayment(orderID)
 }
 
-func (repo *repository) GetPaymentMethodByID(paymentMethodID int) (res model.PaymentMethod, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
+func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error) {
+	// prepare midtrans request data
+	snapReq := &snap.Request{
+		CreditCard: &snap.CreditCardDetails{
+			Secure: false,
+		},
+		EnabledPayments: []snap.SnapPaymentType{
+			snap.PaymentTypeAlfamart,
+			snap.PaymentTypeAkulaku,
+			snap.PaymentTypeBCAKlikpay,
+			snap.PaymentTypeBRIEpay,
+			snap.PaymentTypeGopay,
+			snap.PaymentTypeIndomaret,
+			snap.PaymentTypeMandiriEcash,
+		},
+		TransactionDetails: midtrans.TransactionDetails{
+			OrderID:  fmt.Sprint(req.OrderID),
+			GrossAmt: req.TotalPayment,
+		},
+	}
 
-	query := `SELECT id, payment_gateway_id, name FROM payment_methods WHERE id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
+	// send data to midtrans
+	res, err = repo.midtrans.CreateTransaction(snapReq)
 	if err != nil {
-		return
+		return res, fmt.Errorf("error midtrans : %v", err.Error())
 	}
 
-	result, err := stmt.QueryContext(ctx, paymentMethodID)
+	// publish data to RabbitMQ
+	err = repo.publisher.Publish(req, "create_payment_logs")
 	if err != nil {
-		return
-	}
-
-	for result.Next() {
-		result.Scan(&res.Id, &res.PaymentGatewayID, &res.Name)
-	}
-
-	return
-}
-
-func (repo *repository) GetPaymentMethodByName(name string) (res model.PaymentMethod, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	query := `SELECT id, payment_gateway_id, name FROM payment_methods WHERE name = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx, name)
-	if err != nil {
-		return
-	}
-
-	for result.Next() {
-		result.Scan(&res.Id, &res.PaymentGatewayID, &res.Name)
-	}
-
-	return
-}
-
-func (repo *repository) CreatePaymentMethod(req []model.PaymentMethodRequest) (err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
-	defer cancel()
-
-	query := `INSERT INTO payment_methods(payment_gateway_id, name) values ($1, $2)`
-	trx, err := repo.db.BeginTx(ctx, nil)
-	if err != nil {
-		return
-	}
-
-	stmt, err := trx.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	for _, v := range req {
-		_, err = stmt.ExecContext(ctx, v.PaymentGatewayID, v.Name)
-		if err != nil {
-			trx.Rollback()
-			return err
-		}
-	}
-
-	trx.Commit()
-
-	return
-}
-
-func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res model.PaymentLog, err error) {
-	// ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
-	// defer cancel()
-
-	// query := `INSERT INTO payment_logs (user_id, order_id, payment_method_id) values ($1, $2, $3)`
-	// trx, err := repo.db.BeginTx(ctx, nil)
-	// if err != nil {
-	// 	return
-	// }
-
-	// stmt, err := trx.PrepareContext(ctx, query)
-	// if err != nil {
-	// 	return
-	// }
-
-	// _, err = stmt.ExecContext(ctx, v.UserID, v.OrderID, v.PaymentMethodID)
-	// if err != nil {
-	// 	trx.Rollback()
-	// 	return model.PaymentLog{}, err
-	// }
-
-	// 	// res = append(res, model.PaymentMethod{
-	// 	// 	Id:   				int(lastID),
-	// 	// 	PaymentGatewayID: 	v.PaymentGatewayID,
-	// 	// 	Name: 				v.Name,
-	// 	// })
-
-	// trx.Commit()
-	return
-}
-
-func (repo *repository) DeletePaymentMethod(paymentMethodID int) (err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-
-	query := `DELETE FROM payment_methods WHERE id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	_, err = stmt.QueryContext(ctx, paymentMethodID)
-	if err != nil {
+		err = fmt.Errorf("error publish data to RabbitMQ : %s", err.Error())
 		return
 	}
 

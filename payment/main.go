@@ -7,13 +7,17 @@ import (
 	"payment-go/handler"
 	"payment-go/helper/logging"
 	"payment-go/helper/middleware"
+	"payment-go/midtrans"
 	"payment-go/package/db"
+	"payment-go/publisher"
 	"payment-go/repository"
 	"payment-go/server"
 	"payment-go/service"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/midtrans/midtrans-go/coreapi"
+	"github.com/midtrans/midtrans-go/snap"
 )
 
 func main() {
@@ -35,7 +39,11 @@ func main() {
 		_ = sqlDB.Close()
 	}()
 
-	repo := repository.NewRepository(sqlDB.SQLDB)
+	var c coreapi.Client
+	var s snap.Client
+	midtrans := midtrans.NewMidtrans(c, s)
+	publisher := publisher.NewPublisher()
+	repo := repository.NewRepository(sqlDB.SQLDB, midtrans, publisher)
 	svc := service.NewService(repo)
 	handler := handler.NewHandler(svc)
 
@@ -43,11 +51,8 @@ func main() {
 	router.Use(middleware.Logger(logger))
 	router.Use(gin.Recovery())
 
-	paymentMethod := router.Group("/payments/methods")
-	paymentLog := router.Group("/payments/logs")
-	paymentMethod.GET("/", handler.GetPaymentMethod)
-	paymentMethod.POST("/", handler.CreatePaymentMethod)
-	paymentMethod.DELETE("/", handler.DeletePaymentMethod)
+	paymentLog := router.Group("/payments")
+	paymentLog.GET("/", handler.ApprovePayment)
 	paymentLog.POST("/", handler.CreatePaymentLog)
 
 	srv := &http.Server{

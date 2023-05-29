@@ -6,7 +6,7 @@ import (
 	"payment-go/helper/response"
 	"payment-go/model"
 	"payment-go/service"
-	"strconv"
+	//"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,37 +21,25 @@ func NewHandler(svc service.Servicer) Handlerer {
 	}
 }
 
-func (h *handler) GetPaymentMethod(ctx *gin.Context) {
-	res, err := h.svc.GetPaymentMethod()
-	if err != nil {
-		response.ResponseError(ctx, http.StatusInternalServerError, err)
-		return
-	}
-	response.ResponseSuccess(ctx, http.StatusOK, res)
-}
-
-func (h *handler) CreatePaymentMethod(ctx *gin.Context) {
-	req := []model.PaymentMethodRequest{}
-
-	err := ctx.ShouldBind(&req)
-	if err != nil {
-		response.ResponseError(ctx, http.StatusBadRequest, err)
+func (h *handler) ApprovePayment(ctx *gin.Context) {
+	orderID, ok := ctx.GetQuery("order_id")
+	if !ok {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query order_id should not be empty"))
 		return
 	}
 
-	for _, v := range req {
-		if v.Name == "" {
-			response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("payment method's name should not be empty"))
-			return
-		}
+	// orderIDInt, err := strconv.Atoi(orderID)
+	// if err != nil {
+	// 	response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("order_id should be number"))
+	// 	return
+	// }
 
-		if v.PaymentGatewayID == "" {
-			response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("payment_method_id should not be empty"))
-			return
-		}
-	}
+	// if orderIDInt <= 0 {
+	// 	response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("order_id should be positive number"))
+	// 	return
+	// }
 
-	res, err := h.svc.CreatePaymentMethod(req)
+	res, err := h.svc.ApprovePayment(orderID)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
@@ -83,30 +71,15 @@ func (h *handler) CreatePaymentLog(ctx *gin.Context) {
 		return
 	}
 
+	if req.TotalPayment <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("total payment should not be empty"))
+		return
+	}
+
 	res, err := h.svc.CreatePaymentLog(req)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 	response.ResponseSuccess(ctx, http.StatusOK, res)
-}
-
-func (h *handler) DeletePaymentMethod(ctx *gin.Context) {
-	paymentMethodIDString, ok := ctx.GetQuery("payment_method_id")
-	if !ok {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param payment_method_id should not be empty"))
-		return
-	}
-
-	paymentMethodID, err := strconv.Atoi(paymentMethodIDString)
-	if err != nil {
-		response.ResponseError(ctx, http.StatusBadRequest, err)
-		return
-	}
-
-	if err = h.svc.DeletePaymentMethod(paymentMethodID); err != nil {
-		response.ResponseError(ctx, http.StatusInternalServerError, err)
-		return
-	}
-	response.ResponseSuccess(ctx, http.StatusOK, nil)
 }

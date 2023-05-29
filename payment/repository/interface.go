@@ -2,13 +2,12 @@ package repository
 
 import (
 	"payment-go/model"
+
+	"github.com/midtrans/midtrans-go/coreapi"
+	"github.com/midtrans/midtrans-go/snap"
 )
 
 type Repositorier interface {
-	GetPaymentMethod() (res []model.PaymentMethod, err error)
-	GetPaymentMethodByID(paymentMethodID int) (res model.PaymentMethod, err error)
-	GetPaymentMethodByName(name string) (res model.PaymentMethod, err error)
-	CreatePaymentMethod(req []model.PaymentMethodRequest) (err error)
-	CreatePaymentLog(req model.PaymentLogRequest) (res model.PaymentLog, err error)
-	DeletePaymentMethod(paymentMethodID int) (err error)
+	ApprovePayment(orderID string) (res *coreapi.ChargeResponse, err error)
+	CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error)
 }

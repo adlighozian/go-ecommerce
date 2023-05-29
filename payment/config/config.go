@@ -10,6 +10,13 @@ type Config struct {
 	RabbitMQURL string `mapstructure:"RABBITMQURL"`
 
 	Database `mapstructure:",squash"`
+	Midtrans `mapstructure:",squash"`
+}
+
+type Midtrans struct {
+	MerchantID	string `mapstructure:"MERCHANTID"`
+	ClientID	string `mapstructure:"CLIENTKEY"`
+	ServerID	string `mapstructure:"SERVERKEY"`
 }
 
 type Database struct {
