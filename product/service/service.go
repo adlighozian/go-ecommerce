@@ -34,7 +34,13 @@ func (svc *service) ShowProduct(id int) (model.Respon, error) {
 		}, errors.New("error detail, id not found")
 	}
 
-	res, _ := svc.repo.ShowProduct(id)
+	res, err := svc.repo.ShowProduct(id)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
 	return model.Respon{
 		Status: http.StatusOK,
 		Data:   res,
@@ -46,7 +52,7 @@ func (svc *service) CreateProduct(req []model.ProductReq) (model.Respon, error) 
 	var data []model.ProductReq
 
 	for _, v := range req {
-		if v.StoreID == 0 && v.CategoryID == 0 && v.SizeID == 0 && v.ColorID == 0 && v.Name == "" && v.Subtitle == "" && v.Description == "" && v.UnitPrice == 0 && v.Stock == 0 && v.Sku == "" && v.Weight == 0 {
+		if v.StoreID == 0 || v.CategoryID == 0 || v.SizeID == 0 || v.ColorID == 0 || v.Name == "" || v.Subtitle == "" || v.Description == "" || v.UnitPrice == 0 || v.Stock == 0 || v.Sku == "" || v.Weight == 0 {
 			continue
 		}
 		data = append(data, model.ProductReq{
@@ -95,8 +101,14 @@ func (svc *service) UpdateProduct(req model.ProductReq) (model.Respon, error) {
 		}, errors.New("error update data")
 	}
 
-	svc.repo.UpdateProduct(req)
-
+	// start
+	err := svc.repo.UpdateProduct(req)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
 	return model.Respon{
 		Status: http.StatusOK,
 		Data:   nil,
@@ -108,9 +120,16 @@ func (svc *service) DeleteProduct(id int) (model.Respon, error) {
 		return model.Respon{
 			Status: http.StatusBadRequest,
 			Data:   nil,
-		}, errors.New("error delete data")
+		}, errors.New("error invalid id")
 	}
 
+	err := svc.repo.DeleteProduct(id)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
 	return model.Respon{
 		Status: http.StatusOK,
 		Data:   nil,

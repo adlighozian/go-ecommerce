@@ -26,13 +26,15 @@ func (repo *repository) GetProduct(req model.ProductSearch) ([]model.Product, er
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
-	searchProduct := `select p.id, p.store_id, p.category_id, p.size_id, p.color_id ,p.name,p.subtitle ,p.description ,p.unit_price ,p.status ,p.stock ,p.sku ,p.weight ,p.created_at ,p.updated_at from products p  join categories c on c.id = p.category_id join product_sizes s on s.id = p.size_id join product_colors co on co.id = p.color_id where c.name like '%' || $1 || '%' and s.name like '%' || $2 || '%' and co.name like '%' || $3 || '%'`
+	querySearchProduct := `select p.id, p.store_id, p.category_id, p.size_id, p.color_id ,p.name,p.subtitle ,p.description ,p.unit_price ,p.status ,p.stock ,p.sku ,p.weight ,p.created_at ,p.updated_at from products p  join categories c on c.id = p.category_id join product_sizes s on s.id = p.size_id join product_colors co on co.id = p.color_id where c.name like '%' || $1 || '%' and s.name like '%' || $2 || '%' and co.name like '%' || $3 || '%'`
 
-	stmt, err := repo.db.PrepareContext(ctx, searchProduct)
+	stmt, err := repo.db.PrepareContext(ctx, querySearchProduct)
 	failerror.FailError(err, "error prepare")
 
 	result, err := stmt.QueryContext(ctx, req.Brand, req.Name, req.Category)
-	failerror.FailError(err, "error query")
+	if err != nil {
+		return []model.Product{}, errors.New("error get product")
+	}
 
 	var data []model.Product
 
@@ -103,5 +105,18 @@ func (repo *repository) UpdateProduct(req model.ProductReq) error {
 }
 
 func (repo *repository) DeleteProduct(id int) error {
+
+	ctx, cancel := timeout.NewCtxTimeout()
+	defer cancel()
+
+	query := `DELETE FROM products WHERE id = $1`
+	stmt, err := repo.db.PrepareContext(ctx, query)
+	failerror.FailError(err, "")
+
+	_, err = stmt.ExecContext(ctx, id)
+	if err != nil {
+		return errors.New("error id product not found")
+	}
+
 	return nil
 }
