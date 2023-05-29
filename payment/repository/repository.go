@@ -5,7 +5,6 @@ import (
 	"fmt"
 	midtransrepo "payment-go/midtrans"
 	"payment-go/model"
-	"payment-go/publisher"
 
 	"github.com/midtrans/midtrans-go"
 	"github.com/midtrans/midtrans-go/coreapi"
@@ -15,14 +14,12 @@ import (
 type repository struct {
 	db        *sql.DB
 	midtrans  midtransrepo.MidtransInterface
-	publisher publisher.PublisherInterface
 }
 
-func NewRepository(db *sql.DB, midtrans midtransrepo.MidtransInterface, publisher publisher.PublisherInterface) Repositorier {
+func NewRepository(db *sql.DB, midtrans midtransrepo.MidtransInterface) Repositorier {
 	return &repository{
 		db:        db,
 		midtrans:  midtrans,
-		publisher: publisher,
 	}
 }
 
@@ -33,8 +30,8 @@ func (repo *repository) CheckTransaction(orderID string) (res *coreapi.Transacti
 func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error) {
 	// prepare midtrans request data
 	snapReq := &snap.Request{
-		CreditCard: &snap.CreditCardDetails{
-			Secure: false,
+		Metadata: model.Customer {
+			UserID: req.UserID,
 		},
 		EnabledPayments: []snap.SnapPaymentType{
 			snap.PaymentTypeAlfamart,
@@ -56,13 +53,6 @@ func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res *snap
 	if err != nil {
 		return res, fmt.Errorf("error midtrans : %v", err.Error())
 	}
-
-	// publish data to RabbitMQ
-	// err = repo.publisher.Publish(req, "create_payment_logs")
-	// if err != nil {
-	// 	err = fmt.Errorf("error publish data to RabbitMQ : %s", err.Error())
-	// 	return
-	// }
 
 	return
 }

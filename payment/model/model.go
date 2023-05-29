@@ -2,6 +2,10 @@ package model
 
 import "time"
 
+type Customer struct {
+	UserID int `json:"user_id"`
+}
+
 type PaymentLogRequest struct {
 	UserID          int 		`json:"user_id"`
 	OrderID         int 		`json:"order_id"`
