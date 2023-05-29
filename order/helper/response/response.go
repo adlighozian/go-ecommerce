@@ -2,7 +2,7 @@ package response
 
 import (
 	"net/http"
-	"product-go/model"
+	"order-go/model"
 
 	"github.com/gin-gonic/gin"
 )

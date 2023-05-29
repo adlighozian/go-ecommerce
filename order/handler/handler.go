@@ -1,37 +1,33 @@
 package handler
 
 import (
-	"net/http"
+	"order-go/service"
+
 	"github.com/gin-gonic/gin"
-	"auth-go/service"
 )
 
 type handler struct {
 	svc service.Servicer
 }
 
-func NewHandler(svc service.Servicer) *Handlerer {
+func NewHandler(svc service.Servicer) Handlerer {
 	return &handler{
 		svc: svc,
 	}
 }
 
-func (h *handler) Get(ctx *gin.Context) {
-	h.svc.GetList()
+func (h *handler) GetOrders(ctx *gin.Context) {
+
 }
 
-func (h *handler) GetDetail(ctx *gin.Context) {
-	h.svc.GetDetail()
+func (h *handler) ShowOrders(ctx *gin.Context) {
+
 }
 
-func (h *handler) Create(ctx *gin.Context) {
-	h.svc.Create()
+func (h *handler) CreateOrders(ctx *gin.Context) {
+
 }
 
-func (h *handler) Update(ctx *gin.Context) {
-	h.svc.Update()
-}
+func (h *handler) UpdateOrders(ctx *gin.Context) {
 
-func (h *handler) Delete(ctx *gin.Context) {
-	h.svc.Delete()
 }

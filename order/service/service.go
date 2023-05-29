@@ -1,37 +1,31 @@
-package  service
+package service
 
 import (
-	"net/http"
-	"github.com/gin-gonic/gin"
-	"auth-go/repository"
+	"order-go/model"
 )
 
 type service struct {
 	repo repository.Repositorier
 }
 
-func NewService(repo repository.Repositorier) *Servicer {
+func NewService(repo repository.Repositorier) Servicer {
 	return &service{
 		repo: repo,
 	}
 }
 
-func (svc *service) Get(ctx *gin.Context) {
-	svc.repo.Get()
+func (svc *service) GetOrders(id int) (model.Respon, error) {
+	return model.Respon{}, nil
 }
 
-func (svc *service) GetDetail(ctx *gin.Context) {
-	svc.repo.GetDetail()
+func (svc *service) CreateOrders(req model.Orders) (model.Respon, error) {
+	return model.Respon{}, nil
 }
 
-func (svc *service) Create(ctx *gin.Context) {
-	svc.repo.Create()
+func (svc *service) ShowOrders(idOrder int, idUser int) (model.Respon, error) {
+	return model.Respon{}, nil
 }
 
-func (svc *service) Update(ctx *gin.Context) {
-	svc.repo.Update()
-}
-
-func (svc *service) Delete(ctx *gin.Context) {
-	svc.repo.Delete()
+func (svc *service) UpdateOrders(idOrder int, req string) (model.Respon, error) {
+	return model.Respon{}, nil
 }

@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"product-go/model"
 	"product-go/repository"
@@ -19,9 +18,6 @@ func NewService(repo repository.Repositorier) Servicer {
 }
 
 func (svc *service) GetProduct(req model.ProductSearch) (model.Respon, error) {
-
-	fmt.Println(req)
-
 	res, _ := svc.repo.GetProduct(req)
 	return model.Respon{
 		Status: http.StatusOK,
@@ -35,7 +31,7 @@ func (svc *service) ShowProduct(id int) (model.Respon, error) {
 		return model.Respon{
 			Status: http.StatusBadRequest,
 			Data:   nil,
-		}, errors.New("error delete data, id not found")
+		}, errors.New("error detail, id not found")
 	}
 
 	res, _ := svc.repo.ShowProduct(id)
@@ -50,7 +46,7 @@ func (svc *service) CreateProduct(req []model.ProductReq) (model.Respon, error) 
 	var data []model.ProductReq
 
 	for _, v := range req {
-		if v.StoreID == 0 && v.CategoryID == 0 && v.SizeID == 0 && v.ColorID == 0 && v.Name == "" && v.Subtitle == "" && v.Description == "" && v.UnitPrice == 0 && v.Status == nil && v.Stock == 0 && v.Sku == "" && v.Weight == 0 {
+		if v.StoreID == 0 && v.CategoryID == 0 && v.SizeID == 0 && v.ColorID == 0 && v.Name == "" && v.Subtitle == "" && v.Description == "" && v.UnitPrice == 0 && v.Stock == 0 && v.Sku == "" && v.Weight == 0 {
 			continue
 		}
 		data = append(data, model.ProductReq{
@@ -73,10 +69,17 @@ func (svc *service) CreateProduct(req []model.ProductReq) (model.Respon, error) 
 		return model.Respon{
 			Status: http.StatusBadRequest,
 			Data:   nil,
-		}, errors.New("error create data")
+		}, errors.New("error input")
 	}
 
-	res, _ := svc.repo.CreateProduct(data)
+	// start
+	res, err := svc.repo.CreateProduct(data)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
 	return model.Respon{
 		Status: http.StatusOK,
 		Data:   res,
