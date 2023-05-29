@@ -27,7 +27,7 @@ func NewMidtrans(coreapiclient coreapi.Client, snapclient snap.Client) MidtransI
 	}
 }
 
-func (m Midtrans) ApprovePayment(orderID string) (res *coreapi.ChargeResponse, err error) {
+func (m Midtrans) CheckTransaction(orderID string) (res *coreapi.TransactionStatusResponse, err error) {
 	// inisialization snap connection
 	config, confErr := config.LoadConfig()
 	if confErr != nil {
@@ -40,8 +40,8 @@ func (m Midtrans) ApprovePayment(orderID string) (res *coreapi.ChargeResponse, e
 
 	c.New(ServerKey, midtrans.Sandbox)
 	
-	// approve transaction
-	res, err = c.ApproveTransaction(orderID)
+	// get transaction status by order id
+	res, err = c.CheckTransaction(orderID)
 	if res != nil {
 		return
 	}
@@ -66,6 +66,12 @@ func(m Midtrans) CreateTransaction(req *snap.Request) (*snap.Response, error) {
 	if err != nil {
 		return nil, fmt.Errorf(err.GetMessage())
 	}
-	fmt.Println("RESPONSE 1: ", resp)
+
+	fmt.Println("ORDER ID : ", req.TransactionDetails.OrderID)
+	c.New(ServerKey, midtrans.Sandbox)
+	res, _ := c.CheckTransaction(req.TransactionDetails.OrderID)
+	fmt.Println("CHECK TRANSACTION: ", res)
+	fmt.Println("CHECK TRANSACTION ORDER ID : ", res.OrderID)
+
 	return resp, nil
 }

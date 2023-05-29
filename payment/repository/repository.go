@@ -26,8 +26,8 @@ func NewRepository(db *sql.DB, midtrans midtransrepo.MidtransInterface, publishe
 	}
 }
 
-func (repo *repository) ApprovePayment(orderID string) (res *coreapi.ChargeResponse, err error) {
-	return repo.midtrans.ApprovePayment(orderID)
+func (repo *repository) CheckTransaction(orderID string) (res *coreapi.TransactionStatusResponse, err error) {
+	return repo.midtrans.CheckTransaction(orderID)
 }
 
 func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error) {
@@ -58,11 +58,11 @@ func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res *snap
 	}
 
 	// publish data to RabbitMQ
-	err = repo.publisher.Publish(req, "create_payment_logs")
-	if err != nil {
-		err = fmt.Errorf("error publish data to RabbitMQ : %s", err.Error())
-		return
-	}
+	// err = repo.publisher.Publish(req, "create_payment_logs")
+	// if err != nil {
+	// 	err = fmt.Errorf("error publish data to RabbitMQ : %s", err.Error())
+	// 	return
+	// }
 
 	return
 }

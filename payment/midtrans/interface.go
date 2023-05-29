@@ -6,6 +6,6 @@ import (
 )
 
 type MidtransInterface interface {
-	ApprovePayment(orderID string) (res *coreapi.ChargeResponse, err error)
+	CheckTransaction(orderID string) (res *coreapi.TransactionStatusResponse, err error)
 	CreateTransaction(req *snap.Request) (*snap.Response, error)
 }

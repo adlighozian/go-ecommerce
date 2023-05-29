@@ -5,6 +5,6 @@ import (
 )
 
 type Handlerer interface {
-	ApprovePayment(ctx *gin.Context)
+	CheckTransaction(ctx *gin.Context)
 	CreatePaymentLog(ctx *gin.Context)
 }

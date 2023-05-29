@@ -6,7 +6,7 @@ import (
 	"payment-go/helper/response"
 	"payment-go/model"
 	"payment-go/service"
-	//"strconv"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,25 +21,25 @@ func NewHandler(svc service.Servicer) Handlerer {
 	}
 }
 
-func (h *handler) ApprovePayment(ctx *gin.Context) {
+func (h *handler) CheckTransaction(ctx *gin.Context) {
 	orderID, ok := ctx.GetQuery("order_id")
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query order_id should not be empty"))
 		return
 	}
 
-	// orderIDInt, err := strconv.Atoi(orderID)
-	// if err != nil {
-	// 	response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("order_id should be number"))
-	// 	return
-	// }
+	orderIDInt, err := strconv.Atoi(orderID)
+	if err != nil {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("order_id should be number"))
+		return
+	}
 
-	// if orderIDInt <= 0 {
-	// 	response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("order_id should be positive number"))
-	// 	return
-	// }
+	if orderIDInt <= 0 {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("order_id should be positive number"))
+		return
+	}
 
-	res, err := h.svc.ApprovePayment(orderID)
+	res, err := h.svc.CheckTransaction(orderID)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return

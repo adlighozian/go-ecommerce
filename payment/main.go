@@ -52,7 +52,7 @@ func main() {
 	router.Use(gin.Recovery())
 
 	paymentLog := router.Group("/payments")
-	paymentLog.GET("/", handler.ApprovePayment)
+	paymentLog.GET("/", handler.CheckTransaction)
 	paymentLog.POST("/", handler.CreatePaymentLog)
 
 	srv := &http.Server{

@@ -17,8 +17,8 @@ func NewService(repo repository.Repositorier) Servicer {
 	}
 }
 
-func (svc *service) ApprovePayment(orderID string) (res *coreapi.ChargeResponse, err error) {
-	return svc.repo.ApprovePayment(orderID)
+func (svc *service) CheckTransaction(orderID string) (res *coreapi.TransactionStatusResponse, err error) {
+	return svc.repo.CheckTransaction(orderID)
 }
 
 func (svc *service) CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error) {
