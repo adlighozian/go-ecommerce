@@ -10,9 +10,6 @@ import (
 	"github.com/midtrans/midtrans-go/snap"
 )
 
-var s snap.Client
-var c coreapi.Client
-
 // coreapi used for approve transaction
 // snapclient used for generating redirect_url to midtrans
 type Midtrans struct {
@@ -27,7 +24,7 @@ func NewMidtrans(coreapiclient coreapi.Client, snapclient snap.Client) MidtransI
 	}
 }
 
-func (m Midtrans) CheckTransaction(orderID string) (res *coreapi.TransactionStatusResponse, err error) {
+func (m Midtrans) CheckTransaction(orderID string) (*coreapi.TransactionStatusResponse, error) {
 	// inisialization snap connection
 	config, confErr := config.LoadConfig()
 	if confErr != nil {
@@ -38,14 +35,14 @@ func (m Midtrans) CheckTransaction(orderID string) (res *coreapi.TransactionStat
 	midtrans.ServerKey = ServerKey
 	midtrans.Environment = midtrans.Sandbox
 
-	c.New(ServerKey, midtrans.Sandbox)
+	m.coreapiclient.New(ServerKey, midtrans.Sandbox)
 	
 	// get transaction status by order id
-	res, err = c.CheckTransaction(orderID)
-	if res != nil {
-		return
+	resp, err := m.coreapiclient.CheckTransaction(orderID)
+	if err != nil {
+		return nil, fmt.Errorf(err.GetMessage())
 	}
-	return
+	return resp, nil
 }
 
 func(m Midtrans) CreateTransaction(req *snap.Request) (*snap.Response, error) {
@@ -59,19 +56,13 @@ func(m Midtrans) CreateTransaction(req *snap.Request) (*snap.Response, error) {
 	midtrans.ServerKey = ServerKey
 	midtrans.Environment = midtrans.Sandbox
 
-	s.New(ServerKey, midtrans.Sandbox)
+	m.snapclient.New(ServerKey, midtrans.Sandbox)
 
 	// create transaction
-	resp, err := s.CreateTransaction(req)
+	resp, err := m.snapclient.CreateTransaction(req)
 	if err != nil {
 		return nil, fmt.Errorf(err.GetMessage())
 	}
-
-	fmt.Println("ORDER ID : ", req.TransactionDetails.OrderID)
-	c.New(ServerKey, midtrans.Sandbox)
-	res, _ := c.CheckTransaction(req.TransactionDetails.OrderID)
-	fmt.Println("CHECK TRANSACTION: ", res)
-	fmt.Println("CHECK TRANSACTION ORDER ID : ", res.OrderID)
 
 	return resp, nil
 }

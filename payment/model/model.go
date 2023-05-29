@@ -20,10 +20,3 @@ type PaymentLog struct {
 	CreatedAt       time.Time	`json:"created_at"`
 	UpdatedAt		time.Time	`json:"updated_at"`
 }
-
-type MidtransResponse struct {
-	Status          string 	 `json:"status"`
-	ErrorMessage    []string `json:"error_message"`
-	RedirectURL		string	 `json:"redirect_url"`
-	Token 			string 	 `json:"token"`
-}
