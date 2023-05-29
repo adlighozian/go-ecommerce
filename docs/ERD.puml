@@ -1,0 +1,285 @@
+@startuml
+
+' avoid problems with angled crows feet
+' skinparam linetype ortho
+
+!define TABLE(name,desc) class name as "desc" << (T,#FFAAAA) >>
+!define PRIMARY_KEY(name) <b>name</b>
+!define FOREIGN_KEY(name) <color:red><u>name</u></color>
+!define UNIQUE(name) <b><color:green>name</color></b>
+
+TABLE(api_managements, "api_managements") {
+  PRIMARY_KEY(id)
+  --
+  UNIQUE(api_name)
+  service_name
+  endpoint_url
+  UNIQUE(hashed_endpoint_url)
+  is_available
+  created_at
+  updated_at
+}
+
+TABLE(languages, "languages") {
+  PRIMARY_KEY(id)
+  --
+  name
+  created_at
+  updated_at
+}
+
+TABLE(users, "users") {
+  PRIMARY_KEY(id)
+  --
+  username
+  UNIQUE(email)
+  password
+  role
+  full_name
+  age
+  image_url
+  created_at
+  updated_at
+}
+
+TABLE(user_settings, "user_settings") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(user_id)
+  notification
+  dark_mode
+  FOREIGN_KEY(language_id)
+}
+
+TABLE(addresses, "addresses") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(user_id)
+  street
+  city
+  state
+  FOREIGN_KEY(country_id)
+  zipcode
+  phone_number
+  created_at
+  updated_at
+}
+
+TABLE(countries, "countries") {
+  PRIMARY_KEY(id)
+  --
+  name
+  calling_code
+  created_at
+  updated_at
+}
+
+TABLE(stores, "stores") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(address_id)
+  name
+  description
+  image_url
+  created_at
+  updated_at
+}
+
+TABLE(categories, "categories") {
+  PRIMARY_KEY(id)
+  --
+  name
+  created_at
+  updated_at
+}
+
+TABLE(products, "products") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(store_id)
+  FOREIGN_KEY(category_id)
+  FOREIGN_KEY(size_id)
+  FOREIGN_KEY(color_id)
+  name
+  subtitle
+  description
+  unit_price
+  status
+  stock
+  SKU
+  weight
+  created_at
+  updated_at
+}
+
+TABLE(product_sizes, "product_sizes") {
+  PRIMARY_KEY(id)
+  --
+  size
+  created_at
+  updated_at
+}
+
+TABLE(product_colors, "product_colors") {
+  PRIMARY_KEY(id)
+  --
+  color
+  created_at
+  updated_at
+}
+
+TABLE(product_images, "product_images") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(product_id)
+  image_url
+  created_at
+  updated_at
+}
+
+TABLE(wishlists, "wishlists") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(user_id)
+  FOREIGN_KEY(product_id)
+  created_at
+  updated_at
+}
+
+TABLE(carts, "carts") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(user_id)
+  FOREIGN_KEY(product_id)
+  quantity
+  created_at
+  updated_at
+}
+
+TABLE(orders, "orders") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(user_id)
+  FOREIGN_KEY(payment_method_id)
+  FOREIGN_KEY(shipping_id)
+  total_price
+  status
+  created_at
+  updated_at
+}
+
+TABLE(order_items, "order_items") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(order_id)
+  FOREIGN_KEY(product_id)
+  quantity
+  unit_price
+  created_at
+  updated_at
+}
+
+TABLE(payment_methods, "payment_methods") {
+  PRIMARY_KEY(id)
+  --
+  payment_gateway_id
+  name
+  created_at
+  updated_at
+}
+
+TABLE(shippings, "shippings") {
+  PRIMARY_KEY(id)
+  --
+  receipt_number
+}
+
+TABLE(payment_logs, "payment_logs") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(order_id)
+  FOREIGN_KEY(payment_method_id)
+  payment_status
+  transaction_id
+  transaction_time
+  transaction_status
+  gross_amount
+  debug_info
+  created_at
+  updated_at
+}
+
+TABLE(reviews, "reviews") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(user_id)
+  FOREIGN_KEY(product_id)
+  rating
+  review_text
+  created_at
+  updated_at
+}
+
+TABLE(review_images, "review_images") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(review_id)
+  image_url
+  created_at
+  updated_at
+}
+
+TABLE(promotions, "promotions") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(store_id)
+  FOREIGN_KEY(product_id)
+  FOREIGN_KEY(category_id)
+  discount_type
+  discount_value
+  start_date
+  end_date
+  created_at
+  updated_at
+}
+
+TABLE(promotion_codes, "promotion_codes") {
+  PRIMARY_KEY(id)
+  --
+  FOREIGN_KEY(promotion_id)
+  code
+  created_at
+  updated_at
+}
+
+user_settings -- users : user_id
+user_settings -- languages : language_id
+addresses }-- users : user_id
+addresses }-- countries : country_id
+stores }-- addresses : address_id
+products }-- stores : store_id
+products }-- categories : category_id
+products }-- product_sizes : size_id
+products }-- product_colors : color_id
+product_images }-- products : product_id
+wishlists }-- users : user_id
+wishlists }-- products : product_id
+carts }-- users : user_id
+carts }-- products : product_id
+orders }-- users : user_id
+orders }-- payment_methods : payment_method_id
+orders -- shippings : shipping_id
+order_items }-- orders : order_id
+order_items }-- products : product_id
+payment_methods }-- users : user_id
+payment_logs }-- orders : order_id
+payment_logs }-- payment_methods : payment_method_id
+reviews }-- users : user_id
+reviews }-- products : product_id
+review_images }-- reviews : review_id
+promotions }-- stores : store_id
+promotions }-- products : product_id
+promotions }-- categories : category_id
+promotion_codes }-- promotions : promotion_id
+
+@enduml
