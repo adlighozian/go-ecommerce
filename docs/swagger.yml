@@ -495,7 +495,7 @@ paths:
     post:
       tags:
         - review
-      summary: Insert New review
+      summary: Insert New review By Product ID
       description: test
       operationId: test
       responses:

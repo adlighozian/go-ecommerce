@@ -15,10 +15,10 @@ func NewService(repo repository.Repositorier) Servicer {
 	}
 }
 
-func (svc *service) GetByProductID(productID int) (res []model.Wishlist, err error) {
+func (svc *service) GetByProductID(productID int) (res []model.Review, err error) {
 	return svc.repo.GetByProductID(productID)
 }
 
-func (svc *service) Create(productID int, req []model.WishlistRequest) (res []model.Wishlist, err error) {
-	return svc.repo.Create(productID, req)
+func (svc *service) Create(req []model.ReviewRequest) (res []model.Review, err error) {
+	return svc.repo.Create(req)
 }

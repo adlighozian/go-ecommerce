@@ -17,24 +17,24 @@ func NewRepository(db *sql.DB) Repositorier {
 	}
 }
 
-func (repo *repository) GetDetail(id int) (res []model.Review, err error) {
+func (repo *repository) GetByProductID(productID int) (res []model.Review, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, product_id, quantity FROM reviews WHERE = ?`
+	query := `SELECT id, user_id, product_id, rating, review_text quantity FROM reviews WHERE product_id = ?`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	res, err = stmt.QueryContext(ctx, id)
+	result, err := stmt.QueryContext(ctx, productID)
 	if err != nil {
 		return
 	}
 
-	for res.Next() {
+	for result.Next() {
 		var temp model.Review
-		res.Scan(&temp.Id, &temp.UserID, &temp.ProductID, &temp.Quantity)
+		result.Scan(&temp.Id, &temp.UserID, &temp.ProductID, &temp.Rating, &temp.ReviewText)
 		res = append(res, temp)
 	}
 
@@ -45,19 +45,19 @@ func (repo *repository) Create(req []model.ReviewRequest) (res []model.Review, e
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
-	query := `INSERT INTO reviews (user_id, product_id, quantity) value (?, ?,?)`
+	query := `INSERT INTO reviews (user_id, product_id, rating, review_text) value (?, ?, ?, ?)`
 	trx, err := repo.db.BeginTx(ctx, nil)
 	if err != nil {
 		return
 	}
 
-	stmt, err := repo.db.PrepareContext(ctx, query)
+	stmt, err := trx.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
 	for _, v := range req {
-		result, err := stmt.ExecContext(ctx, v.UserID, v.ProductID, v.Quantity)
+		result, err := stmt.ExecContext(ctx, v.UserID, v.ProductID, v.Rating, v.ReviewText)
 		if err != nil {
 			trx.Rollback()
 			return []model.Review{}, err
@@ -72,7 +72,8 @@ func (repo *repository) Create(req []model.ReviewRequest) (res []model.Review, e
 			Id:   		int(lastID),
 			UserID: 	v.UserID,
 			ProductID: 	v.ProductID,
-			Quantity: 	v.Quantity,
+			Rating: 	v.Rating,
+			ReviewText: v.ReviewText,
 		})
 	}
 

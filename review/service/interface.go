@@ -5,6 +5,6 @@ import (
 )
 
 type Servicer interface {
-	GetByProductID(productID int) (res []model.Wishlist, err error)
-	Create(productID int, req []model.WishlistRequest) (res []model.Wishlist, err error)
+	GetByProductID(productID int) (res []model.Review, err error)
+	Create(req []model.ReviewRequest) (res []model.Review, err error)
 }
