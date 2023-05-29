@@ -1,10 +1,10 @@
 package db
 
 import (
+	"consumer-address-go/helper/timeout"
 	"database/sql"
 	"errors"
 	"time"
-	"consumer-cart-go/helper/timeout"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -54,7 +54,7 @@ func (g *GormDB) init(debug bool, driver, url string) error {
 		return err
 	}
 
-	// _ = db.AutoMigrate(new(model.Cart))
+	// _ = db.AutoMigrate(new(model.Address))
 
 	sqlDB, err := db.DB()
 	if err != nil {

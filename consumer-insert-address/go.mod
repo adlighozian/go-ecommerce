@@ -1,4 +1,4 @@
-module consumer-cart-go
+module consumer-address-go
 
 go 1.19
 

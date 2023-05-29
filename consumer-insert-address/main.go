@@ -3,13 +3,14 @@ package main
 import (
 	"encoding/json"
 	"log"
+
 	amqp "github.com/rabbitmq/amqp091-go"
 
-	"consumer-cart-go/config"
-	"consumer-cart-go/package/db"
-	"consumer-cart-go/helper/logging"
-	"consumer-cart-go/model"
-	"consumer-cart-go/repository"
+	"consumer-address-go/config"
+	"consumer-address-go/helper/logging"
+	"consumer-address-go/model"
+	"consumer-address-go/package/db"
+	"consumer-address-go/repository"
 )
 
 func FailOnError(err error, msg string) {
@@ -24,7 +25,7 @@ func main() {
 		FailOnError(err, "failed to load config")
 		return
 	}
-	
+
 	logger := logging.New(config.Debug)
 
 	sqlDB, errDB := db.NewGormDB(config.Debug, config.Database.Driver, config.Database.URL)
@@ -40,7 +41,7 @@ func main() {
 
 	repo := repository.NewRepository(sqlDB.SQLDB)
 
-	conn, err := amqp.Dial(config.RabbitMQURL)	
+	conn, err := amqp.Dial(config.RabbitMQURL)
 	FailOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 
@@ -49,12 +50,12 @@ func main() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"create_carts", 	  // queue name
-		true,                 // durable
-		false,                // auto delete queue when unused
-		false,                // exclusive
-		false,                // no-wait
-		nil,                  // arguments
+		"create_address", // queue name
+		true,               // durable
+		false,              // auto delete queue when unused
+		false,              // exclusive
+		false,              // no-wait
+		nil,                // arguments
 	)
 	FailOnError(err, "Failed to declare a queue")
 
@@ -77,7 +78,7 @@ func main() {
 		for d := range msgs {
 			log.Printf("Received a message: %s", d.Body)
 
-			var data []model.CartRequest
+			var data model.AddressRequest
 			err := json.Unmarshal(d.Body, &data)
 			if err != nil {
 				FailOnError(err, "error unmarshal")

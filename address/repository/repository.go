@@ -26,7 +26,7 @@ func (repo *repository) Get(userID int) (res []model.Address, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, street, state, city, country, zipcode, phone FROM address WHERE user_id = $1`
+	query := `SELECT id, user_id, street, state, city, country, zipcode, phone_number FROM addresses WHERE user_id = $1`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
@@ -57,7 +57,7 @@ func (repo *repository) Create(req model.AddressRequest) (res []model.Address, e
 
 	res, err = repo.Get(req.UserID)
 	if err != nil {
-		return []model.Address{}, errors.New("error get address by user id after create")
+		return []model.Address{}, errors.New("error get addresses by user id after create")
 	}
 	return
 }
@@ -66,7 +66,7 @@ func (repo *repository) Delete(addressID int) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `DELETE FROM address WHERE id = $1`
+	query := `DELETE FROM addresses WHERE id = $1`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return

@@ -1,9 +1,9 @@
 package repository
 
 import (
-	"consumer-cart-go/model"
+	"consumer-address-go/model"
 )
 
 type Repositorier interface {
-	Create(req []model.CartRequest) (err error)
+	Create(req model.AddressRequest) (err error)
 }
