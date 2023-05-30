@@ -10,7 +10,7 @@ import (
 )
 
 type Response struct {
-	sync.RWMutex
+	*sync.RWMutex
 	Map map[string]chan string
 }
 
