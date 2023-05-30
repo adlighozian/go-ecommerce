@@ -1,31 +1,51 @@
 package config
 
 import (
-	"errors"
-	"fmt"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	Database 	string `mapStructure:"DATABASE"`
+	Debug bool   `mapstructure:"DEBUG"`
+	Port  string `mapstructure:"PORT"`
+
+	JWTSecretKey string `mapstructure:"JWT_SECRET_KEY"`
+
+	GoogleClientID     string `mapstructure:"GOOGLE_CLIENT_ID"`
+	GoogleClientSecret string `mapstructure:"GOOGLE_CLIENT_SECRET"`
+
+	Database `mapstructure:",squash"`
+	Redis    `mapstructure:",squash"`
+	RabbitMQ `mapstructure:",squash"`
+}
+
+type Database struct {
+	Driver string `mapstructure:"DATABASE_DRIVER"`
+	URL    string `mapstructure:"DATABASE_URL"`
+	DBName string `mapstructure:"PGDATABASE"`
+}
+
+type Redis struct {
+	Addr     string `mapstructure:"REDIS_ADDR"`
+	Password string `mapstructure:"REDIS_PASSWORD"`
+	DB       int    `mapstructure:"REDIS_DB"`
+}
+
+type RabbitMQ struct {
+	URL string `mapstructure:"RABBITMQ_URL"`
 }
 
 func LoadConfig() (*Config, error) {
 	viper.SetConfigFile(".env")
 
-	err := viper.ReadInConfig()
-	if err != nil {
-		_, ok := err.(viper.ConfigFileNotFoundError)
-		if ok {
-			return nil, errors.New(".env not found")
-		}
-		return nil, fmt.Errorf("fatal error config file %s", err)
+	errRead := viper.ReadInConfig()
+	if errRead != nil {
+		return nil, errRead
 	}
 
-	config := Config{}
-	err = viper.Unmarshal(&config)
-	if err != nil {
-		return nil, fmt.Errorf("fatal error decode : %s", err)
+	config := new(Config)
+	errUn := viper.Unmarshal(&config)
+	if errUn != nil {
+		return nil, errUn
 	}
-	return &config, nil
+	return config, nil
 }
