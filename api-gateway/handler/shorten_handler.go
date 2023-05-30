@@ -2,7 +2,6 @@ package handler
 
 import (
 	"api-gateway-go/helper/response"
-	"api-gateway-go/helper/shorten"
 	"api-gateway-go/helper/timeout"
 	"api-gateway-go/model"
 	"api-gateway-go/service"
@@ -13,19 +12,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type shortenHandler struct {
-	svc     service.ShortenServiceI
-	shorten shorten.Shorten
+type ShortenHandler struct {
+	svc service.ShortenServiceI
 }
 
 func NewShortenHandler(svc service.ShortenServiceI) ShortenHandlerI {
-	h := new(shortenHandler)
+	h := new(ShortenHandler)
 	h.svc = svc
-	h.shorten = shorten.New()
 	return h
 }
 
-func (h *shortenHandler) Get(ctx *gin.Context) {
+func (h *ShortenHandler) Get(ctx *gin.Context) {
 	var url string
 	urlCtx, _ := ctx.Get("url")
 	url, _ = urlCtx.(string)
@@ -76,7 +73,7 @@ func (h *shortenHandler) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, jsonRes)
 }
 
-func (h *shortenHandler) copyHeaders(dst http.Header, src http.Header) {
+func (h *ShortenHandler) copyHeaders(dst http.Header, src http.Header) {
 	for key, values := range src {
 		for _, value := range values {
 			dst.Add(key, value)
@@ -84,26 +81,14 @@ func (h *shortenHandler) copyHeaders(dst http.Header, src http.Header) {
 	}
 }
 
-func (h *shortenHandler) Shorten(ctx *gin.Context) {
+func (h *ShortenHandler) Shorten(ctx *gin.Context) {
 	shortenReq := new(model.ShortenReq)
 	if errJSON := ctx.ShouldBindJSON(&shortenReq); errJSON != nil {
 		response.NewJSONResErr(ctx, http.StatusBadRequest, "", errJSON.Error())
 		return
 	}
 
-	url := shortenReq.EndpointURL
-
-	url = h.shorten.EnforceHTTP(url)
-	hashedURL := h.shorten.Encode(url)
-	apiManagement := &model.APIManagement{
-		APIName:           shortenReq.APIName,
-		ServiceName:       shortenReq.ServiceName,
-		EndpointURL:       url,
-		HashedEndpointURL: hashedURL,
-		IsAvailable:       shortenReq.IsAvailable,
-	}
-
-	apiManagement, errSvc := h.svc.Create(apiManagement)
+	apiManagement, errSvc := h.svc.Create(shortenReq)
 	if errSvc != nil {
 		_ = ctx.Error(errSvc)
 		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errSvc.Error())

@@ -1,10 +1,10 @@
 package db
 
 import (
-	"auth-go/helper/timeout"
 	"database/sql"
 	"errors"
 	"time"
+	"user-consumer-go/helper/timeout"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

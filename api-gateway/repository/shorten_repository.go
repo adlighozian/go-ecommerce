@@ -38,6 +38,7 @@ func (repo *ShortenRepo) Get(hashedURL string) (*model.APIManagement, error) {
 		if errJSON != nil {
 			return nil, errJSON
 		}
+
 		// Store the data in the cache for future reads
 		errSetCache := repo.redis.Set(context.Background(), hashedURL, dataByte, 10*time.Minute).Err()
 		if errSetCache != nil {

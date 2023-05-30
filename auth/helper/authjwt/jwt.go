@@ -1,10 +1,10 @@
 package authjwt
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/spf13/viper"
 )
 
 type CustomClaims struct {
@@ -13,40 +13,18 @@ type CustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-// GenerateAccessToken generates an access token for a given user ID
-func GenerateAccessToken(userID uint, userRole string) (string, error) {
-	secretKey := viper.GetString("JWT_SECRET_KEY")
-	accessTokenDuration := viper.GetDuration("JWT_ACCESS_TOKEN_DURATION")
-
+// GenerateToken generates a token for a given token duration, user ID, and user Role.
+func GenerateToken(jwtSecretKey string, tokenDur time.Duration, userID uint, userRole string) (string, error) {
 	claims := &CustomClaims{
-		UserID:   userID,
+		UserID:   strconv.FormatUint(uint64(userID), 10),
 		UserRole: userRole,
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "ecommerce",
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(accessTokenDuration)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(tokenDur)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(secretKey))
-}
-
-// GenerateRefreshToken generates a refresh token for a given user ID
-func GenerateRefreshToken(userID uint, userRole string) (string, error) {
-	secretKey := viper.GetString("JWT_SECRET_KEY")
-	refreshTokenDuration := viper.GetDuration("JWT_REFRESH_TOKEN_DURATION")
-
-	claims := &CustomClaims{
-		UserID:   userID,
-		UserRole: userRole,
-		RegisteredClaims: jwt.RegisteredClaims{
-			Issuer:    "ecommerce",
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(refreshTokenDuration)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			NotBefore: jwt.NewNumericDate(time.Now()),
-		},
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(secretKey))
+	return token.SignedString([]byte(jwtSecretKey))
 }
