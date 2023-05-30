@@ -6,7 +6,8 @@ import (
 
 type Repositorier interface {
 	Get(userID int) (res []model.Cart, err error)
-	GetDetail(userID, cartID int) (res model.Cart, err error)
+	GetByID(cartID int) (res model.Cart, err error)
+	GetDetail(userID, productID int) (res model.Cart, err error)
 	Create(req []model.CartRequest) (res []model.Cart, err error)
-	Delete(userID, cartID int) (err error)
+	Delete(cartID int) (err error)
 }

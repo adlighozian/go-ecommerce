@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"wishlist-go/model"
 	"wishlist-go/repository"
 )
@@ -20,8 +21,8 @@ func (svc *service) Get(userID int) (res []model.Wishlist, err error) {
 	return svc.repo.Get(userID)
 }
 
-func (svc *service) GetDetail(userID, wishlistID int) (res model.Wishlist, err error) {
-	res, err = svc.repo.GetDetail(userID, wishlistID)
+func (svc *service) GetDetail(userID, productID int) (res model.Wishlist, err error) {
+	res, err = svc.repo.GetDetail(userID, productID)
 	if err != nil {
 		return
 	}
@@ -35,9 +36,27 @@ func (svc *service) GetDetail(userID, wishlistID int) (res model.Wishlist, err e
 }
 
 func (svc *service) Create(req []model.WishlistRequest) (res []model.Wishlist, err error) {
+	// check in each userID, ProductID already exist in wishlist or not
+	for _, v := range req {
+		_, err := svc.GetDetail(v.UserID, v.ProductID)
+		if err != nil {
+			continue
+		} else {
+			err = fmt.Errorf("wishlist with product_id %d in user_id %d already exist", v.ProductID, v.UserID)
+			return []model.Wishlist{}, err
+		}
+	}
+
 	return svc.repo.Create(req)
 }
 
-func (svc *service) Delete(userID, wishlistID int) (err error) {
-	return svc.repo.Delete(userID, wishlistID)
+func (svc *service) Delete(wishlistID int) (err error) {
+	// check wishlist id exist or not
+	emptyStruct := model.Wishlist{}
+	res, _ := svc.repo.GetByID(wishlistID)
+	if res == emptyStruct {
+		return fmt.Errorf("item with id %d not found", wishlistID)
+	}
+	
+	return svc.repo.Delete(wishlistID)
 }

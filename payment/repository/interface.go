@@ -1,9 +1,13 @@
-package repositoy
+package repository
+
+import (
+	"payment-go/model"
+
+	"github.com/midtrans/midtrans-go/coreapi"
+	"github.com/midtrans/midtrans-go/snap"
+)
 
 type Repositorier interface {
-	Get(..., err error)
-	GetDetail(..., err error)
-	Create(..., err error)
-	Update(..., err error)
-	Delete(..., err error)
+	CheckTransaction(orderID string) (*coreapi.TransactionStatusResponse, error)
+	CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error)
 }

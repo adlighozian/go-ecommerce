@@ -21,7 +21,8 @@ func NewHandler(svc service.Servicer) Handlerer {
 }
 
 func (h *handler) Get(ctx *gin.Context) {
-	userIDString, ok := ctx.GetQuery("user_ID")	
+	userIDString, ok := ctx.GetQuery("user_id")
+	fmt.Println(ok)
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param user_id should not be empty"))
 		return
@@ -39,49 +40,6 @@ func (h *handler) Get(ctx *gin.Context) {
 	}
 
 	res, err := h.svc.Get(userID)
-	if err != nil {
-		response.ResponseError(ctx, http.StatusInternalServerError, err)
-		return
-	}
-	response.ResponseSuccess(ctx, http.StatusOK, res)
-}
-
-func (h *handler) GetDetail(ctx *gin.Context) {
-	userIDString, ok := ctx.GetQuery("user_ID")	
-	if !ok {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param user_id should not be empty"))
-		return
-	}
-
-	cartIDString, ok := ctx.GetQuery("cart_id")	
-	if !ok {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param cart_id should not be empty"))
-		return
-	}
-
-	userID, err := strconv.Atoi(userIDString)
-	if err != nil {
-		response.ResponseError(ctx, http.StatusBadRequest, err)
-		return
-	}
-
-	cartID, err := strconv.Atoi(cartIDString)
-	if err != nil {
-		response.ResponseError(ctx, http.StatusBadRequest, err)
-		return
-	}
-
-	if userID <= 0 {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("userID must be positive number"))
-		return
-	}
-
-	if cartID <= 0 {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("cartID must be positive number"))
-		return
-	}
-
-	res, err := h.svc.GetDetail(userID, cartID)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
@@ -124,21 +82,9 @@ func (h *handler) Create(ctx *gin.Context) {
 }
 
 func (h *handler) Delete(ctx *gin.Context) {
-	userIDString, ok := ctx.GetQuery("user_ID")	
-	if !ok {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param user_id should not be empty"))
-		return
-	}
-
 	cartIDString, ok := ctx.GetQuery("cart_id")	
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param cart_id should not be empty"))
-		return
-	}
-
-	userID, err := strconv.Atoi(userIDString)
-	if err != nil {
-		response.ResponseError(ctx, http.StatusBadRequest, err)
 		return
 	}
 
@@ -148,7 +94,7 @@ func (h *handler) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if err = h.svc.Delete(userID, cartID); err != nil {
+	if err = h.svc.Delete(cartID); err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
 	}
