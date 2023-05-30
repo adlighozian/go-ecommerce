@@ -13,3 +13,9 @@ type UserSetting struct {
 
 	Language Language `json:"language,omitempty"`
 }
+
+type SettingReq struct {
+	Notification *bool `json:"notification" binding:"-"`
+	DarkMode     *bool `json:"dark_mode" binding:"-"`
+	LanguageID   uint  `json:"language_id" binding:"-"`
+}

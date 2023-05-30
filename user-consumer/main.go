@@ -2,7 +2,9 @@ package main
 
 import (
 	"log"
-	"time"
+	"os"
+	"os/signal"
+	"syscall"
 	"user-consumer-go/config"
 	"user-consumer-go/handler"
 	"user-consumer-go/helper/logging"
@@ -50,12 +52,18 @@ func main() {
 	userSvc := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(rmq, logger, userSvc)
 
-	time.Sleep(5 * time.Second)
+	userHandler.Create()
+	userHandler.UpdateByID()
 
-	var forever chan struct{}
+	// Channel to listen for interrupt signal
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	userHandler.Create()
 
 	logger.Debug().Msg("[*] To exit press CTRL+C")
-	<-forever
+
+	// Wait for interrupt signal
+	<-quit
+	logger.Debug().Msg("user-consumer shutting down...")
 }

@@ -57,3 +57,37 @@ func (h *UserHandler) Create() {
 		}
 	}(msgs)
 }
+
+func (h *UserHandler) UpdateByID() {
+	msgs, errSub := h.rmq.Subscribe(
+		"user.updated",
+		"topic",
+		"user.updated",
+		"user.updated",
+		false,
+		1,
+	)
+	if errSub != nil {
+		h.logger.Error().Err(errSub).Msg("rmq.Subscribe err")
+		return
+	}
+
+	go func(deliveries <-chan amqp091.Delivery) {
+		newUser := new(model.User)
+		for d := range deliveries {
+			_ = json.Unmarshal(d.Body, &newUser)
+
+			// h.logger.Debug().Msgf("%v", newUser)
+
+			user, ucErr := h.svc.UpdateByID(newUser)
+			if ucErr != nil {
+				h.logger.Error().Err(ucErr).Msgf("svc.UpdateByID err: %v\n%v", newUser, user)
+				// _ = d.Nack(false, false)
+				continue
+			}
+
+			_ = d.Ack(false)
+			h.logger.Debug().Msgf("from %s, rmq.Sub success with id:%v", d.RoutingKey, user.ID)
+		}
+	}(msgs)
+}
