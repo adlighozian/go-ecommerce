@@ -3,21 +3,18 @@ package main
 import (
 	"log"
 	"net/http"
-	"payment-go/config"
-	"payment-go/handler"
-	"payment-go/helper/logging"
-	"payment-go/helper/middleware"
-	midtransRepo "payment-go/midtrans"
-	"payment-go/package/db"
-	"payment-go/repository"
-	"payment-go/server"
-	"payment-go/service"
+	"splash-screen-go/config"
+	"splash-screen-go/handler"
+	"splash-screen-go/helper/logging"
+	"splash-screen-go/helper/middleware"
+	"splash-screen-go/package/db"
+	"splash-screen-go/publisher"
+	"splash-screen-go/repository"
+	"splash-screen-go/server"
+	"splash-screen-go/service"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/midtrans/midtrans-go"
-	"github.com/midtrans/midtrans-go/coreapi"
-	"github.com/midtrans/midtrans-go/snap"
 )
 
 func main() {
@@ -39,32 +36,19 @@ func main() {
 		_ = sqlDB.Close()
 	}()
 
-	// inisialization midtrans connection
-	// coreapi used to get Payment
-	// snapclient used for generating redirect_url to midtrans
-
-	var c coreapi.Client
-	var s snap.Client
-	ServerKey := config.Midtrans.ServerID
-	midtrans.ServerKey = ServerKey
-	midtrans.Environment = midtrans.Sandbox
-
-	c.New(ServerKey, midtrans.Sandbox)
-	s.New(ServerKey, midtrans.Sandbox)
-
-	midtrans := midtransRepo.NewMidtrans(c, s)
-	repo := repository.NewRepository(sqlDB.SQLDB, midtrans)
+	publisher := publisher.NewPublisher()
+	repo := repository.NewRepository(sqlDB.SQLDB, publisher)
 	svc := service.NewService(repo)
 	handler := handler.NewHandler(svc)
 
-	// routing
 	router := gin.New()
 	router.Use(middleware.Logger(logger))
 	router.Use(gin.Recovery())
 
-	paymentLog := router.Group("/payments")
-	paymentLog.GET("/", handler.CheckPayment)
-	paymentLog.POST("/", handler.CreatePaymentLog)
+	review := router.Group("/splashscreens")
+	review.GET("/", handler.Get)
+	review.POST("/", handler.Create)
+	review.DELETE("/", handler.Delete)
 
 	srv := &http.Server{
 		Addr:         ":" + config.Port,

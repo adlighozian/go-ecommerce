@@ -1,4 +1,3 @@
-//go:generate mockery --output=../mocks --name Repositorier
 package publisher
 
 type PublisherInterface interface {

@@ -5,15 +5,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type Response struct {
-	Status	int			`json:"status,omniempty"`
-	Message string		`json:"message,omniempty"`
-	Data	interface{}	`json:"data,omniempty"`
-	Error	string		`json:"error,omniempty"`
+type ResSuccess struct {
+	Status	int			`json:"status"`
+	Message string		`json:"message"`
+	Data	interface{}	`json:"data"`
+}
+
+type ResError struct {
+	Status	int			`json:"status"`
+	Message string		`json:"message"`
+	Error	string		`json:"error"`
 }
 
 func ResponseSuccess(ctx *gin.Context, status int, data interface{}) {
-	ctx.JSON(status, Response{
+	ctx.JSON(status, ResSuccess{
 		Status: 	status,
 		Message: 	http.StatusText(status),
 		Data:		data,
@@ -21,7 +26,7 @@ func ResponseSuccess(ctx *gin.Context, status int, data interface{}) {
 }
 
 func ResponseError(ctx *gin.Context, status int, err error) {
-	ctx.JSON(status, Response{
+	ctx.JSON(status, ResError{
 		Status: 	status,
 		Message: 	http.StatusText(status),
 		Error:		err.Error(),

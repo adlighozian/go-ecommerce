@@ -8,6 +8,6 @@ import (
 )
 
 type Repositorier interface {
-	CheckTransaction(orderID string) (*coreapi.TransactionStatusResponse, error)
+	CheckPayment(orderID string) (*coreapi.TransactionStatusResponse, error)
 	CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error)
 }

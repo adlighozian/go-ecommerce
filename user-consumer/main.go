@@ -50,8 +50,6 @@ func main() {
 	userSvc := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(rmq, logger, userSvc)
 
-	time.Sleep(5 * time.Second)
-
 	var forever chan struct{}
 
 	userHandler.Create()

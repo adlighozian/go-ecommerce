@@ -1,3 +1,4 @@
+//go:generate mockery --output=../mocks --name Repositorier
 package repository
 
 import (
