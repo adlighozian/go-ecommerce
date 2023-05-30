@@ -22,9 +22,9 @@ import (
 )
 
 func main() {
-	config, confErr := config.LoadConfig()
-	if confErr != nil {
-		log.Fatalf("load config err:%s", confErr)
+	config, errConf := config.LoadConfig()
+	if errConf != nil {
+		log.Fatalf("load config err:%s", errConf)
 	}
 
 	logger := logging.New(config.Debug)
@@ -50,12 +50,16 @@ func main() {
 	logger.Debug().Msg("enforcer connected")
 
 	defer func() {
-		logger.Debug().Msg("closing db")
-		_ = sqlDB.Close()
+		errDBC := sqlDB.Close()
+		if errDBC != nil {
+			logger.Fatal().Err(errDBC).Msg("db failed to closed")
+		}
 		logger.Debug().Msg("db closed")
 
-		logger.Debug().Msg("closing redis")
-		_ = redisClient.Close()
+		errRedisC := redisClient.Close()
+		if errRedisC != nil {
+			logger.Fatal().Err(errRedisC).Msg("redis failed to closed")
+		}
 		logger.Debug().Msg("redis closed")
 	}()
 
@@ -114,7 +118,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	if srvErr := server.Run(srv, logger); srvErr != nil {
-		logger.Fatal().Err(srvErr).Msg("server shutdown failed")
+	if errSrv := server.Run(srv, logger); errSrv != nil {
+		logger.Fatal().Err(errSrv).Msg("server shutdown failed")
 	}
 }
