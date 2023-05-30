@@ -1,10 +1,10 @@
 package db
 
 import (
-	"api-gateway-go/helper/timeout"
 	"database/sql"
 	"errors"
 	"time"
+	"cart-go/helper/timeout"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -12,7 +12,7 @@ import (
 )
 
 type GormDB struct {
-	SqlDB *sql.DB
+	SQLDB *sql.DB
 }
 
 func NewGormDB(debug bool, driver, url string) (*GormDB, error) {
@@ -54,24 +54,26 @@ func (g *GormDB) init(debug bool, driver, url string) error {
 		return err
 	}
 
-	SqlDB, err := db.DB()
+	// _ = db.AutoMigrate(new(model.Cart))
+
+	sqlDB, err := db.DB()
 	if err != nil {
 		return err
 	}
 
-	SqlDB.SetMaxIdleConns(10)
-	SqlDB.SetMaxOpenConns(100)
-	SqlDB.SetConnMaxIdleTime(5 * time.Minute)
-	SqlDB.SetConnMaxLifetime(60 * time.Minute)
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
+	sqlDB.SetConnMaxLifetime(60 * time.Minute)
 
-	if err = SqlDB.PingContext(ctx); err != nil {
+	if err = sqlDB.PingContext(ctx); err != nil {
 		return err
 	}
 
-	g.SqlDB = SqlDB
+	g.SQLDB = sqlDB
 	return nil
 }
 
 func (g *GormDB) Close() error {
-	return g.SqlDB.Close()
+	return g.SQLDB.Close()
 }

@@ -3,17 +3,22 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"time"
 	"review-go/model"
+	"review-go/publisher"
 )
 
 type repository struct {
-	db *sql.DB
+	db        *sql.DB
+	publisher publisher.PublisherInterface
 }
 
-func NewRepository(db *sql.DB) Repositorier {
+func NewRepository(db *sql.DB, publisher publisher.PublisherInterface) Repositorier {
 	return &repository{
-		db: db,
+		db:        db,
+		publisher: publisher,
 	}
 }
 
@@ -21,7 +26,7 @@ func (repo *repository) GetByProductID(productID int) (res []model.Review, err e
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, product_id, rating, review_text quantity FROM reviews WHERE product_id = ?`
+	query := `SELECT id, user_id, product_id, rating, review_text quantity FROM reviews WHERE product_id = $1`
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
@@ -41,43 +46,43 @@ func (repo *repository) GetByProductID(productID int) (res []model.Review, err e
 	return
 }
 
-func (repo *repository) Create(req []model.ReviewRequest) (res []model.Review, err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+func (repo *repository) GetDetail(userID, productID int) (res model.Review, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `INSERT INTO reviews (user_id, product_id, rating, review_text) value (?, ?, ?, ?)`
-	trx, err := repo.db.BeginTx(ctx, nil)
+	query := `SELECT id, user_id, product_id, quantity FROM reviews WHERE user_id = $1 AND product_id = $2`
+	stmt, err := repo.db.PrepareContext(ctx, query)
 	if err != nil {
 		return
 	}
 
-	stmt, err := trx.PrepareContext(ctx, query)
+	result, err := stmt.QueryContext(ctx, userID, productID)
 	if err != nil {
 		return
 	}
+
+	for result.Next() {
+		result.Scan(&res.Id, &res.UserID, &res.ProductID)
+	}
+	return
+}
+
+func (repo *repository) Create(req []model.ReviewRequest) (res []model.Review, err error) {
+	// publish data to RabbitMQ
+	err = repo.publisher.Publish(req, "create_reviews")
+	if err != nil {
+		err = fmt.Errorf("error publish data to RabbitMQ : %s", err.Error())
+		return
+	}
+
+	time.Sleep(3*time.Second)
 
 	for _, v := range req {
-		result, err := stmt.ExecContext(ctx, v.UserID, v.ProductID, v.Rating, v.ReviewText)
+		result, err := repo.GetDetail(v.UserID, v.ProductID)
 		if err != nil {
-			trx.Rollback()
-			return []model.Review{}, err
+			return []model.Review{}, errors.New("error get by user id after create")
 		}
-
-		lastID, err := result.LastInsertId()
-		if err != nil {
-			return []model.Review{}, err
-		}
-
-		res = append(res, model.Review{
-			Id:   		int(lastID),
-			UserID: 	v.UserID,
-			ProductID: 	v.ProductID,
-			Rating: 	v.Rating,
-			ReviewText: v.ReviewText,
-		})
+		res = append(res, result)
 	}
-
-	trx.Commit()
-
 	return
 }

@@ -1,33 +1,58 @@
-package  repository
+package repository
 
 import (
 	"database/sql"
-	"net/http"
-	"github.com/gin-gonic/gin"
-	"auth-go/db"
+	"fmt"
+	midtransrepo "payment-go/midtrans"
+	"payment-go/model"
+
+	"github.com/midtrans/midtrans-go"
+	"github.com/midtrans/midtrans-go/coreapi"
+	"github.com/midtrans/midtrans-go/snap"
 )
 
-type  repository struct {
-	db *sql.DB
+type repository struct {
+	db        *sql.DB
+	midtrans  midtransrepo.MidtransInterface
 }
 
-func NewRepository(db *sql.DB) *Repositorier {
+func NewRepository(db *sql.DB, midtrans midtransrepo.MidtransInterface) Repositorier {
 	return &repository{
-		db: db,
+		db:        db,
+		midtrans:  midtrans,
 	}
 }
 
-func (repo *repository) Get(ctx *gin.Context) {
+func (repo *repository) CheckTransaction(orderID string) (res *coreapi.TransactionStatusResponse, err error) {
+	return repo.midtrans.CheckTransaction(orderID)
 }
 
-func (repo *repository) GetDetail(ctx *gin.Context) {
-}
+func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error) {
+	// prepare midtrans request data
+	snapReq := &snap.Request{
+		Metadata: model.Customer {
+			UserID: req.UserID,
+		},
+		EnabledPayments: []snap.SnapPaymentType{
+			snap.PaymentTypeAlfamart,
+			snap.PaymentTypeAkulaku,
+			snap.PaymentTypeBCAKlikpay,
+			snap.PaymentTypeBRIEpay,
+			snap.PaymentTypeGopay,
+			snap.PaymentTypeIndomaret,
+			snap.PaymentTypeMandiriEcash,
+		},
+		TransactionDetails: midtrans.TransactionDetails{
+			OrderID:  fmt.Sprint(req.OrderID),
+			GrossAmt: req.TotalPayment,
+		},
+	}
 
-func (repo *repository) Create(ctx *gin.Context) {
-}
+	// send data to midtrans
+	res, err = repo.midtrans.CreateTransaction(snapReq)
+	if err != nil {
+		return res, fmt.Errorf("error midtrans : %v", err.Error())
+	}
 
-func (repo *repository) Update(ctx *gin.Context) {
-}
-
-func (repo *repository) Delete(ctx *gin.Context) {
+	return
 }
