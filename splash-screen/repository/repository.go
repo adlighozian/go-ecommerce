@@ -25,12 +25,7 @@ func (repo *repository) Get() (res []model.SplashScreen, err error) {
 	defer cancel()
 
 	query := `SELECT id, image_url FROM splash_screens`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx)
+	result, err := repo.db.QueryContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -76,12 +71,7 @@ func (repo *repository) Delete(splashScreenID int) (err error) {
 	defer cancel()
 
 	query := `DELETE FROM splash_screens WHERE id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	_, err = stmt.QueryContext(ctx, splashScreenID)
+	_, err = repo.db.QueryContext(ctx, query, splashScreenID)
 	if err != nil {
 		return
 	}

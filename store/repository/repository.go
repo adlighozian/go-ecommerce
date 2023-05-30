@@ -27,12 +27,7 @@ func (repo *repository) Get() (res []model.Store, err error) {
 	defer cancel()
 
 	query := `SELECT id, address_id, description, image_url, name FROM stores`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx)
+	result, err := repo.db.QueryContext(ctx, query)
 	if err != nil {
 		return
 	}
@@ -51,12 +46,7 @@ func (repo *repository) GetStoreByName(name string) (res model.Store, err error)
 	defer cancel()
 
 	query := `SELECT id, address_id, description, image_url, name FROM stores WHERE name = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx, name)
+	result, err := repo.db.QueryContext(ctx, query, name)
 	if err != nil {
 		return
 	}
@@ -92,12 +82,7 @@ func (repo *repository) Delete(storeID int) (err error) {
 	defer cancel()
 
 	query := `DELETE FROM stores WHERE id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	_, err = stmt.QueryContext(ctx, storeID)
+	_, err = repo.db.QueryContext(ctx, query, storeID)
 	if err != nil {
 		return
 	}
