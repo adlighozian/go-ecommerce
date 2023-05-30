@@ -70,7 +70,8 @@ func (repo *ShortenRepo) getHashURLFromDatabase(hashedURL string) (*model.APIMan
 
 	sqlQuery := `
 	SELECT id, api_name, service_name, endpoint_url, 
-				 hashed_endpoint_url, is_available, created_at, updated_at 
+				 hashed_endpoint_url, is_available, need_bypass,
+				 created_at, updated_at 
 	FROM api_managements 
 	WHERE hashed_endpoint_url = $1 AND is_available = TRUE 
 	LIMIT 1
@@ -85,7 +86,8 @@ func (repo *ShortenRepo) getHashURLFromDatabase(hashedURL string) (*model.APIMan
 	row := stmt.QueryRowContext(ctx, hashedURL)
 	scanErr := row.Scan(
 		&apiManagement.ID, &apiManagement.APIName, &apiManagement.ServiceName, &apiManagement.EndpointURL,
-		&apiManagement.HashedEndpointURL, &apiManagement.IsAvailable, &apiManagement.CreatedAt, &apiManagement.UpdatedAt,
+		&apiManagement.HashedEndpointURL, &apiManagement.IsAvailable, &apiManagement.NeedBypass,
+		&apiManagement.CreatedAt, &apiManagement.UpdatedAt,
 	)
 	if scanErr != nil {
 		return nil, scanErr
@@ -99,8 +101,8 @@ func (repo *ShortenRepo) Create(apiManagement *model.APIManagement) (*model.APIM
 	defer cancel()
 
 	sqlQuery := `
-	INSERT INTO api_managements (api_name, service_name, endpoint_url, hashed_endpoint_url, is_available)
-	VALUES ($1, $2, $3, $4, $5)
+	INSERT INTO api_managements (api_name, service_name, endpoint_url, hashed_endpoint_url, is_available, need_bypass)
+	VALUES ($1, $2, $3, $4, $5, $6)
 	RETURNING id, created_at, updated_at
 	`
 	stmt, errStmt := repo.db.PrepareContext(ctx, sqlQuery)
@@ -113,7 +115,7 @@ func (repo *ShortenRepo) Create(apiManagement *model.APIManagement) (*model.APIM
 		ctx,
 		&apiManagement.APIName, &apiManagement.ServiceName,
 		&apiManagement.EndpointURL, &apiManagement.HashedEndpointURL,
-		&apiManagement.IsAvailable,
+		&apiManagement.IsAvailable, &apiManagement.NeedBypass,
 	).Scan(
 		&apiManagement.ID, &apiManagement.CreatedAt, &apiManagement.UpdatedAt,
 	)

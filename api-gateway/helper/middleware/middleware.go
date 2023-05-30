@@ -97,6 +97,8 @@ func RequestCounter(redis *redis.Client) gin.HandlerFunc {
 	}
 }
 
+// HashedURLConverter convert hashed url that have been save to database
+// into endpoint url.
 func HashedURLConverter(svc service.ShortenServiceI) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		hashedURL := ctx.Param("hash")
@@ -127,34 +129,37 @@ func HashedURLConverter(svc service.ShortenServiceI) gin.HandlerFunc {
 
 		// Pass the real url and raw query into to the AuthMiddleware
 		ctx.Set("url", url)
+		ctx.Set("need_bypass", apiManagement.NeedBypass)
 		ctx.Next()
 	}
 }
 
 // If path is the allowed, next to handler.
-func isAllowedPath(ctx *gin.Context, allowedPaths []string) (string, string, bool) {
+func isAllowedPath(ctx *gin.Context) (string, string, bool) {
 	var uri string
 
 	urlCtx, _ := ctx.Get("url")
 	uri, _ = urlCtx.(string)
 
+	needBypassCtx, _ := ctx.Get("need_bypass")
+	needBypass, _ := needBypassCtx.(bool)
+
 	parsedURL, _ := url.Parse(uri)
 	path := parsedURL.Path[1:]
 
-	for _, allowedPath := range allowedPaths {
-		if path == allowedPath {
-			// Pass the real url and raw query into to handler
-			ctx.Set("url", uri)
-			ctx.Next()
-			return "", "", true
-		}
+	if needBypass {
+		// Pass the real url and raw query into to handler
+		ctx.Set("url", uri)
+		ctx.Next()
+		return "", "", true
 	}
 	return uri, path, false
 }
 
-func AuthMiddleware(jwtSecretKey string, allowedPaths []string) gin.HandlerFunc {
+// AuthMiddleware validate jwt token.
+func AuthMiddleware(jwtSecretKey string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		uri, path, shouldReturn := isAllowedPath(ctx, allowedPaths)
+		uri, path, shouldReturn := isAllowedPath(ctx)
 		if shouldReturn {
 			return
 		}
@@ -207,9 +212,10 @@ func AuthMiddleware(jwtSecretKey string, allowedPaths []string) gin.HandlerFunc 
 	}
 }
 
-func AuthzMiddleware(enforcer *casbin.Enforcer, allowedPaths []string) gin.HandlerFunc {
+// AuthzMiddleware authorize request based on resource and role that have been setup.
+func AuthzMiddleware(enforcer *casbin.Enforcer) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		uri, path, shouldReturn := isAllowedPath(ctx, allowedPaths)
+		uri, path, shouldReturn := isAllowedPath(ctx)
 		if shouldReturn {
 			return
 		}
