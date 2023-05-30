@@ -59,7 +59,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, errSvc := h.svc.GetByEmail(loginReq)
+	user, errSvc := h.svc.LoginByEmail(loginReq)
 	if errSvc != nil {
 		if errors.Is(errSvc, errors.New("incorrect password")) {
 			response.NewJSONResErr(ctx, http.StatusBadRequest, "", errSvc.Error())
@@ -170,44 +170,10 @@ func (h *AuthHandler) GoogleCallback(ctx *gin.Context) {
 
 	userReq := new(model.UserReq)
 
-	req, errReq := http.NewRequestWithContext(
-		context.Background(),
-		http.MethodGet, "https://www.googleapis.com/oauth2/v3/userinfo", nil,
-	)
-	if errReq != nil {
-		_ = ctx.Error(errReq)
-		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errReq.Error())
+	shouldReturn := h.getUserReq(ctx, token, userReq)
+	if shouldReturn {
 		return
 	}
-
-	client := h.gauth.Client(context.Background(), token)
-	resp, errResp := client.Do(req)
-	if errResp != nil {
-		_ = ctx.Error(errResp)
-		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errResp.Error())
-		return
-	}
-	defer resp.Body.Close()
-
-	body, errRead := io.ReadAll(resp.Body)
-	if errRead != nil {
-		_ = ctx.Error(errRead)
-		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errRead.Error())
-		return
-	}
-
-	var data map[string]interface{}
-	errJSONUn := json.Unmarshal(body, &data)
-	if errJSONUn != nil {
-		_ = ctx.Error(errJSONUn)
-		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errJSONUn.Error())
-		return
-	}
-
-	userReq.Username, _ = data["name"].(string)
-	userReq.Email, _ = data["email"].(string)
-	userReq.FullName, _ = data["name"].(string)
-	userReq.ImageURL, _ = data["picture"].(string)
 
 	user, errSvc := h.svc.FirstOrCreate(userReq)
 	if errSvc != nil {
@@ -262,4 +228,46 @@ func (h *AuthHandler) GoogleCallback(ctx *gin.Context) {
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 	})
+}
+
+func (h *AuthHandler) getUserReq(ctx *gin.Context, token *oauth2.Token, userReq *model.UserReq) bool {
+	req, errReq := http.NewRequestWithContext(
+		context.Background(),
+		http.MethodGet, "https://www.googleapis.com/oauth2/v3/userinfo", nil,
+	)
+	if errReq != nil {
+		_ = ctx.Error(errReq)
+		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errReq.Error())
+		return true
+	}
+
+	client := h.gauth.Client(context.Background(), token)
+	resp, errResp := client.Do(req)
+	if errResp != nil {
+		_ = ctx.Error(errResp)
+		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errResp.Error())
+		return true
+	}
+	defer resp.Body.Close()
+
+	body, errRead := io.ReadAll(resp.Body)
+	if errRead != nil {
+		_ = ctx.Error(errRead)
+		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errRead.Error())
+		return true
+	}
+
+	var data map[string]interface{}
+	errJSONUn := json.Unmarshal(body, &data)
+	if errJSONUn != nil {
+		_ = ctx.Error(errJSONUn)
+		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errJSONUn.Error())
+		return true
+	}
+
+	userReq.Username, _ = data["name"].(string)
+	userReq.Email, _ = data["email"].(string)
+	userReq.FullName, _ = data["name"].(string)
+	userReq.ImageURL, _ = data["picture"].(string)
+	return false
 }

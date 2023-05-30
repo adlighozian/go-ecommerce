@@ -21,31 +21,37 @@ import (
 )
 
 func main() {
+	// load config from .env using viper
 	config, errConf := config.LoadConfig()
 	if errConf != nil {
 		log.Fatalf("load config err:%s", errConf)
 	}
 
+	// setup logger config
 	logger := logging.New(config.Debug)
 
+	// connect to postgres using gorm
 	sqlDB, errDB := db.NewGormDB(config.Debug, config.Database.Driver, config.Database.URL)
 	if errDB != nil {
 		logger.Fatal().Err(errDB).Msg("db failed to connect")
 	}
 	logger.Debug().Msg("db connected")
 
+	// connect to redis using redis client
 	redisClient, errRedis := redisclient.NewRedisClient(config.Redis.Addr, config.Redis.Password, config.Redis.DB)
 	if errDB != nil {
 		logger.Fatal().Err(errRedis).Msg("redis failed to connect")
 	}
 	logger.Debug().Msg("redis connected")
 
+	// connect to rabbitmq using amqp091 and provide publish and subscribe method
 	rmq, errRmq := rmq.NewRabbitMQ(config.RabbitMQ.URL)
 	if errRmq != nil {
 		logger.Fatal().Err(errRmq).Msg("rabbitmq failed to connect")
 	}
 	logger.Debug().Msg("rabbitmq connected")
 
+	// closing all connection after get interrupt signal
 	defer func() {
 		errDBC := sqlDB.Close()
 		if errDBC != nil {
@@ -66,6 +72,7 @@ func main() {
 		logger.Debug().Msg("rabbitmq closed")
 	}()
 
+	// setup google oauth2 config
 	gauth := &oauth2.Config{
 		ClientID:     config.GoogleClientID,
 		ClientSecret: config.GoogleClientSecret,
@@ -106,6 +113,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
+	// run the ListenAndServe() of a server
 	if errSrv := server.Run(srv, logger); errSrv != nil {
 		logger.Fatal().Err(errSrv).Msg("server shutdown failed")
 	}

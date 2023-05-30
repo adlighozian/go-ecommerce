@@ -163,10 +163,42 @@ func (repo *AuthRepository) getByEmailFromDatabase(email string) (*model.User, e
 	user := new(model.User)
 	row := stmt.QueryRowContext(ctx, email)
 	scanErr := row.Scan(
-		&user.ID, &user.Username, &user.Email, &user.Role, &user.FullName,
-		&user.Age, &user.ImageURL, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.Username, &user.Email, &user.Role,
+		&user.FullName, &user.Age, &user.ImageURL,
+		&user.CreatedAt, &user.UpdatedAt,
 		&user.UserSetting.Notification, &user.UserSetting.DarkMode,
 		&user.UserSetting.Language.Name,
+	)
+	if scanErr != nil {
+		return nil, scanErr
+	}
+
+	return user, nil
+}
+
+func (repo *AuthRepository) LoginByEmail(email string) (*model.User, error) {
+	ctx, cancel := timeout.NewCtxTimeout()
+	defer cancel()
+
+	sqlQuery := `
+	SELECT id, username, email, password, role, full_name, 
+	    	 age, image_url, created_at, updated_at
+	FROM users 
+	WHERE email = $1
+	LIMIT 1
+	`
+	stmt, errStmt := repo.db.PrepareContext(ctx, sqlQuery)
+	if errStmt != nil {
+		return nil, errStmt
+	}
+	defer stmt.Close()
+
+	user := new(model.User)
+	row := stmt.QueryRowContext(ctx, email)
+	scanErr := row.Scan(
+		&user.ID, &user.Username, &user.Email, &user.Password, &user.Role,
+		&user.FullName, &user.Age, &user.ImageURL,
+		&user.CreatedAt, &user.UpdatedAt,
 	)
 	if scanErr != nil {
 		return nil, scanErr
