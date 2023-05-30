@@ -70,7 +70,6 @@ func (h *handler) CreateProduct(ctx *gin.Context) {
 	} else {
 		response.ResponseSuccess(ctx, res.Status, res.Data)
 	}
-
 }
 
 func (h *handler) UpdateProduct(ctx *gin.Context) {

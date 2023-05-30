@@ -49,8 +49,3 @@ func (p product) CreateProduct(req []model.ProductReq) error {
 	return nil
 
 }
-
-func (p product) UpdateProduct(req model.ProductReq) error {
-
-	return nil
-}

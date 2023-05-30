@@ -1,10 +1,11 @@
 package db
 
 import (
+	"consumer-insert-order-go/helpers"
 	"database/sql"
 	"errors"
 	"log"
-	"order-go/helper/timeout"
+
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -55,7 +56,7 @@ func (g *GormDB) init(debug bool, driver string, url string) error {
 	gormConf.PrepareStmt = true
 	gormConf.SkipDefaultTransaction = true
 
-	ctx, cancel := timeout.NewCtxTimeout()
+	ctx, cancel := helpers.NewCtxTimeout()
 	defer cancel()
 
 	var dialector gorm.Dialector

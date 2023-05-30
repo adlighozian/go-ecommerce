@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"product-go/helper/failerror"
+	"product-go/helper/random"
 	"product-go/helper/timeout"
 	"product-go/model"
 	"product-go/publisher"
@@ -68,17 +69,13 @@ func (repo *repository) ShowProduct(id int) (model.Product, error) {
 }
 
 func (repo *repository) CreateProduct(req []model.ProductReq) ([]model.Product, error) {
-	err := repo.sent.Public(req, "create_product")
-	if err != nil {
-		return nil, errors.New("failed publisher")
-	}
+	ctx, cancel := timeout.NewCtxTimeout()
+	defer cancel()
 
-	time.Sleep(1 * time.Second)
+	var sent []model.ProductReq
 
-	var result []model.Product
 	for _, v := range req {
-		// result, err := repo.ShowProduct(v.Id)
-		data := model.Product{
+		inrandom := model.ProductReq{
 			StoreID:     v.StoreID,
 			CategoryID:  v.CategoryID,
 			SizeID:      v.SizeID,
@@ -89,18 +86,49 @@ func (repo *repository) CreateProduct(req []model.ProductReq) ([]model.Product, 
 			UnitPrice:   v.UnitPrice,
 			Status:      v.Status,
 			Stock:       v.Stock,
-			Sku:         v.Sku,
+			Sku:         random.NewRandom().RandomString(),
 			Weight:      v.Weight,
 		}
 
-		result = append(result, data)
-
+		sent = append(sent, inrandom)
 	}
 
-	return result, nil
+	err := repo.sent.Public(sent, "create_product")
+	if err != nil {
+		return nil, errors.New("failed publisher")
+	}
+
+	time.Sleep(1 * time.Second)
+
+	var resultss []model.Product
+	query := `select  id, store_id, category_id, size_id, color_id , name, subtitle , description , unit_price , status , stock ,sku , weight , created_at , updated_at from products p where sku = $1`
+	for _, v := range sent {
+
+		stmt, err := repo.db.PrepareContext(ctx, query)
+		failerror.FailError(err, "error prepare")
+
+		result, err := stmt.QueryContext(ctx, v.Sku)
+		failerror.FailError(err, "error prepare")
+
+		var temp model.Product
+		for result.Next() {
+			result.Scan(&temp.Id, &temp.StoreID, &temp.CategoryID, &temp.SizeID, &temp.ColorID, &temp.Name, &temp.Subtitle, &temp.Description, &temp.UnitPrice, &temp.Status, &temp.Stock, &temp.Sku, &temp.Weight, &temp.Created_at, &temp.Update_at)
+		}
+		if temp.Id == 0 {
+			continue
+		}
+		resultss = append(resultss, temp)
+	}
+
+	if resultss == nil {
+		return nil, errors.New("error create product")
+	}
+
+	return resultss, nil
 }
 
 func (repo *repository) UpdateProduct(req model.ProductReq) error {
+
 	return nil
 }
 

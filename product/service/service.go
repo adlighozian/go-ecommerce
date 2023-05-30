@@ -18,7 +18,13 @@ func NewService(repo repository.Repositorier) Servicer {
 }
 
 func (svc *service) GetProduct(req model.ProductSearch) (model.Respon, error) {
-	res, _ := svc.repo.GetProduct(req)
+	res, err := svc.repo.GetProduct(req)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
 	return model.Respon{
 		Status: http.StatusOK,
 		Data:   res,
@@ -52,7 +58,7 @@ func (svc *service) CreateProduct(req []model.ProductReq) (model.Respon, error) 
 	var data []model.ProductReq
 
 	for _, v := range req {
-		if v.StoreID == 0 || v.CategoryID == 0 || v.SizeID == 0 || v.ColorID == 0 || v.Name == "" || v.Subtitle == "" || v.Description == "" || v.UnitPrice == 0 || v.Stock == 0 || v.Sku == "" || v.Weight == 0 {
+		if v.StoreID == 0 || v.CategoryID == 0 || v.SizeID == 0 || v.ColorID == 0 || v.Name == "" || v.Subtitle == "" || v.Description == "" || v.UnitPrice == 0 || v.Stock == 0 || v.Weight == 0 {
 			continue
 		}
 		data = append(data, model.ProductReq{

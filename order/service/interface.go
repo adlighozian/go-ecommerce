@@ -5,8 +5,8 @@ import (
 )
 
 type Servicer interface {
-	GetOrders(id int) (model.Respon, error)
-	CreateOrders(req model.Orders) (model.Respon, error)
-	ShowOrders(idOrder int, idUser int) (model.Respon, error)
+	GetOrders(idUser int) (model.Respon, error)
+	CreateOrders(req []model.OrderReq) (model.Respon, error)
+	ShowOrders(req model.OrderItems) (model.Respon, error)
 	UpdateOrders(idOrder int, req string) (model.Respon, error)
 }

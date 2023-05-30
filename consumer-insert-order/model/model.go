@@ -18,24 +18,3 @@ type OrderReq struct {
 	ShippingID int
 	TotalPrice float64
 }
-
-type OrderItems struct {
-	UserId      int
-	OrderNumber string
-}
-
-type Respon struct {
-	Status int
-	Data   any
-}
-
-type ResponSuccess struct {
-	Status  int
-	Message string
-	Data    any
-}
-type ResponError struct {
-	Status  int
-	Message string
-	Error   string
-}
