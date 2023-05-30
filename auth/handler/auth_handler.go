@@ -209,19 +209,6 @@ func (h *AuthHandler) GoogleCallback(ctx *gin.Context) {
 	userReq.FullName, _ = data["name"].(string)
 	userReq.ImageURL, _ = data["picture"].(string)
 
-	// user := &model.UserReq{
-	// 	Username: data["name"].(string),
-	// 	Email:    data["email"].(string),
-	// 	FullName: data["name"].(string),
-	// 	ImageURL: data["picture"].(string),
-	// }
-	// userReq, errGetUser := h.getUser(client)
-	// if errGetUser != nil {
-	// 	_ = ctx.Error(errGetUser)
-	// 	response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errGetUser.Error())
-	// 	return
-	// }
-
 	user, errSvc := h.svc.FirstOrCreate(userReq)
 	if errSvc != nil {
 		_ = ctx.Error(errSvc)
@@ -276,39 +263,3 @@ func (h *AuthHandler) GoogleCallback(ctx *gin.Context) {
 		"refresh_token": refreshToken,
 	})
 }
-
-// func (h *AuthHandler) getUser(client *http.Client) (*model.UserReq, error) {
-// 	req, errReq := http.NewRequestWithContext(
-// 		context.Background(),
-// 		http.MethodGet, "https://www.googleapis.com/oauth2/v3/userinfo", nil,
-// 	)
-// 	if errReq != nil {
-// 		return nil, errReq
-// 	}
-
-// 	resp, errResp := client.Do(req)
-// 	if errResp != nil {
-// 		return nil, errResp
-// 	}
-// 	defer resp.Body.Close()
-
-// 	body, err := io.ReadAll(resp.Body)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	var data map[string]interface{}
-// 	err = json.Unmarshal(body, &data)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	user := &model.UserReq{
-// 		Username: data["name"].(string),
-// 		Email:    data["email"].(string),
-// 		FullName: data["name"].(string),
-// 		ImageURL: data["picture"].(string),
-// 	}
-
-// 	return user, nil
-// }

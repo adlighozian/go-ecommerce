@@ -64,23 +64,3 @@ func (svc *AuthService) SetRefreshToken(refreshToken string, dataByte []byte, re
 func (svc *AuthService) GetByRefreshToken(token string) (*model.RefreshToken, error) {
 	return svc.repo.GetByRefreshToken(token)
 }
-
-// func (svc *service) Get(ctx *gin.Context) {
-// 	svc.repo.Get()
-// }
-
-// func (svc *service) GetDetail(ctx *gin.Context) {
-// 	svc.repo.GetDetail()
-// }
-
-// func (svc *service) Create(ctx *gin.Context) {
-// 	svc.repo.Create()
-// }
-
-// func (svc *service) Update(ctx *gin.Context) {
-// 	svc.repo.Update()
-// }
-
-// func (svc *service) Delete(ctx *gin.Context) {
-// 	svc.repo.Delete()
-// }

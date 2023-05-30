@@ -42,11 +42,6 @@ func (h *UserHandler) Create() {
 		newUser := new(model.User)
 		for d := range deliveries {
 			_ = json.Unmarshal(d.Body, &newUser)
-			// if errJSONUn != nil {
-			// 	h.logger.Error().Err(errJSONUn).Msg("json.Unmarshal err")
-			// 	_ = d.Nack(false, false)
-			// 	continue
-			// }
 
 			// h.logger.Debug().Msgf("%v", newUser)
 

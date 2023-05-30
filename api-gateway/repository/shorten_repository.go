@@ -109,14 +109,12 @@ func (repo *ShortenRepo) Create(apiManagement *model.APIManagement) (*model.APIM
 	}
 	defer stmt.Close()
 
-	// apiManagement := new(model.APIManagement)
-	row := stmt.QueryRowContext(
+	scanErr := stmt.QueryRowContext(
 		ctx,
 		&apiManagement.APIName, &apiManagement.ServiceName,
 		&apiManagement.EndpointURL, &apiManagement.HashedEndpointURL,
 		&apiManagement.IsAvailable,
-	)
-	scanErr := row.Scan(
+	).Scan(
 		&apiManagement.ID, &apiManagement.CreatedAt, &apiManagement.UpdatedAt,
 	)
 	if scanErr != nil {

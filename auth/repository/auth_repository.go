@@ -197,9 +197,3 @@ func (repo *AuthRepository) GetByRefreshToken(token string) (*model.RefreshToken
 
 	return refreshToken, nil
 }
-
-// func (repo *repository) Update(ctx *gin.Context) {
-// }
-
-// func (repo *repository) Delete(ctx *gin.Context) {
-// }
