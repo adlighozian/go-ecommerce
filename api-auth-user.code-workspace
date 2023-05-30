@@ -1,15 +1,23 @@
 {
 	"folders": [
 		{
+			"name": "api-gateway",
 			"path": "api-gateway"
 		},
 		{
+			"name": "auth",
 			"path": "auth"
 		},
 		{
+			"name": "user-consumer",
+			"path": "user-consumer"
+		},
+		{
+			"name": "docs",
 			"path": "docs"
 		},
 		{
+			"name": "sql",
 			"path": "sql"
 		}
 	],
