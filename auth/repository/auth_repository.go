@@ -151,7 +151,7 @@ func (repo *AuthRepository) getByEmailFromDatabase(email string) (*model.User, e
 	FROM users 
 	INNER JOIN user_settings on users.id = user_settings.user_id
 	INNER JOIN languages on user_settings.language_id= languages.id
-	WHERE email = $1
+	WHERE users.email = $1
 	LIMIT 1
 	`
 	stmt, errStmt := repo.db.PrepareContext(ctx, sqlQuery)
