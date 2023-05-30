@@ -54,6 +54,7 @@ func (svc *service) Delete(cartID int) (err error) {
 	// check cart id exist or not
 	emptyStruct := model.Cart{}
 	res, _ := svc.repo.GetByID(cartID)
+	fmt.Println("STATUS : ", res == emptyStruct)
 	if res == emptyStruct {
 		return fmt.Errorf("item with id %d not found", cartID)
 	}

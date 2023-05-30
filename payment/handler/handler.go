@@ -21,7 +21,7 @@ func NewHandler(svc service.Servicer) Handlerer {
 	}
 }
 
-func (h *handler) CheckTransaction(ctx *gin.Context) {
+func (h *handler) CheckPayment(ctx *gin.Context) {
 	orderID, ok := ctx.GetQuery("order_id")
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query order_id should not be empty"))
@@ -39,12 +39,24 @@ func (h *handler) CheckTransaction(ctx *gin.Context) {
 		return
 	}
 
-	res, err := h.svc.CheckTransaction(orderID)
+	res, err := h.svc.CheckPayment(orderID)
 	if err != nil {
 		response.ResponseError(ctx, http.StatusInternalServerError, err)
 		return
 	}
-	response.ResponseSuccess(ctx, http.StatusOK, res)
+	response.ResponseSuccess(ctx, http.StatusOK, model.PaymentStatusResponse{
+		TransactionTime   : res.TransactionTime,
+		GrossAmount       : res.GrossAmount,
+		Currency          : res.Currency,
+		OrderID           : res.OrderID,
+		PaymentType       : res.PaymentType,
+		TransactionID     : res.TransactionID,
+		TransactionStatus : res.TransactionStatus,
+		SettlementTime    : res.SettlementTime,
+		StatusMessage     : res.StatusMessage,
+		Acquirer          : res.Acquirer,
+		Metadata          : res.Metadata,
+	})
 }
 
 func (h *handler) CreatePaymentLog(ctx *gin.Context) {
@@ -63,11 +75,6 @@ func (h *handler) CreatePaymentLog(ctx *gin.Context) {
 
 	if req.OrderID <= 0 {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("order_id should be positive number"))
-		return
-	}
-
-	if req.PaymentMethodID <= 0 {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("payment_method_id should not be empty"))
 		return
 	}
 

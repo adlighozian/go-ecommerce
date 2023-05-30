@@ -40,9 +40,9 @@ func main() {
 	}()
 
 	// inisialization midtrans connection
-	// coreapi used to get transaction
+	// coreapi used to get Payment
 	// snapclient used for generating redirect_url to midtrans
-	
+
 	var c coreapi.Client
 	var s snap.Client
 	ServerKey := config.Midtrans.ServerID
@@ -63,7 +63,7 @@ func main() {
 	router.Use(gin.Recovery())
 
 	paymentLog := router.Group("/payments")
-	paymentLog.GET("/", handler.CheckTransaction)
+	paymentLog.GET("/", handler.CheckPayment)
 	paymentLog.POST("/", handler.CreatePaymentLog)
 
 	srv := &http.Server{

@@ -20,8 +20,8 @@ func NewMidtrans(coreapiclient coreapi.Client, snapclient snap.Client) MidtransI
 	}
 }
 
-func (m Midtrans) CheckTransaction(orderID string) (*coreapi.TransactionStatusResponse, error) {
-	// get transaction status by order id
+func (m Midtrans) CheckPayment(orderID string) (*coreapi.TransactionStatusResponse, error) {
+	// get transaction status by order id in midtrans
 	resp, err := m.coreapiclient.CheckTransaction(orderID)
 	if err != nil {
 		return nil, fmt.Errorf(err.GetMessage())
@@ -29,8 +29,8 @@ func (m Midtrans) CheckTransaction(orderID string) (*coreapi.TransactionStatusRe
 	return resp, nil
 }
 
-func(m Midtrans) CreateTransaction(req *snap.Request) (*snap.Response, error) {
-	// create transaction
+func(m Midtrans) CreatePayment(req *snap.Request) (*snap.Response, error) {
+	// create transaction in midtrans
 	resp, err := m.snapclient.CreateTransaction(req)
 	if err != nil {
 		return nil, fmt.Errorf(err.GetMessage())

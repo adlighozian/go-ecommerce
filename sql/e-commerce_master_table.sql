@@ -126,7 +126,7 @@ CREATE TABLE "product_images" (
 );
 
 CREATE TABLE "wishlists" (
-  "id" int PRIMARY KEY,
+  "id" serial not null PRIMARY KEY,
   "user_id" int,
   "product_id" int,
   "created_at" timestamp DEFAULT (now()),
@@ -134,7 +134,7 @@ CREATE TABLE "wishlists" (
 );
 
 CREATE TABLE "carts" (
-  "id" int PRIMARY KEY,
+  "id" serial not null PRIMARY KEY,
   "user_id" int,
   "product_id" int,
   "quantity" int,
@@ -191,7 +191,7 @@ CREATE TABLE "payment_logs" (
 );
 
 CREATE TABLE "reviews" (
-  "id" int PRIMARY KEY,
+  "id" serial not null PRIMARY KEY,
   "user_id" int,
   "product_id" int,
   "rating" int,

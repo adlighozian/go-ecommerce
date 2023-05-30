@@ -3,100 +3,227 @@ info:
   title: Swagger E-Commerce
   description: |-
     Swagger E-Commerce API Documentation
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 servers:
-  - url: http://localhost:5000
+  - url: http://localhost:8080
 tags:
+  - name: address
+    description: Address
   - name: auth
     description: Login and Register
   - name: cart
-    description: cart
+    description: Cart
   - name: cms
     description: Content Management System
   - name: product
-    description: Product Management
+    description: Product
   - name: order
     description: Order
   - name: payment
     description: Payment
   - name: review
-    description: review
+    description: Review
+  - name: store
+    description: Store Management in Content Management System Web
   - name: user
-    description: User Profile Management
+    description: User Profile
   - name: voucher
-    description: Voucher Management
+    description: Voucher
   - name: wishlist
-    description: Wishtlist
+    description: Wishlist
 paths:
+  /address:
+    get:
+      tags:
+        - address
+      summary: Get Address by User ID
+      parameters:
+        - name: user_id
+          in: query
+          description: user_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Address'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - address
+      summary: Insert Multiple Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AddressRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Address'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - address
+      summary: Delete Address By Address ID
+      parameters:
+        - name: address_id
+          in: query
+          description: address_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkDelete'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
   /carts:
     get:
       tags:
         - cart
       summary: Get Carts by User ID
-      operationId: test
       parameters:
-        - name: voucherID
+        - name: user_id
           in: query
-          description: Voucher ID
+          description: user_id
           required: true
           schema:
             type: string
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
-        '404':
-          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     post:
       tags:
         - cart
-      summary: Insert Item in Cart by User ID
-      operationId: test
-      parameters:
-        - name: voucherID
-          in: query
-          description: Voucher ID
-          required: true
-          schema:
-            type: string
+      summary: Insert Multiple Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CartRequest'
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     delete:
       tags:
         - cart
       summary: Delete Cart by User ID
-      operationId: test
       parameters:
-        - name: voucherID
+        - name: cart_id
           in: query
-          description: Voucher ID
+          description: cart_id
           required: true
           schema:
             type: string
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkDelete'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
   /login:
     post:
       tags:
@@ -107,12 +234,28 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '401':
-          description: Not Authorized
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
   /login/cms:
     post:
       tags:
@@ -123,12 +266,28 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '401':
-          description: Not Authorized
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /register:
     post:
@@ -140,12 +299,28 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '401':
-          description: Not Authorized
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /products:
     get:
@@ -181,12 +356,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     post:
       tags:
         - cms
@@ -195,12 +380,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     patch:
       tags:
         - cms
@@ -209,12 +404,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
   /products/details:
     get:
       tags:
@@ -237,12 +442,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /profiles:
     get:
@@ -260,12 +475,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     patch:
       tags:
         - user
@@ -281,12 +506,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /orders:
     get:
@@ -304,12 +539,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     post:
       tags:
         - order
@@ -318,12 +563,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     patch:
       tags:
         - cms
@@ -339,12 +594,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /orders/details:
     get:
@@ -368,28 +633,75 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /payments:
-    post:
+    get:
       tags:
         - payment
-      summary: Insert New Payment Log
-      operationId: test
+      summary: Get Payment Detail in Midtrans
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MidtransCheckPaymentResponse'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - payment
+      summary: Insert Payment to Midtrans
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MidtransPaymentRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MidtransInsertPaymentResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
  
   /splashs:
     get:
@@ -400,12 +712,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     post:
       tags:
         - cms
@@ -414,12 +736,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     patch:
       tags:
         - cms
@@ -428,87 +760,206 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
   
   /stores:
+    get:
+      tags:
+        - store
+      summary: Get All Store
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Store'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     post:
       tags:
-        - cms
-      summary: Insert New Store Data
-      operationId: test
+        - store
+      summary: Insert Multiple Store Data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/StoreRequest'
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Store'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
-    patch:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
       tags:
-        - cms
-      summary: Update Existing Store Data by Store ID
-      operationId: test
+        - store
+      summary: Delete Store by ID
+      parameters:
+        - name: store_id
+          in: query
+          description: store_id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkDelete'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /reviews:
     get:
       tags:
         - review
       summary: Get review By Product ID
-      description: test
-      operationId: test
       parameters:
-        - name: pagination
+        - name: product_id
           in: query
-          description: Pagination
-          required: false
-          schema:
-            type: string
-        - name: limit
-          in: query
-          description: Limit
-          required: false
+          description: product_id
+          required: true
           schema:
             type: string
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OkDelete'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     post:
       tags:
         - review
-      summary: Insert New review By Product ID
-      description: test
-      operationId: test
+      summary: Insert Multiple Review by Product ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReviewRequest'
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - review
+      summary: Delete Review by ID
+      parameters:
+        - name: review_id
+          in: query
+          description: review_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkDelete'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
 
   /vouchers:
     get:
@@ -533,12 +984,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     post:
       tags:
         - cms
@@ -548,12 +1009,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     patch:
       tags:
         - cms
@@ -563,12 +1034,22 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /vouchers/details:
     get:
@@ -587,79 +1068,483 @@ paths:
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
   /wishlist:
     get:
       tags:
         - wishlist
-      summary: Get Wishlist by User ID
-      operationId: test
+      summary: Get Wishlists by User ID
       parameters:
-        - name: voucherID
+        - name: user_id
           in: query
-          description: Voucher ID
+          description: user_id
           required: true
           schema:
             type: string
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     post:
       tags:
         - wishlist
-      summary: Insert New Wishlist by User ID
-      operationId: test
-      parameters:
-        - name: voucherID
-          in: query
-          description: Voucher ID
-          required: true
-          schema:
-            type: string
+      summary: Insert Multiple Wishlist
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/WishlistRequest'
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Cart'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
     delete:
       tags:
         - wishlist
       summary: Delete Wishlist by User ID
-      operationId: test
       parameters:
-        - name: voucherID
+        - name: wishlist_id
           in: query
-          description: Voucher ID
+          description: wishlist_id
           required: true
           schema:
             type: string
       responses:
         '200':
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkDelete'
         '400':
           description: Bad Request
-        '401':
-          description: Not Authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
 components:
   schemas:
+    OkDelete:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int
+          example: 200
+        message:
+          type: string
+          format: string
+          example: "Ok"
+        data:
+          example: null
+    BadRequest:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int
+          example: 400
+        message:
+          type: string
+          format: string
+          example: "Bad Request"
+        error:
+          type: string
+          format: string
+          example: "some error"
+    Unauthorized:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int
+          example: 401
+        message:
+          type: string
+          format: string
+          example: "Unautorized"
+        error:
+          type: string
+          format: string
+          example: "not authorize"
+    NotFound:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int
+          example: 404
+        message:
+          type: string
+          format: string
+          example: "Unautorized"
+        error:
+          type: string
+          format: string
+          example: "some error"
+    InternalServerError:
+      type: object
+      properties:
+        status:
+          type: integer
+          format: int
+          example: 500
+        message:
+          type: string
+          format: string
+          example: "Internal Server Error"
+        error:
+          type: string
+          format: string
+          example: "some error"
+    Address:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        street:
+          type: string
+          format: int
+          example: Menteng Street
+        city:
+          type: string
+          format: int
+          example: South Jakarta
+        state:
+          type: string
+          format: int
+          example: Jakarta
+        country:
+          type: string
+          format: int
+          example: Indonesia
+        zipcode:
+          type: integer
+          format: int
+          example: 55555
+        phone_number:
+          type: integer
+          format: int
+          example: 088243379274
+    AddressRequest:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        street:
+          type: string
+          format: int
+          example: Menteng Street
+        city:
+          type: string
+          format: int
+          example: South Jakarta
+        state:
+          type: string
+          format: int
+          example: Jakarta
+        country:
+          type: string
+          format: int
+          example: Indonesia
+        zipcode:
+          type: integer
+          format: int
+          example: 55555
+        phone_number:
+          type: integer
+          format: int
+          example: 088243379274
+    Cart:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        product_id:
+          type: integer
+          format: int
+          example: 1
+        quantity:
+          type: integer
+          format: int
+          example: 5
+    CartRequest:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        product_id:
+          type: integer
+          format: int
+          example: 1
+        quantity:
+          type: integer
+          format: int
+          example: 5
+    MidtransCheckPaymentResponse:
+      type: object
+      properties:
+        transaction_time:
+          type: string
+          format: string
+          example: 2023-05-29 15:59:56
+        gross_amount:
+          type: string
+          format: string
+          example: 150000
+        currency:
+          type: string
+          format: string
+          example: IDR
+        order_id:
+          type: string
+          format: string
+          example: 8
+        payment_type:
+          type: string
+          format: string
+          example: qris
+        transaction_id:
+          type: string
+          format: string
+          example: 008c42fe-2e4c-487f-9678-db73f8f094be
+        transaction_status:
+          type: string
+          format: string
+          example: status
+        settlement_Time:
+          type: string
+          format: string
+          example: 2023-05-29 16:59:56
+        status_Message:
+          type: string
+          format: string
+          example: Success, transaction is found
+        acquirer:
+          type: string
+          format: string
+          example: gopay
+        metadata:
+          type: object
+          properties:
+            user_id:
+              type: string
+              format: string
+              example: 2
+    MidtransPaymentRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        order_id:
+          type: integer
+          format: int
+          example: 1
+        total_payment:
+          type: number
+          format: float64
+          example: 199999.99
+    MidtransInsertPaymentResponse:
+      type: object
+      properties:
+        redirect_url:
+          type: string
+          format: string
+          example: https://app.sandbox.midtrans.com/snap/v3/redirection/bdb43983-20bb-4b34-a329-ca42e4c3a4b6
+        token:
+          type: string
+          format: string
+          example: bdb43983-20bb-4b34-a329-ca42e4c3a4b6
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        product_id:
+          type: integer
+          format: int
+          example: 1
+        rating_id:
+          type: integer
+          format: int
+          example: 1
+        review_text:
+          type: string
+          format: string
+          example: good quality
+    ReviewRequest:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        product_id:
+          type: integer
+          format: int
+          example: 1
+        rating_id:
+          type: integer
+          format: int
+          example: 1
+        review_text:
+          type: string
+          format: string
+          example: good quality
+    Store:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        address_id:
+          type: integer
+          format: int
+          example: 1
+        name:
+          type: string
+          format: string
+          example: Branch Menteng
+        description:
+          type: string
+          format: string
+          example: Fashion Store
+        image_url:
+          type: string
+          format: string
+          example: https://phincon.com/
+    StoreRequest:
+      type: object
+      properties:
+        address_id:
+          type: integer
+          format: int
+          example: 1
+        name:
+          type: string
+          format: string
+          example: Branch Menteng
+        description:
+          type: string
+          format: string
+          example: Fashion Store
+        image_url:
+          type: string
+          format: string
+          example: https://phincon.com/
+    Wishlist:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        product_id:
+          type: integer
+          format: int
+          example: 1
+    WishlistRequest:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        product_id:
+          type: integer
+          format: int
+          example: 1
     Order:
       type: object
       properties:
@@ -709,23 +1594,7 @@ components:
             $ref: '#/components/schemas/Address'
       xml:
         name: customer
-    Address:
-      type: object
-      properties:
-        street:
-          type: string
-          example: 437 Lytton
-        city:
-          type: string
-          example: Palo Alto
-        state:
-          type: string
-          example: CA
-        zip:
-          type: string
-          example: '94301'
-      xml:
-        name: address
+
     Category:
       type: object
       properties:
