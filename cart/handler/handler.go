@@ -21,7 +21,7 @@ func NewHandler(svc service.Servicer) Handlerer {
 }
 
 func (h *handler) Get(ctx *gin.Context) {
-	userIDString := ctx.GetHeader("user_id")
+	userIDString := ctx.GetHeader("user-id")
 
 	userID, err := strconv.Atoi(userIDString)
 	if err != nil {
