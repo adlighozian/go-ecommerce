@@ -47,6 +47,7 @@ func main() {
 	review := router.Group("/reviews")
 	review.GET("/", handler.GetByProductID)
 	review.POST("/", handler.Create)
+	review.DELETE("/", handler.Delete)
 
 	srv := &http.Server{
 		Addr:         ":" + config.Port,

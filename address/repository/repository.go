@@ -27,12 +27,7 @@ func (repo *repository) Get(userID int) (res []model.Address, err error) {
 	defer cancel()
 
 	query := `SELECT id, user_id, street, state, city, country, zipcode, phone_number FROM addresses WHERE user_id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx, userID)
+	result, err := repo.db.QueryContext(ctx, query, userID)
 	if err != nil {
 		return
 	}
@@ -67,12 +62,7 @@ func (repo *repository) Delete(addressID int) (err error) {
 	defer cancel()
 
 	query := `DELETE FROM addresses WHERE id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	_, err = stmt.QueryContext(ctx, addressID)
+	_, err = repo.db.QueryContext(ctx, query, addressID)
 	if err != nil {
 		return
 	}

@@ -72,12 +72,7 @@ func (repo *repository) GetDetail(userID, productID int) (res model.Cart, err er
 	defer cancel()
 
 	query := `SELECT id, user_id, product_id, quantity FROM carts WHERE user_id = $1 AND product_id = $2`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx, userID, productID)
+	result, err := repo.db.QueryContext(ctx, query, userID, productID)
 	if err != nil {
 		return
 	}
@@ -113,12 +108,7 @@ func (repo *repository) Delete(cartID int) (err error) {
 	defer cancel()
 
 	query := `DELETE FROM carts WHERE id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	_, err = stmt.QueryContext(ctx, cartID)
+	_, err = repo.db.QueryContext(ctx, query, cartID)
 	if err != nil {
 		return
 	}
