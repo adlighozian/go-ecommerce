@@ -21,12 +21,7 @@ func NewHandler(svc service.Servicer) Handlerer {
 }
 
 func (h *handler) Get(ctx *gin.Context) {
-	userIDString, ok := ctx.GetQuery("user_id")
-	fmt.Println(ok)
-	if !ok {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param user_id should not be empty"))
-		return
-	}
+	userIDString := ctx.GetHeader("user_id")
 
 	userID, err := strconv.Atoi(userIDString)
 	if err != nil {
