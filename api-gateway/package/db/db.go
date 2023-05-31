@@ -2,6 +2,7 @@ package db
 
 import (
 	"api-gateway-go/helper/timeout"
+	"api-gateway-go/model"
 	"database/sql"
 	"errors"
 	"time"
@@ -13,6 +14,7 @@ import (
 
 type GormDB struct {
 	SQLDB *sql.DB
+	Gorm  *gorm.DB
 }
 
 func NewGormDB(debug bool, driver, url string) (*GormDB, error) {
@@ -54,7 +56,9 @@ func (g *GormDB) init(debug bool, driver, url string) error {
 		return err
 	}
 
-	// _ = db.AutoMigrate(new(model.APIManagement))
+	if debug {
+		_ = db.AutoMigrate(new(model.APIManagement))
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -70,6 +74,7 @@ func (g *GormDB) init(debug bool, driver, url string) error {
 		return err
 	}
 
+	g.Gorm = db
 	g.SQLDB = sqlDB
 	return nil
 }

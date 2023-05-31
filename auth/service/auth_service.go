@@ -44,15 +44,17 @@ func (svc *AuthService) FirstOrCreate(userReq *model.UserReq) (*model.User, erro
 	return svc.repo.FirstOrCreate(newUser)
 }
 
-func (svc *AuthService) GetByEmail(loginReq *model.LoginReq) (*model.User, error) {
-	user, errRepo := svc.repo.GetByEmail(loginReq.Email)
+func (svc *AuthService) LoginByEmail(loginReq *model.LoginReq) (*model.User, error) {
+	user, errRepo := svc.repo.LoginByEmail(loginReq.Email)
 	if errRepo != nil {
 		return nil, errRepo
 	}
 
-	if isPasswordCorrect := authjwt.CheckPasswordHash(loginReq.Password, user.Password); !isPasswordCorrect {
+	if isPasswordCorrect := authjwt.CheckPasswordHash(user.Password, loginReq.Password); !isPasswordCorrect {
 		return nil, errors.New("incorrect password")
 	}
+
+	user.Password = ""
 
 	return user, nil
 }
@@ -64,23 +66,3 @@ func (svc *AuthService) SetRefreshToken(refreshToken string, dataByte []byte, re
 func (svc *AuthService) GetByRefreshToken(token string) (*model.RefreshToken, error) {
 	return svc.repo.GetByRefreshToken(token)
 }
-
-// func (svc *service) Get(ctx *gin.Context) {
-// 	svc.repo.Get()
-// }
-
-// func (svc *service) GetDetail(ctx *gin.Context) {
-// 	svc.repo.GetDetail()
-// }
-
-// func (svc *service) Create(ctx *gin.Context) {
-// 	svc.repo.Create()
-// }
-
-// func (svc *service) Update(ctx *gin.Context) {
-// 	svc.repo.Update()
-// }
-
-// func (svc *service) Delete(ctx *gin.Context) {
-// 	svc.repo.Delete()
-// }

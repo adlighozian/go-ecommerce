@@ -32,7 +32,8 @@ func (svc *ShortenService) Create(shortenReq *model.ShortenReq) (*model.APIManag
 		ServiceName:       shortenReq.ServiceName,
 		EndpointURL:       url,
 		HashedEndpointURL: hashedURL,
-		IsAvailable:       shortenReq.IsAvailable,
+		IsAvailable:       *shortenReq.IsAvailable,
+		NeedBypass:        *shortenReq.NeedBypass,
 	}
 	return svc.repo.Create(apiManagement)
 }

@@ -2,6 +2,8 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
+	"strings"
 	"user-consumer-go/helper/timeout"
 	"user-consumer-go/model"
 )
@@ -60,6 +62,70 @@ func (repo *UserRepository) Create(user *model.User) (*model.User, error) {
 	}
 
 	_ = tx.Commit()
+
+	return user, nil
+}
+
+func (repo *UserRepository) UpdateByID(user *model.User) (*model.User, error) {
+	// Prepare the SQL statement
+	var columns []string
+	var args []interface{}
+	var argPos = 1
+
+	if user.Username != "" {
+		columns = append(columns, fmt.Sprintf("username = $%d", argPos))
+		args = append(args, user.Username)
+		argPos++
+	}
+
+	if user.FullName != "" {
+		columns = append(columns, fmt.Sprintf("full_name = $%d", argPos))
+		args = append(args, user.FullName)
+		argPos++
+	}
+
+	if user.Age != 0 {
+		columns = append(columns, fmt.Sprintf("age = $%d", argPos))
+		args = append(args, user.Age)
+		argPos++
+	}
+
+	if user.ImageURL != "" {
+		columns = append(columns, fmt.Sprintf("image_url = $%d", argPos))
+		args = append(args, user.ImageURL)
+		argPos++
+	}
+
+	if len(columns) == 0 {
+		return user, nil // no update needed
+	}
+
+	// Append the user ID at the end
+	args = append(args, user.ID)
+	//nolint:gosec // hard to avoid this
+	query := fmt.Sprintf(
+		`
+	UPDATE users SET %s 
+	WHERE id = $%d 
+	RETURNING id, username, full_name, age, image_url 
+	`, strings.Join(columns, ", "), argPos,
+	)
+
+	ctx, cancel := timeout.NewCtxTimeout()
+	defer cancel()
+
+	stmt, errStmt2 := repo.db.PrepareContext(ctx, query)
+	if errStmt2 != nil {
+		return nil, errStmt2
+	}
+	defer stmt.Close()
+
+	errScan := stmt.QueryRowContext(ctx, args...).Scan(
+		&user.ID, &user.Username, &user.FullName, &user.Age, &user.ImageURL,
+	)
+	if errScan != nil {
+		return nil, errScan
+	}
 
 	return user, nil
 }

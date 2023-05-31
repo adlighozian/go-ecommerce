@@ -21,34 +21,43 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//nolint:funlen // hard to avoid
 func main() {
+	// * load config from .env using viper
 	config, errConf := config.LoadConfig()
 	if errConf != nil {
 		log.Fatalf("load config err:%s", errConf)
 	}
 
+	// * setup logger config
 	logger := logging.New(config.Debug)
 
+	// * connect to postgres using gorm
 	sqlDB, errDB := db.NewGormDB(config.Debug, config.Database.Driver, config.Database.URL)
 	if errDB != nil {
 		logger.Fatal().Err(errDB).Msg("db failed to connect")
 	}
 	logger.Debug().Msg("db connected")
 
+	// * connect to redis using redis client
 	redisClient, errRedis := redisclient.NewRedisClient(config.Redis.Addr, config.Redis.Password, config.Redis.DB)
 	if errDB != nil {
 		logger.Fatal().Err(errRedis).Msg("redis failed to connect")
 	}
 	logger.Debug().Msg("redis connected")
 
-	// Initialize Gorm adapter and the Casbin enforcer with the model
-	adapter, _ := gormadapter.NewAdapter(config.Database.Driver, config.Database.URL, config.Database.DBName, true)
+	// * Initialize the Casbin Gorm adapter and the Casbin enforcer with the model
+	adapter, _ := gormadapter.NewAdapterByDB(sqlDB.Gorm)
+	if !config.Debug {
+		gormadapter.TurnOffAutoMigrate(sqlDB.Gorm)
+	}
 	enforcer, errEnforcer := casbin.NewEnforcer("./model.conf", adapter)
-	if errDB != nil {
+	if errEnforcer != nil {
 		logger.Fatal().Err(errEnforcer).Msg("enforcer failed")
 	}
 	logger.Debug().Msg("enforcer connected")
 
+	// * closing all connection after get interrupt signal
 	defer func() {
 		errDBC := sqlDB.Close()
 		if errDBC != nil {
@@ -72,44 +81,53 @@ func main() {
 	router := gin.New()
 	router.Use(cors.Default())
 
-	// 9. Error and panic handling
+	// * 9. Error and panic handling
 	router.Use(middleware.Logger(logger))
 	router.Use(gin.Recovery())
 
-	// 1. Paramater validation,
-	// 6. Dynamic routing using path parameters,
-	// 7. Service discovery using database,
-	router.Use(middleware.HashedURLConverter(shortenSvc))
-
-	// 2. Allow-path
-	allowedPaths := []string{
-		// "ping",
-		"register",
-		"login", "login/cms",
+	router.GET("/ping", pingHandler.Ping)
+	if config.Debug {
+		router.POST("/shorten", shortenHandler.Shorten)
 	}
-	// 3. Authentication
-	router.Use(middleware.AuthMiddleware(config.JWTSecretKey, allowedPaths))
-	// 4. Authorization
-	router.Use(middleware.AuthzMiddleware(enforcer, allowedPaths))
 
-	router.Use(requestid.New())
-	// 5. Request counter
-	router.Use(middleware.RequestCounter(redisClient.Redis))
+	short := router.Group("/v1")
 
-	// things outside my capabilities:
-	// 2. Allow-list based on IPs
-	// 10. Circuit Breaker
-	// 11. Monitoring
-	// 12. Cache
+	// * 1. Paramater validation,
+	// * 6. Dynamic routing using path parameters,
+	// * 7. Service discovery using database,
+	short.Use(middleware.HashedURLConverter(shortenSvc))
+
+	// * 2. Allow-path
+	// allowedPaths := []string{
+	// 	"auth/ping",
+	// 	"auth/register",
+	// 	"auth/login",
+	// 	"auth/google/login",
+
+	// 	"login/cms",
+	// }
+	// * 3. Authentication
+	short.Use(middleware.AuthMiddleware(config.JWTSecretKey))
+	// * 4. Authorization
+	short.Use(middleware.AuthzMiddleware(enforcer))
+
+	short.Use(requestid.New())
+	// * 5. Request counter
+	short.Use(middleware.RequestCounter(redisClient.Redis))
+
+	// * things outside my capabilities:
+	// * 2. Allow-list based on IPs
+	// * 10. Circuit Breaker
+	// * 11. Monitoring
+	// * 12. Cache
 
 	// if config.Debug {
-	// 	pprof.Register(router)
+	// 	pprof.Register(short)
 	// }
 
-	router.GET("/ping", pingHandler.Ping)
-
-	router.POST("/shorten", shortenHandler.Shorten)
-	router.Any("/:hash", shortenHandler.Get)
+	{
+		short.Any("/:hash", shortenHandler.Get)
+	}
 
 	srv := &http.Server{
 		Addr:         ":" + config.Port,
@@ -118,6 +136,7 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
+	// * run the ListenAndServe() of a server
 	if errSrv := server.Run(srv, logger); errSrv != nil {
 		logger.Fatal().Err(errSrv).Msg("server shutdown failed")
 	}

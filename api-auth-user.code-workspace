@@ -13,6 +13,10 @@
 			"path": "user-consumer"
 		},
 		{
+			"name": "user",
+			"path": "user"
+		},
+		{
 			"name": "docs",
 			"path": "docs"
 		},
