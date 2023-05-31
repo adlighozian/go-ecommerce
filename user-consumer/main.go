@@ -52,14 +52,12 @@ func main() {
 	userSvc := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(rmq, logger, userSvc)
 
-	userHandler.Create()
-	userHandler.UpdateByID()
-
 	// Channel to listen for interrupt signal
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
 	userHandler.Create()
+	userHandler.UpdateByID()
 
 	logger.Debug().Msg("[*] To exit press CTRL+C")
 
