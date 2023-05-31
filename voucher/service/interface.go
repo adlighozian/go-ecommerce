@@ -1,9 +1,10 @@
-package  service
+package service
+
+import "voucher-go/model"
 
 type Servicer interface {
-	Get(..., err error)
-	GetDetail(..., err error)
-	Create(..., err error)
-	Update(..., err error)
-	Delete(..., err error)
+	GetVoucher(idUser int) (model.Respon, error)
+	ShowVoucher(code string) (model.Respon, error)
+	CreateVoucher(req []model.VoucherReq) (model.Respon, error)
+	DeleteVoucher(idVoucher int) (model.Respon, error)
 }

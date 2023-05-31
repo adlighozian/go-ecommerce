@@ -73,11 +73,21 @@ func (h *handler) CreateProduct(ctx *gin.Context) {
 }
 
 func (h *handler) UpdateProduct(ctx *gin.Context) {
+	id := ctx.Query("id")
 	var data model.ProductReq
+
 	err := ctx.ShouldBindJSON(&data)
 	failerror.FailError(err, "error bind json")
 
-	res, err := h.svc.UpdateProduct(data)
+	var numi int
+
+	if id != "" {
+		num, err := strconv.Atoi(id)
+		failerror.FailError(err, "error convert to int")
+		numi = num
+	}
+
+	res, err := h.svc.UpdateProduct(data, numi)
 	if err != nil {
 		response.ResponseError(ctx, res.Status, err)
 	} else {

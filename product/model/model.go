@@ -34,7 +34,6 @@ type ProductReq struct {
 	UnitPrice   float64 `json:"unit_price"`
 	Status      bool    `json:"status"`
 	Stock       int     `json:"stock"`
-	Sku         string  `json:"sku"`
 	Weight      float64 `json:"weight"`
 }
 
@@ -51,12 +50,12 @@ type ProductSearch struct {
 }
 
 type ResponSuccess struct {
-	Status  int
-	Message string
-	Data    any
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
 }
 type ResponError struct {
-	Status  int
-	Message string
-	Error   string
+	Status  int    `json:"status"`
+	Message string `json:"message"`
+	Error   string `json:"error"`
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"order-go/helper/failerror"
 	"order-go/helper/response"
 	"order-go/model"
@@ -65,11 +66,12 @@ func (h *handler) ShowOrders(ctx *gin.Context) {
 }
 
 func (h *handler) CreateOrders(ctx *gin.Context) {
-
-	var data []model.OrderReq
+	var data model.GetOrders
 
 	err := ctx.ShouldBindJSON(&data)
 	failerror.FailError(err, "error bind json")
+
+	fmt.Println(data)
 
 	res, err := h.svc.CreateOrders(data)
 	if err != nil {

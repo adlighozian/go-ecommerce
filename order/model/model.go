@@ -13,10 +13,36 @@ type Orders struct {
 	OrderNumber string    `json:"order_number"`
 }
 
-type OrderReq struct {
-	UserID     int
-	ShippingID int
-	TotalPrice float64
+type OrderItem struct {
+	Id         int       `json:"id"`
+	OrderID    int       `json:"order_id"`
+	ProductId  int       `json:"product_id"`
+	Quantity   int       `json:"quantity"`
+	TotalPrice float64   `json:"total_price"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+}
+
+type GetOrders struct {
+	UserID       int            `json:"user_id"`
+	ShippingID   int            `json:"shipping_id"`
+	TotalPrice   float64        `json:"total_price"`
+	OrderItemReq []OrderItemReq `json:"order_items"`
+}
+
+type OrderItemReq struct {
+	ProductId  int     `json:"product_id"`
+	Quantity   int     `json:"quantity"`
+	TotalPrice float64 `json:"total_price"`
+}
+
+type GetOrdersSent struct {
+	UserID       int            `json:"user_id"`
+	ShippingID   int            `json:"shipping_id"`
+	TotalPrice   float64        `json:"total_price"`
+	Status       bool           `json:"status"`
+	OrderNumber  string         `json:"order_number"`
+	OrderItemReq []OrderItemReq `json:"order_items"`
 }
 
 type OrderItems struct {

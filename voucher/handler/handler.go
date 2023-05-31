@@ -1,37 +1,83 @@
 package handler
 
 import (
-	"net/http"
+	"strconv"
+	"voucher-go/helper/failerror"
+	"voucher-go/helper/response"
+	"voucher-go/model"
+	"voucher-go/service"
+
 	"github.com/gin-gonic/gin"
-	"auth-go/service"
 )
 
 type handler struct {
 	svc service.Servicer
 }
 
-func NewHandler(svc service.Servicer) *Handlerer {
+func NewHandler(svc service.Servicer) Handlerer {
 	return &handler{
 		svc: svc,
 	}
 }
 
-func (h *handler) Get(ctx *gin.Context) {
-	h.svc.GetList()
+func (h *handler) GetVoucher(ctx *gin.Context) {
+	id := ctx.Query("user_id")
+	var numi int
+
+	if id != "" {
+		num, err := strconv.Atoi(id)
+		failerror.FailError(err, "error convert to int")
+		numi = num
+	}
+
+	res, err := h.svc.GetVoucher(numi)
+	if err != nil {
+		response.ResponseError(ctx, res.Status, err)
+	} else {
+		response.ResponseSuccess(ctx, res.Status, res.Data)
+	}
+
 }
 
-func (h *handler) GetDetail(ctx *gin.Context) {
-	h.svc.GetDetail()
+func (h *handler) ShowVoucher(ctx *gin.Context) {
+	code := ctx.Query("code")
+
+	res, err := h.svc.ShowVoucher(code)
+	if err != nil {
+		response.ResponseError(ctx, res.Status, err)
+	} else {
+		response.ResponseSuccess(ctx, res.Status, res.Data)
+	}
 }
 
-func (h *handler) Create(ctx *gin.Context) {
-	h.svc.Create()
+func (h *handler) CreateVoucher(ctx *gin.Context) {
+	var data []model.VoucherReq
+
+	err := ctx.ShouldBindJSON(&data)
+	failerror.FailError(err, "error bind json")
+
+	res, err := h.svc.CreateVoucher(data)
+	if err != nil {
+		response.ResponseError(ctx, res.Status, err)
+	} else {
+		response.ResponseSuccess(ctx, res.Status, res.Data)
+	}
 }
 
-func (h *handler) Update(ctx *gin.Context) {
-	h.svc.Update()
-}
+func (h *handler) DeleteVoucher(ctx *gin.Context) {
+	id := ctx.Query("id")
+	var numi int
 
-func (h *handler) Delete(ctx *gin.Context) {
-	h.svc.Delete()
+	if id != "" {
+		num, err := strconv.Atoi(id)
+		failerror.FailError(err, "error convert to int")
+		numi = num
+	}
+
+	res, err := h.svc.DeleteVoucher(numi)
+	if err != nil {
+		response.ResponseError(ctx, res.Status, err)
+	} else {
+		response.ResponseSuccess(ctx, res.Status, res.Data)
+	}
 }

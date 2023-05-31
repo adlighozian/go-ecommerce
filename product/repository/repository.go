@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"product-go/helper/failerror"
 	"product-go/helper/random"
 	"product-go/helper/timeout"
@@ -29,15 +30,12 @@ func (repo *repository) GetProduct(req model.ProductSearch) ([]model.Product, er
 
 	querySearchProduct := `select p.id, p.store_id, p.category_id, p.size_id, p.color_id ,p.name,p.subtitle ,p.description ,p.unit_price ,p.status ,p.stock ,p.sku ,p.weight ,p.created_at ,p.updated_at from products p  join categories c on c.id = p.category_id join product_sizes s on s.id = p.size_id join product_colors co on co.id = p.color_id where c.name like '%' || $1 || '%' and s.name like '%' || $2 || '%' and co.name like '%' || $3 || '%'`
 
-	stmt, err := repo.db.PrepareContext(ctx, querySearchProduct)
-	failerror.FailError(err, "error prepare")
-
-	result, err := stmt.QueryContext(ctx, req.Brand, req.Name, req.Category)
+	result, err := repo.db.QueryContext(ctx, querySearchProduct, req.Brand, req.Name, req.Category)
 	if err != nil {
 		return []model.Product{}, errors.New("error get product")
 	}
 
-	var data []model.Product
+	var data = []model.Product{}
 
 	for result.Next() {
 		var temp model.Product
@@ -54,10 +52,7 @@ func (repo *repository) ShowProduct(id int) (model.Product, error) {
 
 	query := `select  id, store_id, category_id, size_id, color_id , name, subtitle , description , unit_price , status , stock ,sku , weight , created_at , updated_at from products p where id = $1`
 
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	failerror.FailError(err, "error prepare")
-
-	result, err := stmt.QueryContext(ctx, id)
+	result, err := repo.db.QueryContext(ctx, query, id)
 	failerror.FailError(err, "error prepare")
 
 	var temp model.Product
@@ -72,10 +67,10 @@ func (repo *repository) CreateProduct(req []model.ProductReq) ([]model.Product, 
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
-	var sent []model.ProductReq
+	var sent []model.Product
 
 	for _, v := range req {
-		inrandom := model.ProductReq{
+		inrandom := model.Product{
 			StoreID:     v.StoreID,
 			CategoryID:  v.CategoryID,
 			SizeID:      v.SizeID,
@@ -84,7 +79,7 @@ func (repo *repository) CreateProduct(req []model.ProductReq) ([]model.Product, 
 			Subtitle:    v.Subtitle,
 			Description: v.Description,
 			UnitPrice:   v.UnitPrice,
-			Status:      v.Status,
+			Status:      false,
 			Stock:       v.Stock,
 			Sku:         random.NewRandom().RandomString(),
 			Weight:      v.Weight,
@@ -102,10 +97,11 @@ func (repo *repository) CreateProduct(req []model.ProductReq) ([]model.Product, 
 
 	var resultss []model.Product
 	query := `select  id, store_id, category_id, size_id, color_id , name, subtitle , description , unit_price , status , stock ,sku , weight , created_at , updated_at from products p where sku = $1`
-	for _, v := range sent {
 
-		stmt, err := repo.db.PrepareContext(ctx, query)
-		failerror.FailError(err, "error prepare")
+	stmt, err := repo.db.PrepareContext(ctx, query)
+	failerror.FailError(err, "error prepare")
+
+	for _, v := range sent {
 
 		result, err := stmt.QueryContext(ctx, v.Sku)
 		failerror.FailError(err, "error prepare")
@@ -127,9 +123,33 @@ func (repo *repository) CreateProduct(req []model.ProductReq) ([]model.Product, 
 	return resultss, nil
 }
 
-func (repo *repository) UpdateProduct(req model.ProductReq) error {
+func (repo *repository) UpdateProduct(req model.ProductReq) (model.Product, error) {
+	ctx, cancel := timeout.NewCtxTimeout()
+	defer cancel()
 
-	return nil
+	err := repo.sent.Public(req, "update_product")
+	if err != nil {
+		return model.Product{}, errors.New("failed publisher")
+	}
+
+	log.Println(req)
+	time.Sleep(1 * time.Second)
+
+	query := `select * from products p where id = $1`
+
+	result, err := repo.db.QueryContext(ctx, query, req.Id)
+	failerror.FailError(err, "error prepare")
+
+	var temp model.Product
+	for result.Next() {
+		result.Scan(&temp.Id, &temp.StoreID, &temp.CategoryID, &temp.SizeID, &temp.ColorID, &temp.Name, &temp.Subtitle, &temp.Description, &temp.UnitPrice, &temp.Status, &temp.Stock, &temp.Sku, &temp.Weight, &temp.Created_at, &temp.Update_at)
+	}
+
+	if temp.Id == 0 {
+		return model.Product{}, errors.New("error create product")
+	}
+
+	return temp, nil
 }
 
 func (repo *repository) DeleteProduct(id int) error {
@@ -137,14 +157,18 @@ func (repo *repository) DeleteProduct(id int) error {
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
-	query := `DELETE FROM products WHERE id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	failerror.FailError(err, "")
+	// var idCheck int
+	// queryCheck := `select id from products where id = $1 returning id`
+	// err := repo.db.QueryRowContext(ctx, queryCheck, id).Scan(&idCheck)
+	// failerror.FailError(err, "error exec")
 
-	_, err = stmt.ExecContext(ctx, id)
-	if err != nil {
-		return errors.New("error id product not found")
-	}
+	// if idCheck == 0 {
+	// 	return errors.New("id tidak ditemukan")
+	// }
+
+	query := `DELETE FROM products WHERE id = $1`
+	_, err := repo.db.ExecContext(ctx, query, id)
+	failerror.FailError(err, "error exec")
 
 	return nil
 }

@@ -1,37 +1,117 @@
-package  service
+package service
 
 import (
+	"errors"
 	"net/http"
-	"github.com/gin-gonic/gin"
-	"auth-go/repository"
+	"voucher-go/model"
+	"voucher-go/repository"
 )
 
 type service struct {
 	repo repository.Repositorier
 }
 
-func NewService(repo repository.Repositorier) *Servicer {
+func NewService(repo repository.Repositorier) Servicer {
 	return &service{
 		repo: repo,
 	}
 }
 
-func (svc *service) Get(ctx *gin.Context) {
-	svc.repo.Get()
+func (svc *service) GetVoucher(idUser int) (model.Respon, error) {
+
+	if idUser == 0 {
+		return model.Respon{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+		}, errors.New("error get, id user not found")
+	}
+
+	// start
+	res, err := svc.repo.GetVoucher(idUser)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
+	return model.Respon{
+		Status: http.StatusOK,
+		Data:   res,
+	}, nil
 }
 
-func (svc *service) GetDetail(ctx *gin.Context) {
-	svc.repo.GetDetail()
+func (svc *service) ShowVoucher(code string) (model.Respon, error) {
+
+	if code == "" {
+		return model.Respon{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+		}, errors.New("invalid input code voucher")
+	}
+
+	// start
+	res, err := svc.repo.ShowVoucher(code)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
+	return model.Respon{
+		Status: http.StatusOK,
+		Data:   res,
+	}, nil
 }
 
-func (svc *service) Create(ctx *gin.Context) {
-	svc.repo.Create()
+func (svc *service) CreateVoucher(req []model.VoucherReq) (model.Respon, error) {
+
+	var check int
+
+	for _, v := range req {
+		if v.StoreID == 0 || v.ProductID == 0 || v.CategoryID == 0 || v.Discount == 0 || v.Name == "" || v.StartDate == "" || v.EndDate == "" {
+			check++
+		}
+	}
+
+	if check > 0 {
+		return model.Respon{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+		}, errors.New("error input")
+	}
+
+	// start
+	res, err := svc.repo.CreateVoucher(req)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
+	return model.Respon{
+		Status: http.StatusOK,
+		Data:   res,
+	}, nil
 }
 
-func (svc *service) Update(ctx *gin.Context) {
-	svc.repo.Update()
-}
+func (svc *service) DeleteVoucher(id int) (model.Respon, error) {
+	if id == 0 {
+		return model.Respon{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+		}, errors.New("error invalid id")
+	}
 
-func (svc *service) Delete(ctx *gin.Context) {
-	svc.repo.Delete()
+	// start
+	err := svc.repo.DeleteVoucher(id)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
+	return model.Respon{
+		Status: http.StatusOK,
+		Data:   nil,
+	}, nil
 }

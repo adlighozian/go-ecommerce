@@ -45,6 +45,7 @@ func NewServer(hand handler.Handlerer, logger *zerolog.Logger) {
 	r.GET("/orders", hand.GetOrders)
 	r.GET("/orders/details", hand.ShowOrders)
 	r.POST("/orders", hand.CreateOrders)
+	r.POST("/orders/item", hand.CreateOrders)
 
 	admin := r.Group("/admin")
 	admin.PATCH("/orders", hand.UpdateOrders)

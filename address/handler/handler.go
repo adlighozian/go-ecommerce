@@ -98,7 +98,7 @@ func (h *handler) Create(ctx *gin.Context) {
 func (h *handler) Delete(ctx *gin.Context) {
 	addressIDString, ok := ctx.GetQuery("address_id")
 	if !ok {
-		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param cart_id should not be empty"))
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param address_id should not be empty"))
 		return
 	}
 
@@ -125,7 +125,7 @@ func (h *handler) Delete(ctx *gin.Context) {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("address_id must be positive number"))
 		return
 	}
-	
+
 	if userID <= 0 {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("user_id must be positive number"))
 		return

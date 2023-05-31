@@ -6,7 +6,7 @@ import (
 
 type Repositorier interface {
 	GetOrders(idUser int) ([]model.Orders, error)
-	CreateOrders(req []model.OrderReq) ([]model.Orders, error)
-	ShowOrders(req model.OrderItems) (model.Orders, error)
+	CreateOrders(req model.GetOrders) (model.GetOrdersSent, error)
+	ShowOrders(req model.OrderItems) ([]model.OrderItem, error)
 	UpdateOrders(idOrder int, req string) error
 }
