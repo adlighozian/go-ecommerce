@@ -23,8 +23,8 @@ func NewRepository(db *sql.DB, midtrans midtransrepo.MidtransInterface) Reposito
 	}
 }
 
-func (repo *repository) CheckTransaction(orderID string) (res *coreapi.TransactionStatusResponse, err error) {
-	return repo.midtrans.CheckTransaction(orderID)
+func (repo *repository) CheckPayment(orderID string) (res *coreapi.TransactionStatusResponse, err error) {
+	return repo.midtrans.CheckPayment(orderID)
 }
 
 func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error) {
@@ -49,7 +49,7 @@ func (repo *repository) CreatePaymentLog(req model.PaymentLogRequest) (res *snap
 	}
 
 	// send data to midtrans
-	res, err = repo.midtrans.CreateTransaction(snapReq)
+	res, err = repo.midtrans.CreatePayment(snapReq)
 	if err != nil {
 		return res, fmt.Errorf("error midtrans : %v", err.Error())
 	}

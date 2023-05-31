@@ -1,9 +1,12 @@
-package repositoy
+package repository
+
+import (
+	"order-go/model"
+)
 
 type Repositorier interface {
-	Get(..., err error)
-	GetDetail(..., err error)
-	Create(..., err error)
-	Update(..., err error)
-	Delete(..., err error)
+	GetOrders(idUser int) ([]model.Orders, error)
+	CreateOrders(req []model.OrderReq) ([]model.Orders, error)
+	ShowOrders(req model.OrderItems) (model.Orders, error)
+	UpdateOrders(idOrder int, req string) error
 }

@@ -8,6 +8,6 @@ import (
 )
 
 type Servicer interface {
-	CheckTransaction(orderID string) (res *coreapi.TransactionStatusResponse, err error)
+	CheckPayment(orderID string) (res *coreapi.TransactionStatusResponse, err error)
 	CreatePaymentLog(req model.PaymentLogRequest) (res *snap.Response, err error)
 }

@@ -1,9 +1,12 @@
-package  service
+package service
+
+import (
+	"order-go/model"
+)
 
 type Servicer interface {
-	Get(..., err error)
-	GetDetail(..., err error)
-	Create(..., err error)
-	Update(..., err error)
-	Delete(..., err error)
+	GetOrders(idUser int) (model.Respon, error)
+	CreateOrders(req []model.OrderReq) (model.Respon, error)
+	ShowOrders(req model.OrderItems) (model.Respon, error)
+	UpdateOrders(idOrder int, req string) (model.Respon, error)
 }
