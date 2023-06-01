@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"product-go/model"
 	"product-go/repository"
@@ -33,13 +34,14 @@ func (svc *service) GetProduct(req model.ProductSearch) (model.Respon, error) {
 
 func (svc *service) ShowProduct(id int) (model.Respon, error) {
 
-	if id == 0 {
+	if id <= 0 {
 		return model.Respon{
 			Status: http.StatusBadRequest,
 			Data:   nil,
-		}, errors.New("error detail, id not found")
+		}, errors.New("invalid id product")
 	}
 
+	// start
 	res, err := svc.repo.ShowProduct(id)
 	if err != nil {
 		return model.Respon{
@@ -58,23 +60,24 @@ func (svc *service) CreateProduct(req []model.ProductReq) (model.Respon, error) 
 	var data []model.ProductReq
 
 	for _, v := range req {
-		if v.StoreID == 0 || v.CategoryID == 0 || v.SizeID == 0 || v.ColorID == 0 || v.Name == "" || v.Subtitle == "" || v.Description == "" || v.UnitPrice == 0 || v.Stock == 0 || v.Weight == 0 {
+		if v.StoreID == 0 || v.CategoryID == 0 || v.SizeID == 0 || v.ColorID == 0 || v.Name == "" || v.Subtitle == "" || v.Description == "" || v.UnitPrice == 0 || v.Stock == 0 || v.Weight == 0 || v.Brand == "" {
 			continue
 		}
+
 		data = append(data, model.ProductReq{
 			StoreID:     v.StoreID,
 			CategoryID:  v.CategoryID,
 			SizeID:      v.SizeID,
 			ColorID:     v.ColorID,
 			Name:        v.Name,
+			Brand:       v.Brand,
 			Subtitle:    v.Subtitle,
 			Description: v.Description,
 			UnitPrice:   v.UnitPrice,
-			Status:      v.Status,
 			Stock:       v.Stock,
-			Sku:         v.Sku,
 			Weight:      v.Weight,
 		})
+
 	}
 
 	if data == nil {
@@ -98,17 +101,35 @@ func (svc *service) CreateProduct(req []model.ProductReq) (model.Respon, error) 
 	}, nil
 }
 
-func (svc *service) UpdateProduct(req model.ProductReq) (model.Respon, error) {
+func (svc *service) UpdateProduct(req model.ProductUpd, id int) (model.Respon, error) {
 
-	if req.Id == 0 {
+	log.Println(id, req)
+
+	if id <= 0 || req.Id != 0 {
 		return model.Respon{
 			Status: http.StatusBadRequest,
 			Data:   nil,
-		}, errors.New("error update data")
+		}, errors.New("invalid input")
+	}
+
+	data := model.ProductUpd{
+		Id:          id,
+		StoreID:     req.StoreID,
+		CategoryID:  req.CategoryID,
+		SizeID:      req.SizeID,
+		ColorID:     req.ColorID,
+		Name:        req.Name,
+		Brand:       req.Brand,
+		Subtitle:    req.Subtitle,
+		Description: req.Description,
+		UnitPrice:   req.UnitPrice,
+		Stock:       req.Stock,
+		Weight:      req.Weight,
+		Status:      req.Status,
 	}
 
 	// start
-	err := svc.repo.UpdateProduct(req)
+	res, err := svc.repo.UpdateProduct(data)
 	if err != nil {
 		return model.Respon{
 			Status: http.StatusInternalServerError,
@@ -117,19 +138,20 @@ func (svc *service) UpdateProduct(req model.ProductReq) (model.Respon, error) {
 	}
 	return model.Respon{
 		Status: http.StatusOK,
-		Data:   nil,
+		Data:   res,
 	}, nil
 }
 
 func (svc *service) DeleteProduct(id int) (model.Respon, error) {
-	if id == 0 {
+	if id <= 0 {
 		return model.Respon{
 			Status: http.StatusBadRequest,
 			Data:   nil,
 		}, errors.New("error invalid id")
 	}
 
-	err := svc.repo.DeleteProduct(id)
+	// start
+	res, err := svc.repo.DeleteProduct(id)
 	if err != nil {
 		return model.Respon{
 			Status: http.StatusInternalServerError,
@@ -138,6 +160,6 @@ func (svc *service) DeleteProduct(id int) (model.Respon, error) {
 	}
 	return model.Respon{
 		Status: http.StatusOK,
-		Data:   nil,
+		Data:   res,
 	}, nil
 }

@@ -1,9 +1,10 @@
-package  handler
+package handler
+
+import "github.com/gin-gonic/gin"
 
 type Handlerer interface {
-	Get(..., err error)
-	GetDetail(..., err error)
-	Create(..., err error)
-	Update(..., err error)
-	Delete(..., err error)
+	GetVoucher(c *gin.Context)
+	ShowVoucher(c *gin.Context)
+	CreateVoucher(c *gin.Context)
+	DeleteVoucher(c *gin.Context)
 }

@@ -56,7 +56,7 @@ func main() {
 		for d := range msgs {
 			log.Printf("Received a message: %s", d.Body)
 
-			var data []model.ProductReq
+			var data []model.Product
 			err := json.Unmarshal(d.Body, &data)
 			if err != nil {
 				helpers.FailOnError(err, "error unmarshal")
@@ -66,6 +66,7 @@ func main() {
 			if err != nil {
 				helpers.FailOnError(err, "error create bulk transaction detail")
 			}
+
 			d.Ack(false)
 		}
 	}()

@@ -1,9 +1,10 @@
-package repositoy
+package repository
+
+import "voucher-go/model"
 
 type Repositorier interface {
-	Get(..., err error)
-	GetDetail(..., err error)
-	Create(..., err error)
-	Update(..., err error)
-	Delete(..., err error)
+	GetVoucher() ([]model.Voucher, error)
+	ShowVoucher(code string) (model.Voucher, error)
+	CreateVoucher(req []model.VoucherReq) ([]model.Voucher, error)
+	DeleteVoucher(id int) (int, error)
 }

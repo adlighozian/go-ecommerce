@@ -18,3 +18,18 @@ type OrderReq struct {
 	ShippingID int
 	TotalPrice float64
 }
+
+type OrderItemReq struct {
+	ProductId  int     `json:"product_id"`
+	Quantity   int     `json:"quantity"`
+	TotalPrice float64 `json:"total_price"`
+}
+
+type GetOrdersSent struct {
+	UserID       int            `json:"user_id"`
+	ShippingID   int            `json:"shipping_id"`
+	TotalPrice   float64        `json:"total_price"`
+	Status       bool           `json:"status"`
+	OrderNumber  string         `json:"order_number"`
+	OrderItemReq []OrderItemReq `json:"order_items"`
+}
