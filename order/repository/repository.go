@@ -8,6 +8,7 @@ import (
 	"order-go/helper/timeout"
 	"order-go/model"
 	"order-go/publisher"
+	"time"
 )
 
 type repository struct {
@@ -22,21 +23,18 @@ func NewRepository(db *sql.DB, sent publisher.Publisher) Repositorier {
 	}
 }
 
-func (repo *repository) GetOrders(idUser int) ([]model.Orders, error) {
+func (repo *repository) GetOrders(userID int) ([]model.Orders, error) {
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
 	querySelect := `select * from orders where user_id = $1`
 
-	stmt, err := repo.db.PrepareContext(ctx, querySelect)
-	failerror.FailError(err, "error prepare context")
-
-	result, err := stmt.QueryContext(ctx, idUser)
+	result, err := repo.db.QueryContext(ctx, querySelect, userID)
 	if err != nil {
 		return []model.Orders{}, errors.New("error get data")
 	}
 
-	var data []model.Orders
+	var data = []model.Orders{}
 
 	for result.Next() {
 		var temp model.Orders
@@ -47,10 +45,53 @@ func (repo *repository) GetOrders(idUser int) ([]model.Orders, error) {
 	return data, nil
 }
 
-func (repo *repository) CreateOrders(req model.GetOrders) (model.GetOrdersSent, error) {
-	// ctx, cancel := timeout.NewCtxTimeout()
-	// defer cancel()
+func (repo *repository) ShowOrders(req model.OrderItems) (model.ResultOrders, error) {
+	ctx, cancel := timeout.NewCtxTimeout()
+	defer cancel()
 
+	var result model.ResultOrders
+
+	queryProduct := `select oi.product_id, oi.quantity, oi.total_price from order_items oi join orders o on o.id = oi.order_id where o.order_number = $1 and o.user_id = $2`
+
+	rows, err := repo.db.QueryContext(ctx, queryProduct, req.OrderNumber, req.UserId)
+	failerror.FailError(err, "error query")
+
+	var dataProduct = []model.OrderItemReq{}
+	for rows.Next() {
+		var temp model.OrderItemReq
+		err := rows.Scan(&temp.ProductId, &temp.Quantity, &temp.TotalPrice)
+		failerror.FailError(err, "error scan")
+
+		dataProduct = append(dataProduct, temp)
+	}
+
+	queryOrder := `select id, user_id, shipping_id , total_price ,status , order_number,created_at ,updated_at from orders o where o.order_number = $1 and o.user_id = $2`
+
+	var dataOrder model.Orders
+	repo.db.QueryRowContext(ctx, queryOrder, req.OrderNumber, req.UserId).Scan(&dataOrder.Id, &dataOrder.UserID, &dataOrder.ShippingID, &dataOrder.TotalPrice, &dataOrder.Status, &dataOrder.OrderNumber, &dataOrder.CreatedAt, &dataOrder.UpdatedAt)
+
+	result = model.ResultOrders{
+		Id:           dataOrder.Id,
+		UserID:       dataOrder.UserID,
+		ShippingID:   dataOrder.ShippingID,
+		TotalPrice:   dataOrder.TotalPrice,
+		Status:       dataOrder.Status,
+		OrderNumber:  dataOrder.OrderNumber,
+		CreatedAt:    dataOrder.CreatedAt,
+		UpdatedAt:    dataOrder.UpdatedAt,
+		OrderItemReq: dataProduct,
+	}
+
+	if result.Id == 0 {
+		return result, errors.New("order not found")
+	}
+
+	return result, nil
+}
+
+func (repo *repository) CreateOrders(req model.GetOrders) (model.Orders, error) {
+	ctx, cancel := timeout.NewCtxTimeout()
+	defer cancel()
 
 	inRandom := model.GetOrdersSent{
 		UserID:       req.UserID,
@@ -63,66 +104,42 @@ func (repo *repository) CreateOrders(req model.GetOrders) (model.GetOrdersSent, 
 
 	err := repo.sent.Public(inRandom, "create_order")
 	if err != nil {
-		return model.GetOrdersSent{}, errors.New("failed publisher")
+		return model.Orders{}, errors.New("failed publisher")
 	}
 
-	return inRandom, nil
+	time.Sleep(3 * time.Second)
 
-	// time.Sleep(1 * time.Second)
+	query := `select id,user_id ,shipping_id ,total_price ,status ,order_number ,created_at ,updated_at  from orders where order_number = $1`
 
-	// var resultss []model.Orders
-	// query := `select * from orders where order_number = $1`
-	// for _, v := range sent {
+	var temp model.Orders
+	repo.db.QueryRowContext(ctx, query, inRandom.OrderNumber).Scan(&temp.Id, &temp.UserID, &temp.ShippingID, &temp.TotalPrice, &temp.Status, &temp.OrderNumber, &temp.CreatedAt, &temp.UpdatedAt)
 
-	// 	stmt, err := repo.db.PrepareContext(ctx, query)
-	// 	failerror.FailError(err, "error prepare")
+	if temp.Id == 0 {
+		return temp, errors.New("error create order")
+	}
 
-	// 	result, err := stmt.QueryContext(ctx, v.OrderNumber)
-	// 	failerror.FailError(err, "error prepare")
-
-	// 	var temp model.Orders
-	// 	for result.Next() {
-	// 		result.Scan(&temp.Id, &temp.UserID, &temp.ShippingID, &temp.TotalPrice, &temp.Status, &temp.CreatedAt, &temp.UpdatedAt, &temp.OrderNumber)
-	// 	}
-	// 	if temp.Id == 0 {
-	// 		continue
-	// 	}
-	// 	resultss = append(resultss, temp)
-	// }
-
-	// if resultss == nil {
-	// 	return nil, errors.New("error create product")
-	// }
-
-	// return resultss, nil
+	return temp, nil
 }
 
-func (repo *repository) ShowOrders(req model.OrderItems) ([]model.OrderItem, error) {
+func (repo *repository) UpdateOrders(req model.OrderUpd) (model.Orders, error) {
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
-	queryDetail := `select oi.id, oi.order_id, oi.product_id, oi.quantity, oi.total_price, oi.created_at, oi.updated_at from order_items oi join orders o on o.id = oi.order_id where o.order_number = $1 and o.user_id = $2`
-	// queryDetail := `select * from orders where user_id = $1 and order_number = $2`
-
-	rows, err := repo.db.QueryContext(ctx, queryDetail, req.OrderNumber, req.UserId)
-	failerror.FailError(err, "error query")
-
-	var data []model.OrderItem
-	for rows.Next() {
-		var temp model.OrderItem
-		err := rows.Scan(&temp.Id, &temp.OrderID, &temp.ProductId, &temp.Quantity, &temp.TotalPrice, &temp.CreatedAt, &temp.UpdatedAt)
-		failerror.FailError(err, "error scan")
-
-		data = append(data, temp)
+	err := repo.sent.Public(req, "update_order")
+	if err != nil {
+		return model.Orders{}, errors.New("failed publisher")
 	}
 
-	if data == nil {
-		return []model.OrderItem{}, errors.New("order not found")
+	time.Sleep(3 * time.Second)
+
+	queryOrder := `select id, user_id, shipping_id , total_price ,status , order_number,created_at ,updated_at from orders o where o.order_number = $1`
+
+	var temp model.Orders
+	repo.db.QueryRowContext(ctx, queryOrder, req.OrderNumber).Scan(&temp.Id, &temp.UserID, &temp.ShippingID, &temp.TotalPrice, &temp.Status, &temp.OrderNumber, &temp.CreatedAt, &temp.UpdatedAt)
+
+	if temp.Id == 0 {
+		return model.Orders{}, errors.New("error update order")
 	}
 
-	return data, nil
-}
-
-func (repo *repository) UpdateOrders(idOrder int, req string) error {
-	return nil
+	return temp, nil
 }

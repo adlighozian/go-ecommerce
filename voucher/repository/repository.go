@@ -23,7 +23,7 @@ func NewRepository(db *sql.DB, sent publisher.Publisher) Repositorier {
 	}
 }
 
-func (repo *repository) GetVoucher(idUser int) ([]model.Voucher, error) {
+func (repo *repository) GetVoucher() ([]model.Voucher, error) {
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
@@ -32,7 +32,7 @@ func (repo *repository) GetVoucher(idUser int) ([]model.Voucher, error) {
 	result, err := repo.db.QueryContext(ctx, query)
 	failerror.FailError(err, "fail query")
 
-	var data []model.Voucher
+	var data = []model.Voucher{}
 	for result.Next() {
 		var temp model.Voucher
 		result.Scan(&temp.Id, &temp.StoreID, &temp.ProductID, &temp.CategoryID, &temp.Discount, &temp.Name, &temp.Code, &temp.StartDate, &temp.EndDate, &temp.Created_at, &temp.Update_at)
@@ -125,27 +125,23 @@ func (repo *repository) CreateVoucher(req []model.VoucherReq) ([]model.Voucher, 
 	return resultss, nil
 }
 
-func (repo *repository) DeleteVoucher(id int) error {
+func (repo *repository) DeleteVoucher(id int) (int, error) {
 
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
+	var idCheck int
 	queryCheck := `select id from voucher where id = $1`
+	err := repo.db.QueryRowContext(ctx, queryCheck, id).Scan(&idCheck)
+	failerror.FailError(err, "error exec")
 
-	result, err := repo.db.QueryContext(ctx, queryCheck, id)
-	failerror.FailError(err, "fail query")
-
-	var ids int
-	for result.Next() {
-		result.Scan(&ids)
-	}
-	if ids == 0 {
-		return errors.New("id voucher not available")
+	if idCheck == 0 {
+		return 0, errors.New("product tidak ditemukan")
 	}
 
 	query := `DELETE FROM Voucher WHERE id = $1`
-	_, err = repo.db.ExecContext(ctx, query, id)
+	_, err = repo.db.ExecContext(ctx, query, idCheck)
 	failerror.FailError(err, "error exec")
 
-	return nil
+	return idCheck, nil
 }

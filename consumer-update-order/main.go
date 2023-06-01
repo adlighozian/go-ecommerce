@@ -1,11 +1,11 @@
 package main
 
 import (
-	"consumer-product-go/config"
-	"consumer-product-go/db"
-	"consumer-product-go/helpers"
-	"consumer-product-go/model"
-	"consumer-product-go/repository"
+	"consumer-update-order-go/config"
+	"consumer-update-order-go/db"
+	"consumer-update-order-go/helpers"
+	"consumer-update-order-go/model"
+	"consumer-update-order-go/repository"
 	"encoding/json"
 	"log"
 
@@ -25,12 +25,12 @@ func main() {
 	defer ch.Close()
 
 	q, err := ch.QueueDeclare(
-		"update_product", // name
-		true,             // durable
-		false,            // auto delete queue when unused
-		false,            // exclusive
-		false,            // no-wait
-		nil,              // arguments
+		"update_order", // name
+		true,           // durable
+		false,          // auto delete queue when unused
+		false,          // exclusive
+		false,          // no-wait
+		nil,            // arguments
 	)
 	helpers.FailOnError(err, "Failed to declare a queue")
 
@@ -56,7 +56,7 @@ func main() {
 		for d := range msgs {
 			log.Printf("Received a message: %s", d.Body)
 
-			var data model.ProductReq
+			var data model.OrderUpd
 			err := json.Unmarshal(d.Body, &data)
 			if err != nil {
 				helpers.FailOnError(err, "error unmarshal")

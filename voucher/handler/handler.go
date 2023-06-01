@@ -21,16 +21,7 @@ func NewHandler(svc service.Servicer) Handlerer {
 }
 
 func (h *handler) GetVoucher(ctx *gin.Context) {
-	id := ctx.Query("user_id")
-	var numi int
-
-	if id != "" {
-		num, err := strconv.Atoi(id)
-		failerror.FailError(err, "error convert to int")
-		numi = num
-	}
-
-	res, err := h.svc.GetVoucher(numi)
+	res, err := h.svc.GetVoucher()
 	if err != nil {
 		response.ResponseError(ctx, res.Status, err)
 	} else {
@@ -65,7 +56,7 @@ func (h *handler) CreateVoucher(ctx *gin.Context) {
 }
 
 func (h *handler) DeleteVoucher(ctx *gin.Context) {
-	id := ctx.Query("id")
+	id := ctx.Query("voucher_id")
 	var numi int
 
 	if id != "" {

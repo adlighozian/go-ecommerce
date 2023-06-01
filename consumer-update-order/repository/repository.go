@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"consumer-product-go/helpers"
-	"consumer-product-go/model"
+	"consumer-update-order-go/helpers"
+	"consumer-update-order-go/model"
 	"database/sql"
 	"fmt"
 )
@@ -17,23 +17,16 @@ func NewProduct(db *sql.DB) Product {
 	}
 }
 
-func (p product) UpdateProduct(req model.ProductReq) error {
+func (p product) UpdateProduct(req model.OrderUpd) error {
 	ctx, cancel := helpers.NewCtxTimeout()
 	defer cancel()
 
-	trx, err := p.db.BeginTx(ctx, nil)
-	helpers.FailOnError(err, "error config")
+	querys := `update orders set  status = $1 where order_number = $2 returning id`
 
-	querys := `update products set store_id = $1 ,category_id = $2, size_id = $3, color_id = $4, name = $5, subtitle = $6,description = $7, unit_price = $8, status = $9, stock = $10, weight = $11 where id = $12`
+	var idCheck int
+	p.db.QueryRowContext(ctx, querys, req.Status, req.OrderNumber).Scan(&idCheck)
 
-	_, err = trx.ExecContext(ctx, querys, req.StoreID, req.CategoryID, req.SizeID, req.ColorID, req.Name, req.Subtitle, req.Description, req.UnitPrice, req.Status, req.Stock, req.Weight, req.Id)
-	if err != nil {
-		trx.Rollback()
-	}
-
-	trx.Commit()
-
-	fmt.Println(req.Id)
+	fmt.Println(idCheck)
 
 	return nil
 

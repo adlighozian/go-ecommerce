@@ -17,21 +17,14 @@ func NewProduct(db *sql.DB) Product {
 	}
 }
 
-func (p product) UpdateProduct(req model.ProductReq) error {
+func (p product) UpdateProduct(req model.ProductUpd) error {
 	ctx, cancel := helpers.NewCtxTimeout()
 	defer cancel()
 
-	trx, err := p.db.BeginTx(ctx, nil)
-	helpers.FailOnError(err, "error config")
+	querys := `update products set store_id = $1 ,category_id = $2, size_id = $3, color_id = $4, name = $5, subtitle = $6,description = $7, unit_price = $8, status = $9, stock = $10, weight = $11, brand = $12 where id = $13`
 
-	querys := `update products set store_id = $1 ,category_id = $2, size_id = $3, color_id = $4, name = $5, subtitle = $6,description = $7, unit_price = $8, status = $9, stock = $10, weight = $11 where id = $12`
-
-	_, err = trx.ExecContext(ctx, querys, req.StoreID, req.CategoryID, req.SizeID, req.ColorID, req.Name, req.Subtitle, req.Description, req.UnitPrice, req.Status, req.Stock, req.Weight, req.Id)
-	if err != nil {
-		trx.Rollback()
-	}
-
-	trx.Commit()
+	_, err := p.db.ExecContext(ctx, querys, req.StoreID, req.CategoryID, req.SizeID, req.ColorID, req.Name, req.Subtitle, req.Description, req.UnitPrice, req.Status, req.Stock, req.Weight, req.Brand, req.Id)
+	helpers.FailOnError(err, "error exec")
 
 	fmt.Println(req.Id)
 

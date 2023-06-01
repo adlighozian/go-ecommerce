@@ -1,7 +1,7 @@
 package db
 
 import (
-	"consumer-product-go/helpers"
+	"consumer-update-order-go/helpers"
 	"database/sql"
 	"errors"
 	"log"

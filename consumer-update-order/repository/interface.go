@@ -1,7 +1,7 @@
 package repository
 
-import "consumer-product-go/model"
+import "consumer-update-order-go/model"
 
 type Product interface {
-	UpdateProduct(req model.ProductReq) error
+	UpdateProduct(req model.OrderUpd) error
 }

@@ -17,17 +17,10 @@ func NewService(repo repository.Repositorier) Servicer {
 	}
 }
 
-func (svc *service) GetVoucher(idUser int) (model.Respon, error) {
-
-	if idUser == 0 {
-		return model.Respon{
-			Status: http.StatusBadRequest,
-			Data:   nil,
-		}, errors.New("error get, id user not found")
-	}
+func (svc *service) GetVoucher() (model.Respon, error) {
 
 	// start
-	res, err := svc.repo.GetVoucher(idUser)
+	res, err := svc.repo.GetVoucher()
 	if err != nil {
 		return model.Respon{
 			Status: http.StatusInternalServerError,
@@ -65,15 +58,28 @@ func (svc *service) ShowVoucher(code string) (model.Respon, error) {
 
 func (svc *service) CreateVoucher(req []model.VoucherReq) (model.Respon, error) {
 
-	var check int
+	var check []model.VoucherReq
 
 	for _, v := range req {
-		if v.StoreID == 0 || v.ProductID == 0 || v.CategoryID == 0 || v.Discount == 0 || v.Name == "" || v.StartDate == "" || v.EndDate == "" {
-			check++
+		if v.StoreID == 0 || v.Discount == 0 || v.Name == "" || v.StartDate == "" || v.EndDate == "" {
+			continue
 		}
+
+		data := model.VoucherReq{
+			StoreID:    v.StoreID,
+			ProductID:  v.ProductID,
+			CategoryID: v.CategoryID,
+			Discount:   v.Discount,
+			Name:       v.Name,
+			StartDate:  v.StartDate,
+			EndDate:    v.EndDate,
+		}
+
+		check = append(check, data)
+
 	}
 
-	if check > 0 {
+	if check == nil {
 		return model.Respon{
 			Status: http.StatusBadRequest,
 			Data:   nil,
@@ -81,7 +87,7 @@ func (svc *service) CreateVoucher(req []model.VoucherReq) (model.Respon, error) 
 	}
 
 	// start
-	res, err := svc.repo.CreateVoucher(req)
+	res, err := svc.repo.CreateVoucher(check)
 	if err != nil {
 		return model.Respon{
 			Status: http.StatusInternalServerError,
@@ -95,7 +101,7 @@ func (svc *service) CreateVoucher(req []model.VoucherReq) (model.Respon, error) 
 }
 
 func (svc *service) DeleteVoucher(id int) (model.Respon, error) {
-	if id == 0 {
+	if id <= 0 {
 		return model.Respon{
 			Status: http.StatusBadRequest,
 			Data:   nil,
@@ -103,7 +109,7 @@ func (svc *service) DeleteVoucher(id int) (model.Respon, error) {
 	}
 
 	// start
-	err := svc.repo.DeleteVoucher(id)
+	res, err := svc.repo.DeleteVoucher(id)
 	if err != nil {
 		return model.Respon{
 			Status: http.StatusInternalServerError,
@@ -112,6 +118,6 @@ func (svc *service) DeleteVoucher(id int) (model.Respon, error) {
 	}
 	return model.Respon{
 		Status: http.StatusOK,
-		Data:   nil,
+		Data:   res,
 	}, nil
 }

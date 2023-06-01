@@ -8,19 +8,29 @@ type Orders struct {
 	ShippingID  int       `json:"shipping_id"`
 	TotalPrice  float64   `json:"total_price"`
 	Status      bool      `json:"status"`
+	OrderNumber string    `json:"order_number"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
-	OrderNumber string    `json:"order_number"`
 }
 
 type OrderItem struct {
-	Id         int       `json:"id"`
-	OrderID    int       `json:"order_id"`
-	ProductId  int       `json:"product_id"`
-	Quantity   int       `json:"quantity"`
-	TotalPrice float64   `json:"total_price"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	Id         int     `json:"id"`
+	OrderID    int     `json:"order_id"`
+	ProductId  int     `json:"product_id"`
+	Quantity   int     `json:"quantity"`
+	TotalPrice float64 `json:"total_price"`
+}
+
+type ResultOrders struct {
+	Id           int            `json:"id"`
+	UserID       int            `json:"user_id"`
+	ShippingID   int            `json:"shipping_id"`
+	TotalPrice   float64        `json:"total_price"`
+	Status       bool           `json:"status"`
+	OrderNumber  string         `json:"order_number"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	OrderItemReq []OrderItemReq `json:"order_items"`
 }
 
 type GetOrders struct {
@@ -43,6 +53,11 @@ type GetOrdersSent struct {
 	Status       bool           `json:"status"`
 	OrderNumber  string         `json:"order_number"`
 	OrderItemReq []OrderItemReq `json:"order_items"`
+}
+
+type OrderUpd struct {
+	OrderNumber string `json:"order_number"`
+	Status      bool   `json:"status"`
 }
 
 type OrderItems struct {

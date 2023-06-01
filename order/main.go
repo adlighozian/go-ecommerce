@@ -36,6 +36,9 @@ func main() {
 }
 
 func NewServer(hand handler.Handlerer, logger *zerolog.Logger) {
+	conf, err := config.LoadConfig()
+	failerror.FailError(err, "error loadconfig")
+
 	// server
 	r := gin.New()
 
@@ -50,5 +53,5 @@ func NewServer(hand handler.Handlerer, logger *zerolog.Logger) {
 	admin := r.Group("/admin")
 	admin.PATCH("/orders", hand.UpdateOrders)
 
-	r.Run(":5001")
+	r.Run(conf.Port)
 }

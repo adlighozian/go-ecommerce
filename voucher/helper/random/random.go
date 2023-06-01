@@ -17,6 +17,7 @@ type Random interface {
 }
 
 func (r *random) RandomString() string {
+	time.Sleep(1 * time.Second)
 	randomizer := rand.New(rand.NewSource(time.Now().Unix()))
 	letters := []rune("qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM1234567890")
 
