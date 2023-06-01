@@ -22,7 +22,7 @@ func NewHandler(svc service.Servicer) Handlerer {
 
 func (h *handler) GetOrders(ctx *gin.Context) {
 
-	idUser := ctx.Query("idUser")
+	idUser := ctx.Query("user_id")
 	var numi int
 
 	if idUser != "" {
@@ -41,8 +41,8 @@ func (h *handler) GetOrders(ctx *gin.Context) {
 }
 
 func (h *handler) ShowOrders(ctx *gin.Context) {
-	idUser := ctx.Query("idUser")
-	orderNumber := ctx.Query("orderNumber")
+	idUser := ctx.Query("user_id")
+	orderNumber := ctx.Query("order_number")
 
 	var numi int
 	if idUser != "" {
@@ -65,8 +65,7 @@ func (h *handler) ShowOrders(ctx *gin.Context) {
 }
 
 func (h *handler) CreateOrders(ctx *gin.Context) {
-
-	var data []model.OrderReq
+	var data model.GetOrders
 
 	err := ctx.ShouldBindJSON(&data)
 	failerror.FailError(err, "error bind json")
@@ -81,5 +80,15 @@ func (h *handler) CreateOrders(ctx *gin.Context) {
 }
 
 func (h *handler) UpdateOrders(ctx *gin.Context) {
+	var data model.OrderUpd
 
+	err := ctx.ShouldBindJSON(&data)
+	failerror.FailError(err, "error bind json")
+
+	res, err := h.svc.UpdateOrders(data)
+	if err != nil {
+		response.ResponseError(ctx, res.Status, err)
+	} else {
+		response.ResponseSuccess(ctx, res.Status, res.Data)
+	}
 }

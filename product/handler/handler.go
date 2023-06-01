@@ -73,11 +73,20 @@ func (h *handler) CreateProduct(ctx *gin.Context) {
 }
 
 func (h *handler) UpdateProduct(ctx *gin.Context) {
-	var data model.ProductReq
+	idProduct := ctx.Query("product_id")
+	var data model.ProductUpd
+
 	err := ctx.ShouldBindJSON(&data)
 	failerror.FailError(err, "error bind json")
 
-	res, err := h.svc.UpdateProduct(data)
+	var numi int
+	if idProduct != "" {
+		num, err := strconv.Atoi(idProduct)
+		failerror.FailError(err, "error convert to int")
+		numi = num
+	}
+
+	res, err := h.svc.UpdateProduct(data, numi)
 	if err != nil {
 		response.ResponseError(ctx, res.Status, err)
 	} else {
@@ -86,7 +95,7 @@ func (h *handler) UpdateProduct(ctx *gin.Context) {
 }
 
 func (h *handler) DeleteProduct(ctx *gin.Context) {
-	id := ctx.Query("id")
+	id := ctx.Query("product_id")
 	var numi int
 
 	if id != "" {
