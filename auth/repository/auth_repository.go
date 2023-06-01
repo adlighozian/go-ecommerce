@@ -76,7 +76,7 @@ func (repo *AuthRepository) Create(user *model.User) (*model.User, error) {
 		return nil, errPub
 	}
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(3 * time.Second)
 
 	user, errGetByEmail := repo.GetByEmail(user.Email)
 	if errGetByEmail != nil {

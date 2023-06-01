@@ -40,7 +40,11 @@ func main() {
 	logger.Debug().Msg("db connected")
 
 	// * connect to redis using redis client
-	redisClient, errRedis := redisclient.NewRedisClient(config.Redis.Addr, config.Redis.Password, config.Redis.DB)
+	redisClient, errRedis := redisclient.NewRedisClient(
+		config.Redis.Addr, config.Redis.ClientName,
+		config.Redis.Username, config.Redis.Password,
+		config.Redis.DB,
+	)
 	if errDB != nil {
 		logger.Fatal().Err(errRedis).Msg("redis failed to connect")
 	}

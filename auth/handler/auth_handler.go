@@ -92,10 +92,10 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("user_id", strconv.FormatUint(uint64(user.ID), 10), 0, "", "", true, true)
-	ctx.SetCookie("user_role", user.Role, 0, "", "", true, true)
+	// ctx.SetCookie("user_id", strconv.FormatUint(uint64(user.ID), 10), 0, "/", "", true, true)
+	// ctx.SetCookie("user_role", user.Role, 0, "", "", true, true)
 
-	ctx.SetCookie("access_token", accessToken, 0, "", "", true, true)
+	ctx.SetCookie("access_token", accessToken, 0, "/", "", false, true)
 
 	// Store the refresh token in Redis
 	dataByte, _ := json.Marshal(model.RefreshToken{
@@ -109,7 +109,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.SetCookie("refresh_token", refreshToken, 0, "", "", true, true)
+	ctx.SetCookie("refresh_token", refreshToken, 0, "/", "", false, true)
 
 	response.NewJSONRes(ctx, http.StatusOK, "", map[string]any{
 		"user":          user,

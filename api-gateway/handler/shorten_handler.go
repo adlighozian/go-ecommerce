@@ -67,18 +67,19 @@ func (h *ShortenHandler) Get(ctx *gin.Context) {
 
 	// if google oauth2 is called, return to []byte / html
 	if strings.Contains(url, "/google/") {
-		ctx.Data(http.StatusOK, "text/html; charset=UTF-8", respBody)
+		// ctx.Data(http.StatusOK, "text/html; charset=UTF-8", respBody)
+		ctx.Writer.Write(respBody)
 		return
 	}
 
-	var jsonRes response.JSONRes
-	if errJSONUn := json.Unmarshal(respBody, &jsonRes); errJSONUn != nil {
+	var jsonGRes response.JSONGatewayRes
+	if errJSONUn := json.Unmarshal(respBody, &jsonGRes); errJSONUn != nil {
 		_ = ctx.Error(errJSONUn)
 		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errJSONUn.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, jsonRes)
+	ctx.JSON(http.StatusOK, jsonGRes)
 }
 
 func (h *ShortenHandler) copyHeaders(dst http.Header, src http.Header) {
