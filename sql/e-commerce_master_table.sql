@@ -145,7 +145,6 @@ CREATE TABLE "carts" (
 CREATE TABLE "orders" (
   "id" int PRIMARY KEY,
   "user_id" int,
-  "payment_method_id" int,
   "shipping_id" int,
   "total_price" float,
   "status" varchar(255),
@@ -163,31 +162,9 @@ CREATE TABLE "order_items" (
   "updated_at" timestamp DEFAULT (now())
 );
 
-CREATE TABLE "payment_methods" (
-  "id" int PRIMARY KEY,
-  "payment_gateway_id" text NOT NULL,
-  "name" text NOT NULL,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now())
-);
-
 CREATE TABLE "shippings" (
   "id" int PRIMARY KEY,
   "receipt_number" text
-);
-
-CREATE TABLE "payment_logs" (
-  "id" int PRIMARY KEY,
-  "order_id" int,
-  "payment_method_id" int,
-  "payment_status" varchar(255),
-  "transaction_id" varchar(255),
-  "transaction_time" timestamp,
-  "transaction_status" varchar(255),
-  "gross_amount" float,
-  "debug_info" json,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp DEFAULT (now())
 );
 
 CREATE TABLE "reviews" (
@@ -262,8 +239,6 @@ ALTER TABLE "carts" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 
 ALTER TABLE "orders" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 
-ALTER TABLE "orders" ADD FOREIGN KEY ("payment_method_id") REFERENCES "payment_methods" ("id");
-
 ALTER TABLE "orders" ADD FOREIGN KEY ("shipping_id") REFERENCES "shippings" ("id");
 
 ALTER TABLE "order_items" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
@@ -271,8 +246,6 @@ ALTER TABLE "order_items" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id"
 ALTER TABLE "order_items" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
 
 ALTER TABLE "payment_logs" ADD FOREIGN KEY ("order_id") REFERENCES "orders" ("id");
-
-ALTER TABLE "payment_logs" ADD FOREIGN KEY ("payment_method_id") REFERENCES "payment_methods" ("id");
 
 ALTER TABLE "reviews" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
 

@@ -27,12 +27,7 @@ func (repo *repository) Get(userID int) (res []model.Wishlist, err error) {
 	defer cancel()
 
 	query := `SELECT id, user_id, product_id FROM wishlists WHERE user_id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx, userID)
+	result, err := repo.db.QueryContext(ctx, query, userID)
 	if err != nil {
 		return
 	}
@@ -51,12 +46,7 @@ func (repo *repository) GetByID(wishlistID int) (res model.Wishlist, err error) 
 	defer cancel()
 
 	query := `SELECT id, user_id, product_id FROM wishlists WHERE id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx, wishlistID)
+	result, err := repo.db.QueryContext(ctx, query, wishlistID)
 	if err != nil {
 		return
 	}
@@ -72,12 +62,7 @@ func (repo *repository) GetDetail(userID, productID int) (res model.Wishlist, er
 	defer cancel()
 
 	query := `SELECT id, user_id, product_id FROM wishlists WHERE user_id = $1 AND product_id = $2`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx, userID, productID)
+	result, err := repo.db.QueryContext(ctx, query, userID, productID)
 	if err != nil {
 		return
 	}
@@ -113,12 +98,7 @@ func (repo *repository) Delete(wishlistID int) (err error) {
 	defer cancel()
 
 	query := `DELETE FROM wishlists WHERE id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	_, err = stmt.ExecContext(ctx, wishlistID)
+	_, err = repo.db.ExecContext(ctx, query, wishlistID)
 	if err != nil {
 		return
 	}

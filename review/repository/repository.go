@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 	"review-go/model"
 	"review-go/publisher"
+	"time"
 )
 
 type repository struct {
@@ -26,13 +26,8 @@ func (repo *repository) GetByProductID(productID int) (res []model.Review, err e
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, product_id, rating, review_text quantity FROM reviews WHERE product_id = $1`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx, productID)
+	query := `SELECT id, user_id, product_id, rating, review_text FROM reviews WHERE product_id = $1`
+	result, err := repo.db.QueryContext(ctx, query, productID)
 	if err != nil {
 		return
 	}
@@ -46,23 +41,34 @@ func (repo *repository) GetByProductID(productID int) (res []model.Review, err e
 	return
 }
 
-func (repo *repository) GetDetail(userID, productID int) (res model.Review, err error) {
+func (repo *repository) GetReviewByID(reviewID int) (res model.Review, err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, user_id, product_id, quantity FROM reviews WHERE user_id = $1 AND product_id = $2`
-	stmt, err := repo.db.PrepareContext(ctx, query)
-	if err != nil {
-		return
-	}
-
-	result, err := stmt.QueryContext(ctx, userID, productID)
+	query := `SELECT id, user_id, product_id, rating, review_text FROM reviews WHERE id = $1`
+	result, err := repo.db.QueryContext(ctx, query, reviewID)
 	if err != nil {
 		return
 	}
 
 	for result.Next() {
-		result.Scan(&res.Id, &res.UserID, &res.ProductID)
+		result.Scan(&res.Id, &res.UserID, &res.ProductID, &res.Rating, &res.ReviewText)
+	}
+	return
+}
+
+func (repo *repository) GetDetail(userID, productID int) (res model.Review, err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT id, user_id, product_id, rating, review_text FROM reviews WHERE user_id = $1 AND product_id = $2`
+	result, err := repo.db.QueryContext(ctx, query, userID, productID)
+	if err != nil {
+		return
+	}
+
+	for result.Next() {
+		result.Scan(&res.Id, &res.UserID, &res.ProductID, &res.Rating, &res.ReviewText)
 	}
 	return
 }
@@ -75,7 +81,7 @@ func (repo *repository) Create(req []model.ReviewRequest) (res []model.Review, e
 		return
 	}
 
-	time.Sleep(3*time.Second)
+	time.Sleep(3 * time.Second)
 
 	for _, v := range req {
 		result, err := repo.GetDetail(v.UserID, v.ProductID)
@@ -84,5 +90,18 @@ func (repo *repository) Create(req []model.ReviewRequest) (res []model.Review, e
 		}
 		res = append(res, result)
 	}
+	return
+}
+
+func (repo *repository) Delete(reviewID int) (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `DELETE FROM reviews WHERE id = $1`
+	_, err = repo.db.QueryContext(ctx, query, reviewID)
+	if err != nil {
+		return
+	}
+
 	return
 }

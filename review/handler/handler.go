@@ -22,7 +22,7 @@ func NewHandler(svc service.Servicer) Handlerer {
 }
 
 func (h *handler) GetByProductID(ctx *gin.Context) {
-	productIDString, ok := ctx.GetQuery("product_id")	
+	productIDString, ok := ctx.GetQuery("product_id")
 	if !ok {
 		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param Review_id should not be empty"))
 		return
@@ -84,4 +84,24 @@ func (h *handler) Create(ctx *gin.Context) {
 		return
 	}
 	response.ResponseSuccess(ctx, http.StatusOK, res)
+}
+
+func (h *handler) Delete(ctx *gin.Context) {
+	reviewIDString, ok := ctx.GetQuery("review_id")
+	if !ok {
+		response.ResponseError(ctx, http.StatusBadRequest, fmt.Errorf("query param review_id should not be empty"))
+		return
+	}
+
+	reviewID, err := strconv.Atoi(reviewIDString)
+	if err != nil {
+		response.ResponseError(ctx, http.StatusBadRequest, err)
+		return
+	}
+
+	if err = h.svc.Delete(reviewID); err != nil {
+		response.ResponseError(ctx, http.StatusInternalServerError, err)
+		return
+	}
+	response.ResponseSuccess(ctx, http.StatusOK, nil)
 }
