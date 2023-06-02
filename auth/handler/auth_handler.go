@@ -6,11 +6,13 @@ import (
 	"auth-go/model"
 	"auth-go/service"
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -40,7 +42,7 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 
 	user, errSvc := h.svc.Create(registerReq)
 	if errSvc != nil {
-		if errors.Is(errSvc, errors.New("duplicated key not allowed")) {
+		if strings.Contains(errSvc.Error(), "duplicated key not allowed") {
 			response.NewJSONResErr(ctx, http.StatusConflict, "", "email already existed")
 			return
 		}
@@ -61,8 +63,12 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 
 	user, errSvc := h.svc.LoginByEmail(loginReq)
 	if errSvc != nil {
-		if errors.Is(errSvc, errors.New("incorrect password")) {
+		if strings.Contains(errSvc.Error(), "incorrect password") {
 			response.NewJSONResErr(ctx, http.StatusBadRequest, "", errSvc.Error())
+			return
+		}
+		if errors.Is(errSvc, sql.ErrNoRows) {
+			response.NewJSONResErr(ctx, http.StatusBadRequest, "", "email didn't existed")
 			return
 		}
 		_ = ctx.Error(errSvc)
@@ -175,7 +181,7 @@ func (h *AuthHandler) GoogleCallback(ctx *gin.Context) {
 		return
 	}
 
-	user, errSvc := h.svc.FirstOrCreate(userReq)
+	user, errSvc := h.svc.FirstOrCreate("google", userReq)
 	if errSvc != nil {
 		_ = ctx.Error(errSvc)
 		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errSvc.Error())
