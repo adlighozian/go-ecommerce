@@ -1,0 +1,34 @@
+@startuml login_oauth2
+title Login with Google OAuth2
+
+actor User
+participant "App" as A
+participant "Handler" as H
+participant "Google OAuth2" as GO
+participant "Service" as S
+participant "Repository" as R
+
+User -> A: Choose to Login \nwith Google \n(Call GoogleLogin())
+A -> GO: Redirect to Google \nfor Authentication
+User -> GO: Enter Google Credentials
+alt Credentials are Valid
+    GO --> A: Return Authorization Code
+    A -> H: Request Login with \nAuthorization Code
+    H -> S: Call GoogleCallback()
+    S -> GO: Exchange Authorization \nCode for Access Token
+    GO --> S: Return Access Token
+    S -> GO: Request User Profile \nwith Access Token
+    GO --> S: Return User Profile
+    S -> R: Check if User \nExists in Database
+    alt User Does Not Exist
+        S -> R: Create New User \nin Database
+    end
+    S --> H: Send OK
+    H --> A: Display OK
+else Credentials are Invalid
+    GO --> A: Return Error
+    A --> User: Show Invalid Error
+end
+User <-- A: Display Result
+
+@enduml

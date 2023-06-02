@@ -208,33 +208,14 @@ TABLE(reviews, "reviews") {
   updated_at
 }
 
-TABLE(review_images, "review_images") {
-  PRIMARY_KEY(id)
-  --
-  FOREIGN_KEY(review_id)
-  image_url
-  created_at
-  updated_at
-}
-
 TABLE(promotions, "promotions") {
   PRIMARY_KEY(id)
   --
   FOREIGN_KEY(store_id)
   FOREIGN_KEY(product_id)
   FOREIGN_KEY(category_id)
-  discount_type
   discount_value
-  start_date
-  end_date
-  created_at
-  updated_at
-}
-
-TABLE(promotion_codes, "promotion_codes") {
-  PRIMARY_KEY(id)
-  --
-  FOREIGN_KEY(promotion_id)
+  name
   code
   created_at
   updated_at
@@ -260,10 +241,8 @@ order_items }-- orders : order_id
 order_items }-- products : product_id
 reviews }-- users : user_id
 reviews }-- products : product_id
-review_images }-- reviews : review_id
 promotions }-- stores : store_id
 promotions }-- products : product_id
 promotions }-- categories : category_id
-promotion_codes }-- promotions : promotion_id
 
 @enduml
