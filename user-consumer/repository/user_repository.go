@@ -28,8 +28,8 @@ func (repo *UserRepository) Create(user *model.User) (*model.User, error) {
 	}
 
 	sqlQuery1 := `
-	INSERT INTO users (username, email, password, role, full_name, age, image_url) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7) 
+	INSERT INTO users (username, email, password, role, provider, full_name, age, image_url) 
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
 	RETURNING id
 	`
 	stmt1, errStmt := tx.PrepareContext(ctx, sqlQuery1)
@@ -40,7 +40,7 @@ func (repo *UserRepository) Create(user *model.User) (*model.User, error) {
 
 	errScan := stmt1.QueryRowContext(ctx,
 		user.Username, user.Email, user.Password, user.Role,
-		user.FullName, user.Age, user.ImageURL,
+		user.Provider, user.FullName, user.Age, user.ImageURL,
 	).
 		Scan(&user.ID)
 	if errScan != nil {

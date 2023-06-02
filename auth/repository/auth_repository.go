@@ -78,7 +78,7 @@ func (repo *AuthRepository) Create(user *model.User) (*model.User, error) {
 
 	time.Sleep(3 * time.Second)
 
-	user, errGetByEmail := repo.GetByEmail(user.Email)
+	user, errGetByEmail := repo.LoginByEmail(user.Email)
 	if errGetByEmail != nil {
 		return nil, errGetByEmail
 	}
@@ -87,7 +87,7 @@ func (repo *AuthRepository) Create(user *model.User) (*model.User, error) {
 }
 
 func (repo *AuthRepository) FirstOrCreate(user *model.User) (*model.User, error) {
-	foundUser, errGetByEmail := repo.GetByEmail(user.Email)
+	foundUser, errGetByEmail := repo.LoginByEmail(user.Email)
 	if errGetByEmail != nil {
 		if errors.Is(errGetByEmail, sql.ErrNoRows) {
 			return repo.Create(user)
@@ -99,38 +99,6 @@ func (repo *AuthRepository) FirstOrCreate(user *model.User) (*model.User, error)
 	return foundUser, nil
 }
 
-func (repo *AuthRepository) GetByEmail(email string) (*model.User, error) {
-	user := new(model.User)
-
-	cachedData, errGetCache := repo.getDataFromCache(email)
-	if errGetCache != nil {
-		data, errGetDB := repo.getByEmailFromDatabase(email)
-		if errGetDB != nil {
-			return nil, errGetDB
-		}
-
-		dataByte, errJSON := json.Marshal(data)
-		if errJSON != nil {
-			return nil, errJSON
-		}
-
-		// Store the data in the cache for future reads
-		errSetCache := repo.redis.Set(context.Background(), email, dataByte, 10*time.Minute).Err()
-		if errSetCache != nil {
-			return nil, errSetCache
-		}
-
-		return data, nil
-	}
-
-	errJSONUn := json.Unmarshal([]byte(cachedData), &user)
-	if errJSONUn != nil {
-		return nil, errJSONUn
-	}
-
-	return user, nil
-}
-
 func (repo *AuthRepository) getDataFromCache(key string) (string, error) {
 	cachedData, errGet := repo.redis.Get(context.Background(), key).Result()
 	if errGet != nil {
@@ -139,50 +107,13 @@ func (repo *AuthRepository) getDataFromCache(key string) (string, error) {
 	return cachedData, nil
 }
 
-func (repo *AuthRepository) getByEmailFromDatabase(email string) (*model.User, error) {
-	ctx, cancel := timeout.NewCtxTimeout()
-	defer cancel()
-
-	sqlQuery := `
-	SELECT users.id, users.username, users.email, users.role, users.full_name, 
-	    	 users.age, users.image_url, users.created_at, users.updated_at, 
-				 user_settings.notification, user_settings.dark_mode, 
-				 languages.name AS language
-	FROM users 
-	INNER JOIN user_settings on users.id = user_settings.user_id
-	INNER JOIN languages on user_settings.language_id= languages.id
-	WHERE users.email = $1
-	LIMIT 1
-	`
-	stmt, errStmt := repo.db.PrepareContext(ctx, sqlQuery)
-	if errStmt != nil {
-		return nil, errStmt
-	}
-	defer stmt.Close()
-
-	user := new(model.User)
-	row := stmt.QueryRowContext(ctx, email)
-	scanErr := row.Scan(
-		&user.ID, &user.Username, &user.Email, &user.Role,
-		&user.FullName, &user.Age, &user.ImageURL,
-		&user.CreatedAt, &user.UpdatedAt,
-		&user.UserSetting.Notification, &user.UserSetting.DarkMode,
-		&user.UserSetting.Language.Name,
-	)
-	if scanErr != nil {
-		return nil, scanErr
-	}
-
-	return user, nil
-}
-
 func (repo *AuthRepository) LoginByEmail(email string) (*model.User, error) {
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
 	sqlQuery := `
 	SELECT id, username, email, password, role, full_name, 
-	    	 age, image_url, created_at, updated_at
+	    	 provider, age, image_url, created_at, updated_at
 	FROM users 
 	WHERE email = $1
 	LIMIT 1
@@ -197,7 +128,7 @@ func (repo *AuthRepository) LoginByEmail(email string) (*model.User, error) {
 	row := stmt.QueryRowContext(ctx, email)
 	scanErr := row.Scan(
 		&user.ID, &user.Username, &user.Email, &user.Password, &user.Role,
-		&user.FullName, &user.Age, &user.ImageURL,
+		&user.Provider, &user.FullName, &user.Age, &user.ImageURL,
 		&user.CreatedAt, &user.UpdatedAt,
 	)
 	if scanErr != nil {
