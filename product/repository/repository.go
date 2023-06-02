@@ -48,14 +48,14 @@ func (repo *repository) ShowProduct(id int) (model.Product, error) {
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
-	query := `select  id, store_id, category_id, size_id, color_id , name, subtitle , description , unit_price , status , stock ,sku , weight , created_at , updated_at from products p where id = $1`
+	query := `select  id, store_id, category_id, size_id, color_id , name,brand, subtitle , description , unit_price , status , stock ,sku , weight , created_at , updated_at from products p where id = $1`
 
 	result, err := repo.db.QueryContext(ctx, query, id)
 	failerror.FailError(err, "error prepare")
 
 	var temp = model.Product{}
 	for result.Next() {
-		result.Scan(&temp.Id, &temp.StoreID, &temp.CategoryID, &temp.SizeID, &temp.ColorID, &temp.Name, &temp.Subtitle, &temp.Description, &temp.UnitPrice, &temp.Status, &temp.Stock, &temp.Sku, &temp.Weight, &temp.Created_at, &temp.Update_at)
+		result.Scan(&temp.Id, &temp.StoreID, &temp.CategoryID, &temp.SizeID, &temp.ColorID, &temp.Name, &temp.Brand, &temp.Subtitle, &temp.Description, &temp.UnitPrice, &temp.Status, &temp.Stock, &temp.Sku, &temp.Weight, &temp.Created_at, &temp.Update_at)
 	}
 
 	if temp.Id <= 0 {
