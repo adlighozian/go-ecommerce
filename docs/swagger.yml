@@ -5,7 +5,20 @@ info:
     Swagger E-Commerce API Documentation
   version: 1.0.0
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:5000
+  - url: http://localhost:5001
+  - url: http://localhost:5002
+  - url: http://localhost:5003
+  - url: http://localhost:5004
+  - url: http://localhost:5005
+  - url: http://localhost:5006
+  - url: http://localhost:5007
+  - url: http://localhost:5008
+  - url: http://localhost:5009
+  - url: http://localhost:5010
+  - url: http://localhost:5011
+  - url: http://localhost:5012
+  - url: http://localhost:5013
 tags:
   - name: address
     description: Address
@@ -34,7 +47,7 @@ tags:
   - name: wishlist
     description: Wishlist
 paths:
-  /address:
+  /v1/HTdm6ZFo2Hd:
     get:
       tags:
         - address
@@ -150,7 +163,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /carts:
+  /v1/PLdKLnBBRbg:
     get:
       tags:
         - cart
@@ -266,48 +279,119 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /login:
+  /v1/VIYMjjr4WBg:
     post:
       tags:
         - auth
-      summary: test
+      summary: User Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequest'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '500':
-          description: Internal Server Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerError'
-  /login/cms:
-    post:
-      tags:
-        - cms
-      summary: test
-      responses:
-        '200':
-          description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Order'
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Created"
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        access_token:
+                          type: string
+                          format: string
+                          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNyIsInVzZXJfcm9sZSI6InVzZXIiLCJpc3MiOiJlY29tbWVyY2UiLCJleHAiOjE2ODU2MDc2OTgsIm5iZiI6MTY4NTUyMTI5OCwiaWF0IjoxNjg1NTIxMjk4fQ.OVfYs4l0anxgRDdHYVZHzgRsSboeqKqCnmRolB3GL0c
+                        refresh_token:
+                          type: string
+                          format: string
+                          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNyIsInVzZXJfcm9sZSI6InVzZXIiLCJpc3MiOiJlY29tbWVyY2UiLCJleHAiOjE2ODYxMjYwOTgsIm5iZiI6MTY4NTUyMTI5OCwiaWF0IjoxNjg1NTIxMjk4fQ.IfjZZj8OkzUJfiv0ktcZQNyIhiQyXfDUeA7dYHG7k2I
+                        user:
+                          type: array
+                          items:
+                            properties:
+                              age:
+                                type: string
+                                format: string
+                                example: 
+                              created_at:
+                                type: string
+                                format: string
+                                example: 2023-05-31T15:21:14.580489+07:00
+                              email:
+                                type: string
+                                format: string
+                                example: test@gmail.com
+                              id:
+                                type: integer
+                                format: integer
+                                example: 7
+                              full_name:
+                                type: string
+                                format: string
+                                example: adli
+                              image_url:
+                                type: string
+                                format: string
+                                example: www.phincon.com
+                              role:
+                                type: string
+                                format: string
+                                example: user
+                              updated_at:
+                                type: string
+                                format: string
+                                example: 2023-05-31T15:21:14.580489+07:00
+                              user_setting:
+                                type: array
+                                items:
+                                  properties:                                   
+                                    created_at:
+                                      type: string
+                                      format: string
+                                      example: 2023-05-31T15:21:14.580489+07:00
+                                    dark_mode:
+                                      type: string
+                                      format: string
+                                      example: null
+                                    id:
+                                      type: integer
+                                      format: integer
+                                      example: 1
+                                    language:
+                                      type: array
+                                      items:
+                                        properties:                          
+                                          created_at:
+                                            type: string
+                                            format: string
+                                            example: 2023-05-31T15:21:14.580489+07:00
+                                          id:
+                                            type: integer
+                                            format: integer
+                                            example: 1
+                                          name:
+                                            type: string
+                                            format: string
+                                          updated_at:
+                                            type: string
+                                            format: string
+                                            example: 2023-05-31T15:21:14.580489+07:00
+                              username:
+                                type: string
+                                format: string
+                                example: adli
+                              
         '400':
           description: Bad Request
           content:
@@ -327,18 +411,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /register:
+  /v1/HTnbxUvQ2IE:
     post:
       tags:
         - auth
-      summary: test
+      summary: User Register
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Created"
+                  data:
+                    type: integer
+                    format: integer
+                    example: 7
         '400':
           description: Bad Request
           content:
@@ -676,7 +772,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /payments:
+  /v1/SFoRY4WeD2B:
     get:
       tags:
         - payment
@@ -753,7 +849,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
  
-  /splashscreens:
+  /v1/Q0S4sLEB1IT:
     get:
       tags:
         - splash screen
@@ -862,7 +958,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
   
-  /stores:
+  /v1/PxtQZh61iap:
     get:
       tags:
         - store
@@ -971,7 +1067,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /reviews:
+  /V1/DS3EFeutzg5:
     get:
       tags:
         - review
@@ -1207,7 +1303,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  /wishlist:
+  /v1/CUbICN8VgNk:
     get:
       tags:
         - wishlist
@@ -1398,6 +1494,32 @@ components:
           type: string
           format: string
           example: "some error"
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          format: string
+          example: adli
+        email:
+          type: integer
+          format: string
+          example: ghozian@test11.com
+        password:
+          type: string
+          format: string
+          example: 1221
+    Login:
+      type: object
+      properties:
+        email:
+          type: integer
+          format: string
+          example: ghozian@test11.com
+        password:
+          type: string
+          format: string
+          example: 1221
     Address:
       type: object
       properties:
@@ -1411,19 +1533,19 @@ components:
           example: 1
         street:
           type: string
-          format: int
+          format: string
           example: Menteng Street
         city:
           type: string
-          format: int
+          format: string
           example: South Jakarta
         state:
           type: string
-          format: int
+          format: string
           example: Jakarta
         country:
           type: string
-          format: int
+          format: string
           example: Indonesia
         zipcode:
           type: integer
@@ -1442,23 +1564,23 @@ components:
           example: 1
         street:
           type: string
-          format: int
+          format: string
           example: Menteng Street
         city:
           type: string
-          format: int
+          format: string
           example: South Jakarta
         state:
           type: string
-          format: int
+          format: string
           example: Jakarta
         country:
           type: string
-          format: int
+          format: string
           example: Indonesia
         zipcode:
           type: integer
-          format: int
+          format: string
           example: 55555
         phone_number:
           type: integer
