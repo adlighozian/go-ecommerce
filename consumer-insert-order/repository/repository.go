@@ -8,7 +8,7 @@ import (
 )
 
 type Product interface {
-	CreateProduct(req []model.Orders) error
+	CreateProduct(req model.GetOrdersSent) error
 }
 
 type product struct {
@@ -21,34 +21,38 @@ func NewProduct(db *sql.DB) Product {
 	}
 }
 
-func (p product) CreateProduct(req []model.Orders) error {
+func (p product) CreateProduct(req model.GetOrdersSent) error {
 	ctx, cancel := helpers.NewCtxTimeout()
 	defer cancel()
 
 	trx, err := p.db.BeginTx(ctx, nil)
 	helpers.FailOnError(err, "error config")
 
-	query := `insert into orders (user_id, shipping_id, total_price, status, order_number) values ($1,$2,$3,$4,$5) returning id`
+	queryOrder := `insert into orders (user_id, shipping_id, total_price, status, order_number) values ($1,$2,$3,$4,$5) returning id`
 
-	var ids []int
-	for _, v := range req {
-		var id int
-
-		stmt, err := trx.PrepareContext(ctx, query)
-		if err != nil {
-			trx.Rollback()
-			return err
-		}
-
-		err = stmt.QueryRowContext(ctx, v.UserID, v.ShippingID, v.TotalPrice, v.Status, v.OrderNumber).Scan(&id)
-		if err != nil {
-			trx.Rollback()
-		}
-		ids = append(ids, id)
+	var idOrders int
+	err = trx.QueryRowContext(ctx, queryOrder, req.UserID, req.ShippingID, req.TotalPrice, req.Status, req.OrderNumber).Scan(&idOrders)
+	if err != nil {
+		trx.Rollback()
 	}
+
+	queryOrderItem := `insert into order_items (order_id,product_id,quantity,total_price) values ($1,$2,$3,$4)`
+
+	stmt, err := trx.PrepareContext(ctx, queryOrderItem)
+	if err != nil {
+		trx.Rollback()
+	}
+
+	for _, v := range req.OrderItemReq {
+		_, err := stmt.ExecContext(ctx, idOrders, v.ProductId, v.Quantity, v.TotalPrice)
+		if err != nil {
+			trx.Rollback()
+		}
+	}
+
 	trx.Commit()
 
-	fmt.Println(ids)
+	fmt.Println(idOrders)
 
 	return nil
 
