@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Swagger E-Commerce
+  title: Swagger API Gateway E-Commerce
   description: |-
-    Swagger E-Commerce API Documentation
+    Swagger API Gateway E-Commerce API Documentation
   version: 1.0.0
 servers:
   - url: http://localhost:5000
@@ -53,9 +53,9 @@ paths:
         - address
       summary: Get Address by User ID
       parameters:
-        - name: user_id
-          in: query
-          description: user_id
+        - name: Authorization
+          in: header
+          description: an authorization header
           required: true
           schema:
             type: string
@@ -2000,16 +2000,3 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/User'
-  securitySchemes:
-    petstore_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
-          scopes:
-            write:pets: modify pets in your account
-            read:pets: read your pets
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header
