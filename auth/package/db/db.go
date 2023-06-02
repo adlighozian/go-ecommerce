@@ -2,6 +2,7 @@ package db
 
 import (
 	"auth-go/helper/timeout"
+	"auth-go/model"
 	"database/sql"
 	"errors"
 	"time"
@@ -54,11 +55,13 @@ func (g *GormDB) init(debug bool, driver, url string) error {
 		return err
 	}
 
-	// _ = db.AutoMigrate(
-	// 	new(model.User),
-	// 	new(model.UserSetting),
-	// 	new(model.Language),
-	// )
+	if debug {
+		_ = db.AutoMigrate(
+			new(model.User),
+			new(model.UserSetting),
+			new(model.Language),
+		)
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
