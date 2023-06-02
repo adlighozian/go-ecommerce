@@ -140,6 +140,8 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
+	logger.Debug().Msgf("service will be start at port: %v", config.Port)
+
 	// * run the ListenAndServe() of a server
 	if errSrv := server.Run(srv, logger); errSrv != nil {
 		logger.Fatal().Err(errSrv).Msg("server shutdown failed")
