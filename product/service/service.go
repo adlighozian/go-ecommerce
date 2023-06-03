@@ -61,7 +61,7 @@ func (svc *service) CreateProduct(req []model.ProductReq) (model.Respon, error) 
 	var data []model.Product
 
 	for _, v := range req {
-		if v.StoreID == 0 || v.CategoryID == 0 || v.SizeID == 0 || v.ColorID == 0 || v.Name == "" || v.Subtitle == "" || v.Description == "" || v.UnitPrice == 0 || v.Stock == 0 || v.Weight == 0 || v.Brand == "" {
+		if v.StoreID == 0 || v.CategoryID == 0 || v.ColorID == 0 || v.Name == "" || v.Subtitle == "" || v.Description == "" || v.UnitPrice == 0 || v.Stock == 0 || v.Weight == 0 || v.Brand == "" {
 			continue
 		}
 

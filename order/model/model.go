@@ -3,14 +3,15 @@ package model
 import "time"
 
 type Orders struct {
-	Id          int       `json:"id"`
-	UserID      int       `json:"user_id"`
-	ShippingID  int       `json:"shipping_id"`
-	TotalPrice  float64   `json:"total_price"`
-	Status      bool      `json:"status"`
-	OrderNumber string    `json:"order_number"`
-	CreatedAt   time.Time `json:"created_at"`
-	UpdatedAt   time.Time `json:"updated_at"`
+	Id            int       `json:"id"`
+	UserID        int       `json:"user_id"`
+	ShippingID    int       `json:"shipping_id"`
+	TotalPrice    float64   `json:"total_price"`
+	Status        bool      `json:"status"`
+	OrderNumber   string    `json:"order_number"`
+	ReceiptNumber string    `json:"receipt_number"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
 }
 
 type OrderItem struct {
@@ -22,15 +23,16 @@ type OrderItem struct {
 }
 
 type ResultOrders struct {
-	Id           int            `json:"id"`
-	UserID       int            `json:"user_id"`
-	ShippingID   int            `json:"shipping_id"`
-	TotalPrice   float64        `json:"total_price"`
-	Status       bool           `json:"status"`
-	OrderNumber  string         `json:"order_number"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
-	OrderItemReq []OrderItemReq `json:"order_items"`
+	Id            int            `json:"id"`
+	UserID        int            `json:"user_id"`
+	ShippingID    int            `json:"shipping_id"`
+	TotalPrice    float64        `json:"total_price"`
+	Status        bool           `json:"status"`
+	OrderNumber   string         `json:"order_number"`
+	ReceiptNumber string         `json:"receipt_number"`
+	OrderItemReq  []OrderItemReq `json:"order_items"`
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
 }
 
 type GetOrders struct {
@@ -56,8 +58,9 @@ type GetOrdersSent struct {
 }
 
 type OrderUpd struct {
-	OrderNumber string `json:"order_number"`
-	Status      bool   `json:"status"`
+	OrderNumber   string `json:"order_number"`
+	Status        bool   `json:"status"`
+	ReceiptNumber string `json:"receipt_number"`
 }
 
 type OrderItems struct {
