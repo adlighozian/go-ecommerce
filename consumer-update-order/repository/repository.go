@@ -21,10 +21,10 @@ func (p product) UpdateProduct(req model.OrderUpd) error {
 	ctx, cancel := helpers.NewCtxTimeout()
 	defer cancel()
 
-	querys := `update orders set  status = $1 where order_number = $2 returning id`
+	querys := `update orders set status = $1, receipt_number = $2 where order_number = $3 returning id`
 
 	var idCheck int
-	p.db.QueryRowContext(ctx, querys, req.Status, req.OrderNumber).Scan(&idCheck)
+	p.db.QueryRowContext(ctx, querys, req.Status, req.ReceiptNumber, req.OrderNumber).Scan(&idCheck)
 
 	fmt.Println(idCheck)
 
