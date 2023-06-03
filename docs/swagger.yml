@@ -357,19 +357,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-
   /products:
     get:
       tags:
         - product
       summary: Get Products
       parameters:
-        - name: Arrival
-          in: query
-          description: Filter by arrival
-          required: false
-          schema:
-            type: string
         - name: Brand
           in: query
           description: Filter by brand
@@ -394,7 +387,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/ProductGet'
         '400':
           description: Bad Request
           content:
@@ -407,17 +400,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+  /admin/products:
     post:
       tags:
         - cms
       summary: Insert New Product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/ProductGet'
         '400':
           description: Bad Request
           content:
@@ -434,13 +433,55 @@ paths:
       tags:
         - cms
       summary: Update Existing Product Information
+      parameters:
+        - name: user_id
+          in: query
+          description: user_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - cms
+      summary: Delete Product by id
+      parameters:
+        - name: ProductID
+          in: query
+          description: Delete by product id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteRespon'
         '400':
           description: Bad Request
           content:
@@ -459,15 +500,9 @@ paths:
         - product
       summary: Get product detail by product ID
       parameters:
-        - name: userID
+        - name: productID
           in: query
-          description: User ID
-          required: true
-          schema:
-            type: string
-        - name: orderID
-          in: query
-          description: Order ID
+          description: product ID
           required: true
           schema:
             type: string
@@ -477,7 +512,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Product'
         '400':
           description: Bad Request
           content:
@@ -588,13 +623,18 @@ paths:
       tags:
         - order
       summary: Insert new order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/OrderCreate'
         '400':
           description: Bad Request
           content:
@@ -607,24 +647,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+  /admin/orders:
     patch:
       tags:
         - cms
-      summary: Update Customer Orders by User ID
-      parameters:
-        - name: userID
-          in: query
-          description: User ID
-          required: true
-          schema:
-            type: string
+      summary: Update Customer Orders by order number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdate'
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/OrderCreate'
         '400':
           description: Bad Request
           content:
@@ -637,7 +676,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-
   /orders/details:
     get:
       tags:
@@ -650,9 +688,9 @@ paths:
           required: true
           schema:
             type: string
-        - name: orderID
+        - name: order number
           in: query
-          description: Order ID
+          description: order number
           required: true
           schema:
             type: string
@@ -662,7 +700,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/OrderDetail'
         '400':
           description: Bad Request
           content:
@@ -1088,32 +1126,18 @@ paths:
                 $ref: '#/components/schemas/InternalServerError'
 
 
-  /vouchers:
+  /voucher:
     get:
       tags:
         - voucher
       summary: Get Voucher
-      description: test
-      parameters:
-        - name: pagination
-          in: query
-          description: Pagination
-          required: false
-          schema:
-            type: string
-        - name: limit
-          in: query
-          description: Limit
-          required: false
-          schema:
-            type: string
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/VoucherGet'
         '400':
           description: Bad Request
           content:
@@ -1126,18 +1150,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+  
+  /admin/voucher:
     post:
       tags:
         - cms
       summary: Insert New Voucher
-      description: test
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoucherRequest'
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/VoucherGet'
         '400':
           description: Bad Request
           content:
@@ -1150,18 +1180,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-    patch:
+    delete:
       tags:
         - cms
-      summary: Update Voucher
-      description: test
+      summary: Delete Voucher
+      parameters:
+        - name: VoucherID
+          in: query
+          description: delete by voucher id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/DeleteRespon'
         '400':
           description: Bad Request
           content:
@@ -1175,16 +1211,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /vouchers/details:
+  /voucher/details:
     get:
       tags:
         - voucher
-      summary: Get Voucher Details By User ID
-      description: test
+      summary: Get Voucher Details By code Voucher
       parameters:
-        - name: voucherID
+        - name: code
           in: query
-          description: Voucher ID
+          description: code voucher
           required: true
           schema:
             type: string
@@ -1194,7 +1229,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Voucher'
         '400':
           description: Bad Request
           content:
@@ -1398,6 +1433,105 @@ components:
           type: string
           format: string
           example: "some error"
+    VoucherGet:
+      type: array
+      items:
+        $ref: '#/components/schemas/Voucher'
+    Voucher:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        store_id: 
+          type: integer
+          format: int
+          example: 1
+        product_id:
+          type: integer
+          format: int
+          example: 1
+        category_id: 
+          type: integer
+          format: int
+          example: 1
+        discount_value: 
+          type: number
+          format: float
+          example: 0.23
+        name:
+          type: string
+          format: varchar(255)
+          example: ramadhan sale 
+        code:
+          type: string
+          format: varchar(255)
+          example: oyAKQwvDuL 
+        start_date: 
+          type: string
+          format: date-time
+          example: 2023-05-21T17:30:00+07:00
+        end_date:
+          type: string
+          format: date-time
+          example: 2023-05-21T17:30:00+07:00
+        created_at:
+          type: string
+          format: date-time
+          example: 2023-06-02T15:03:16.215547+07:00
+        updated_at:
+          type: string
+          format: date-time
+          example: 2023-06-02T15:03:16.215547+07:00 
+    VoucherRequest:
+      type: array
+      items:
+        type: object
+        properties:
+          store_id: 
+            type: integer
+            format: int
+            example: 1
+          product_id:
+            type: integer
+            format: int
+            example: 1
+          category_id: 
+            type: integer
+            format: int
+            example: 1
+          discount_value: 
+            type: number
+            format: float
+            example: 0.23
+          name:
+            type: string
+            format: varchar(255)
+            example: ramadhan sale 
+          start_date: 
+            type: string
+            format: date-time
+            example: 2023-05-21T17:30:00+07:00
+          end_date:
+            type: string
+            format: date-time
+            example: 2023-05-21T17:30:00+07:00
+    DeleteRespon:
+      type: object
+      properties:
+        Status:
+          type: integer
+          format: int
+          example: 200
+        Message:
+          type: string
+          format: varchar(255)
+          example: Ok
+        Data:
+          type: integer
+          format: int
+          example: 44
     Address:
       type: object
       properties:
@@ -1433,6 +1567,177 @@ components:
           type: integer
           format: int
           example: 088243379274
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int
+          example: 1
+        store_id:
+          type: integer
+          format: int
+          example: 1
+        category_id:
+          type: integer
+          format: int
+          example: 1
+        size_id:
+          type: integer
+          format: int
+          example: 1
+        color_id:
+          type: integer
+          format: int
+          example: 1
+        name: 
+          type: string
+          format: varchar(255)
+          example: nike watch
+        brand:
+          type: string
+          format: varchar(255)
+          example: nike
+        subtitle:
+          type: string
+          format: varchar(255)
+          example: jam olahraga
+        description:
+          type: string
+          format: varchar(255)
+          example: jam tangan untuk berolahraga
+        unit_price:
+          type: number
+          format: float
+          example: 3500000
+        status: 
+          type: boolean
+          format: boolean
+          example: true
+        stock:
+          type: integer
+          format: int
+          example: 10 
+        sku:
+          type: string
+          format: varchar(255)
+          example: ksakjudI 
+        weight:
+          type: number
+          format: float64
+          example: 2.4
+        created_at: 
+          type: string
+          format: varchar(255)
+          example: 2023-05-30T10:18:10.294756+07:00
+        updated_at: 
+          type: string
+          format: varchar(255)
+          example: 2023-05-30T10:18:10.294756+07:00
+    ProductRequest:
+      type: array
+      items:
+        type: object
+        properties:
+          store_id:
+            type: integer
+            format: int
+            example: 1
+          category_id:
+            type: integer
+            format: int
+            example: 1
+          size_id:
+            type: integer
+            format: int
+            example: 1
+          color_id:
+            type: integer
+            format: int
+            example: 1
+          name: 
+            type: string
+            format: varchar(255)
+            example: nike watch
+          brand:
+            type: string
+            format: varchar(255)
+            example: nike
+          subtitle:
+            type: string
+            format: varchar(255)
+            example: jam olahraga
+          description:
+            type: string
+            format: varchar(255)
+            example: jam tangan untuk berolahraga
+          unit_price:
+            type: number
+            format: float
+            example: 3500000
+          stock:
+            type: integer
+            format: int
+            example: 10  
+          weight:
+            type: number
+            format: float64
+            example: 2.4
+    ProductUpdate:
+        type: object
+        properties:
+          store_id:
+            type: integer
+            format: int
+            example: 1
+          category_id:
+            type: integer
+            format: int
+            example: 1
+          size_id:
+            type: integer
+            format: int
+            example: 1
+          color_id:
+            type: integer
+            format: int
+            example: 1
+          name: 
+            type: string
+            format: varchar(255)
+            example: nike watch
+          brand:
+            type: string
+            format: varchar(255)
+            example: nike
+          subtitle:
+            type: string
+            format: varchar(255)
+            example: jam olahraga
+          description:
+            type: string
+            format: varchar(255)
+            example: jam tangan untuk berolahraga
+          status:
+            type: string
+            format: boolean
+            example: true
+          unit_price:
+            type: number
+            format: float
+            example: 3500000
+          stock:
+            type: integer
+            format: int
+            example: 10  
+          weight:
+            type: number
+            format: float64
+            example: 2.4
+    ProductGet:
+      type: array
+      items: 
+        $ref: '#/components/schemas/Product'
     AddressRequest:
       type: object
       properties:
@@ -1706,36 +2011,160 @@ components:
           type: integer
           format: int
           example: 1
-    Order:
+    OrderRequest:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          format: int
+          example: 1
+        shipping_id:
+          type: integer
+          format: int
+          example: 3 
+        total_price:
+          type: number
+          format: float
+          example: 54000 
+        order_items:
+          $ref: '#/components/schemas/OrderItems'
+    OrderUpdate:
+      type: object
+      properties:
+        order_number:
+          type: string
+          format: varchar(255)
+          example: 5ResPEGZHZ
+        Status:
+          type: string
+          format: float
+          example: true
+    OrderItems:
+      type: array
+      items:
+        type: object
+        properties:
+          product_id:
+            type: integer
+            format: int
+            example: 1
+          quantity:
+            type: integer
+            format: int
+            example: 10
+          total_price:
+            type: integer
+            format: int
+            example: 15000
+    OrderDetail:
       type: object
       properties:
         id:
           type: integer
-          format: int64
-          example: 10
-        petId:
+          format: int
+          example: 29 
+        user_id:
           type: integer
-          format: int64
-          example: 198772
-        quantity:
+          format: int
+          example: 2
+        shipping_id:
           type: integer
-          format: int32
-          example: 7
-        shipDate:
+          format: int
+          example: 3 
+        total_price:
+          type: integer
+          format: int
+          example: 54000 
+        status:
+          type: boolean
+          format: boolean
+          example: false
+        order_number: 
+          type: string
+          format: varchar(255)
+          example: mHAq33k3bq 
+        created_at: 
           type: string
           format: date-time
-        status:
+          example: 2023-06-01T12:38:50.077582+07:00 
+        updated_at: 
           type: string
-          description: Order Status
-          example: approved
-          enum:
-            - placed
-            - approved
-            - delivered
-        complete:
-          type: boolean
-      xml:
-        name: order
+          format: date-time
+          example: 2023-06-01T12:38:50.077582+07:00 
+        OrderItems:
+          $ref: '#/components/schemas/OrderItems'
+    Order :
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int
+            example: 29 
+          user_id:
+            type: integer
+            format: int
+            example: 2
+          shipping_id:
+            type: integer
+            format: int
+            example: 3 
+          total_price:
+            type: integer
+            format: int
+            example: 54000 
+          status:
+            type: boolean
+            format: boolean
+            example: false
+          order_number: 
+            type: string
+            format: varchar(255)
+            example: mHAq33k3bq 
+          created_at: 
+            type: string
+            format: date-time
+            example: 2023-06-01T12:38:50.077582+07:00 
+          updated_at: 
+            type: string
+            format: date-time
+            example: 2023-06-01T12:38:50.077582+07:00
+    OrderCreate :
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int
+            example: 29 
+          user_id:
+            type: integer
+            format: int
+            example: 2
+          shipping_id:
+            type: integer
+            format: int
+            example: 3 
+          total_price:
+            type: integer
+            format: int
+            example: 54000 
+          status:
+            type: boolean
+            format: boolean
+            example: false
+          order_number: 
+            type: string
+            format: varchar(255)
+            example: mHAq33k3bq 
+          created_at: 
+            type: string
+            format: date-time
+            example: 2023-06-01T12:38:50.077582+07:00 
+          updated_at: 
+            type: string
+            format: date-time
+            example: 2023-06-01T12:38:50.077582+07:00
     Customer:
       type: object
       properties:
@@ -1755,7 +2184,6 @@ components:
             $ref: '#/components/schemas/Address'
       xml:
         name: customer
-
     Category:
       type: object
       properties:
