@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Swagger API Gateway E-Commerce
+  title: Swagger API E-Commerce
   description: |-
-    Swagger API Gateway E-Commerce API Documentation
+    Swagger API E-Commerce Documentation
   version: 1.0.0
 servers:
   - url: http://localhost:5000
@@ -201,6 +201,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -243,6 +249,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -273,6 +285,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -433,6 +451,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -475,6 +499,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -505,6 +535,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1070,6 +1106,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1101,6 +1143,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1196,6 +1244,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1226,12 +1280,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+
   /admin/shipping:
       get:
         tags:
@@ -1314,6 +1375,7 @@ paths:
                   application/json:
                     schema:
                       $ref: '#/components/schemas/InternalServerError'
+
   /orders:
     get:
       tags:
@@ -1469,6 +1531,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1497,6 +1565,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1529,6 +1603,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1567,6 +1647,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1711,6 +1797,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1751,6 +1843,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1897,6 +1995,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1939,6 +2043,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -1969,6 +2079,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2115,6 +2231,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2157,6 +2279,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2187,6 +2315,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2347,6 +2481,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2389,6 +2529,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2419,6 +2565,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2534,6 +2686,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2569,6 +2727,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2599,6 +2763,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2606,6 +2776,106 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
+  /v1/Qn5kXls3C3j:
+      get:
+        tags:
+          - cms
+        summary: Get list shipping order
+        responses:
+          '200':
+            description: Ok
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ShippingGet'
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/BadRequest'
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Unauthorized'
+          '500':
+            description: Internal Server Error
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/InternalServerError'
+      post:
+        tags:
+          - cms
+        summary: Creeate new shipping orrder
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingRequest'
+        responses:
+          '200':
+              description: Ok
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/ShippingGet'
+          '400':
+              description: Bad Request
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/BadRequest'
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Unauthorized'
+          '500':
+              description: Internal Server Error
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/InternalServerError'
+      delete:
+          tags:
+            - cms
+          summary: Delete shipping orrder
+          parameters:
+            - name: shipping_id
+              in: query
+              description: Shipping ID
+              required: true
+              schema:
+                  type: string
+          responses:
+            '200':
+                description: Ok
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/ShippingGet'
+            '400':
+                description: Bad Request
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/BadRequest'
+            '401':
+              description: Unauthorized
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/Unauthorized'
+            '500':
+                description: Internal Server Error
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/InternalServerError'
   /v1/MwlSWpPmVEs:
     patch:
       tags:
@@ -2629,6 +2899,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2659,6 +2935,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2689,6 +2971,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2746,6 +3034,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2778,6 +3072,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2938,6 +3238,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -2980,6 +3286,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -3010,6 +3322,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
@@ -3061,7 +3379,7 @@ components:
         error:
           type: string
           format: string
-          example: "not authorize"
+          example: "some error"
     NotFound:
       type: object
       properties:
