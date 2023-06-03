@@ -11,22 +11,24 @@ type RedisClient struct {
 	Redis *redis.Client
 }
 
-func NewRedisClient(addr, password string, db int) (*RedisClient, error) {
+func NewRedisClient(addr, clientName, username, password string, db int) (*RedisClient, error) {
 	if addr == "" {
 		return nil, errors.New("no redis addr")
 	}
 
 	redisClient := new(RedisClient)
-	client := redisClient.init(addr, password, db)
+	client := redisClient.init(addr, clientName, username, password, db)
 
 	redisClient.Redis = client
 	return redisClient, nil
 }
 
-func (r *RedisClient) init(addr string, password string, db int) *redis.Client {
+func (r *RedisClient) init(addr string, clientName, username, password string, db int) *redis.Client {
 	client := redis.NewClient(
 		&redis.Options{
 			Addr:         addr,
+			ClientName:   clientName,
+			Username:     username,
 			Password:     password,
 			DB:           db,
 			ReadTimeout:  10 * time.Second,

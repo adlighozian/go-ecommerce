@@ -1,3 +1,4 @@
+//go:generate mockery --output=../mocks --name ShortenServiceI
 package service
 
 import "api-gateway-go/model"

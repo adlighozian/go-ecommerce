@@ -25,9 +25,11 @@ type Database struct {
 }
 
 type Redis struct {
-	Addr     string `mapstructure:"REDIS_ADDR"`
-	Password string `mapstructure:"REDIS_PASSWORD"`
-	DB       int    `mapstructure:"REDIS_DB"`
+	Addr       string `mapstructure:"REDIS_ADDR"`
+	ClientName string `mapstructure:"REDIS_CLIENTNAME"`
+	Username   string `mapstructure:"REDIS_USERNAME"`
+	Password   string `mapstructure:"REDIS_PASSWORD"`
+	DB         int    `mapstructure:"REDIS_DB"`
 }
 
 type RabbitMQ struct {

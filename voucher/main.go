@@ -51,5 +51,5 @@ func NewServer(hand handler.Handlerer, logger *zerolog.Logger) {
 	admin.POST("/voucher", hand.CreateVoucher)
 	admin.DELETE("/voucher", hand.DeleteVoucher)
 
-	r.Run(conf.Port)
+	r.Run(":" + conf.Port)
 }

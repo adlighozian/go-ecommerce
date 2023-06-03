@@ -32,7 +32,11 @@ func main() {
 	}
 	logger.Debug().Msg("db connected")
 
-	redisClient, errRedis := redisclient.NewRedisClient(config.Redis.Addr, config.Redis.Password, config.Redis.DB)
+	redisClient, errRedis := redisclient.NewRedisClient(
+		config.Redis.Addr, config.Redis.ClientName,
+		config.Redis.Username, config.Redis.Password,
+		config.Redis.DB,
+	)
 	if errDB != nil {
 		logger.Fatal().Err(errRedis).Msg("redis failed to connect")
 	}
@@ -94,6 +98,8 @@ func main() {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
+
+	logger.Debug().Msgf("service will be start at port: %v", config.Port)
 
 	if errSrv := server.Run(srv, logger); errSrv != nil {
 		logger.Fatal().Err(errSrv).Msg("server shutdown failed")
