@@ -40,6 +40,26 @@ func (h *handler) GetOrders(ctx *gin.Context) {
 
 }
 
+func (h *handler) GetOrdersByStoreID(ctx *gin.Context) {
+
+	storeID := ctx.Query("store_id")
+	var numi int
+
+	if storeID != "" {
+		num, err := strconv.Atoi(storeID)
+		failerror.FailError(err, "error convert to int")
+		numi = num
+	}
+
+	res, err := h.svc.GetOrdersByStoreID(numi)
+	if err != nil {
+		response.ResponseError(ctx, res.Status, err)
+	} else {
+		response.ResponseSuccess(ctx, res.Status, res.Data)
+	}
+
+}
+
 func (h *handler) ShowOrders(ctx *gin.Context) {
 	idUser := ctx.Query("user_id")
 	orderNumber := ctx.Query("order_number")

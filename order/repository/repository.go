@@ -38,7 +38,29 @@ func (repo *repository) GetOrders(userID int) ([]model.Orders, error) {
 
 	for result.Next() {
 		var temp model.Orders
-		result.Scan(&temp.Id, &temp.UserID, &temp.ShippingID, &temp.TotalPrice, &temp.Status, &temp.CreatedAt, &temp.UpdatedAt, &temp.OrderNumber)
+		result.Scan(&temp.Id, &temp.UserID, &temp.ShippingID, &temp.TotalPrice, &temp.Status, &temp.CreatedAt, &temp.UpdatedAt, &temp.OrderNumber, &temp.ReceiptNumber)
+		data = append(data, temp)
+	}
+
+	return data, nil
+}
+
+func (repo *repository) GetOrdersByStoreID(storeID int) ([]model.OrdersByStore, error) {
+	ctx, cancel := timeout.NewCtxTimeout()
+	defer cancel()
+
+	querySelect := `select o.id, o.user_id, o.shipping_id, o.status, o.created_at, o.updated_at, o.order_number, oi.quantity, oi.total_price, p.store_id from orders o inner join order_items oi on o.id = oi.order_id inner join products p on oi.product_id = p.id where p.store_id=$1`
+
+	result, err := repo.db.QueryContext(ctx, querySelect, storeID)
+	if err != nil {
+		return []model.OrdersByStore{}, errors.New("error get data")
+	}
+
+	var data = []model.OrdersByStore{}
+
+	for result.Next() {
+		var temp model.OrdersByStore
+		result.Scan(&temp.Id, &temp.UserID, &temp.ShippingID, &temp.Status, &temp.CreatedAt, &temp.UpdatedAt, &temp.OrderNumber, &temp.Quantity, &temp.TotalPrice, &temp.StoreID)
 		data = append(data, temp)
 	}
 
@@ -65,21 +87,22 @@ func (repo *repository) ShowOrders(req model.OrderItems) (model.ResultOrders, er
 		dataProduct = append(dataProduct, temp)
 	}
 
-	queryOrder := `select id, user_id, shipping_id , total_price ,status , order_number,created_at ,updated_at from orders o where o.order_number = $1 and o.user_id = $2`
+	queryOrder := `select id, user_id, shipping_id , total_price ,status , order_number,created_at ,updated_at, receipt_number from orders o where o.order_number = $1 and o.user_id = $2`
 
 	var dataOrder model.Orders
-	repo.db.QueryRowContext(ctx, queryOrder, req.OrderNumber, req.UserId).Scan(&dataOrder.Id, &dataOrder.UserID, &dataOrder.ShippingID, &dataOrder.TotalPrice, &dataOrder.Status, &dataOrder.OrderNumber, &dataOrder.CreatedAt, &dataOrder.UpdatedAt)
+	repo.db.QueryRowContext(ctx, queryOrder, req.OrderNumber, req.UserId).Scan(&dataOrder.Id, &dataOrder.UserID, &dataOrder.ShippingID, &dataOrder.TotalPrice, &dataOrder.Status, &dataOrder.OrderNumber, &dataOrder.CreatedAt, &dataOrder.UpdatedAt, &dataOrder.ReceiptNumber)
 
 	result = model.ResultOrders{
-		Id:           dataOrder.Id,
-		UserID:       dataOrder.UserID,
-		ShippingID:   dataOrder.ShippingID,
-		TotalPrice:   dataOrder.TotalPrice,
-		Status:       dataOrder.Status,
-		OrderNumber:  dataOrder.OrderNumber,
-		CreatedAt:    dataOrder.CreatedAt,
-		UpdatedAt:    dataOrder.UpdatedAt,
-		OrderItemReq: dataProduct,
+		Id:            dataOrder.Id,
+		UserID:        dataOrder.UserID,
+		ShippingID:    dataOrder.ShippingID,
+		TotalPrice:    dataOrder.TotalPrice,
+		Status:        dataOrder.Status,
+		OrderNumber:   dataOrder.OrderNumber,
+		CreatedAt:     dataOrder.CreatedAt,
+		UpdatedAt:     dataOrder.UpdatedAt,
+		OrderItemReq:  dataProduct,
+		ReceiptNumber: dataOrder.ReceiptNumber,
 	}
 
 	if result.Id == 0 {
@@ -132,10 +155,10 @@ func (repo *repository) UpdateOrders(req model.OrderUpd) (model.Orders, error) {
 
 	time.Sleep(3 * time.Second)
 
-	queryOrder := `select id, user_id, shipping_id , total_price ,status , order_number,created_at ,updated_at from orders o where o.order_number = $1`
+	queryOrder := `select id, user_id, shipping_id , total_price ,status , order_number,created_at ,updated_at,receipt_number from orders where order_number = $1`
 
 	var temp model.Orders
-	repo.db.QueryRowContext(ctx, queryOrder, req.OrderNumber).Scan(&temp.Id, &temp.UserID, &temp.ShippingID, &temp.TotalPrice, &temp.Status, &temp.OrderNumber, &temp.CreatedAt, &temp.UpdatedAt)
+	repo.db.QueryRowContext(ctx, queryOrder, req.OrderNumber).Scan(&temp.Id, &temp.UserID, &temp.ShippingID, &temp.TotalPrice, &temp.Status, &temp.OrderNumber, &temp.CreatedAt, &temp.UpdatedAt, &temp.ReceiptNumber)
 
 	if temp.Id == 0 {
 		return model.Orders{}, errors.New("error update order")

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"product-go/helper/failerror"
 	"product-go/helper/response"
 	"product-go/model"
@@ -24,6 +25,9 @@ func (h *handler) GetProduct(ctx *gin.Context) {
 	brand := ctx.Query("brand")
 	category := ctx.Query("category")
 	name := ctx.Query("name")
+
+	teste := ctx.GetHeader("user-id")
+	fmt.Println(teste)
 
 	data := model.ProductSearch{
 		Brand:    brand,
