@@ -17,8 +17,9 @@ type Random interface {
 }
 
 func (r *random) RandomString() string {
+	time.Sleep(500 * time.Millisecond)
 	randomizer := rand.New(rand.NewSource(time.Now().Unix()))
-	letters := []rune("qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM1234567890")
+	letters := []rune("qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM")
 
 	b := make([]rune, 10)
 	for i := range b {
