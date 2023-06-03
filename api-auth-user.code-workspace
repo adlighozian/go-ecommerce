@@ -1,28 +1,76 @@
 {
 	"folders": [
 		{
-			"name": "api-gateway",
+			"path": "address"
+		},
+		{
 			"path": "api-gateway"
 		},
 		{
-			"name": "auth",
 			"path": "auth"
 		},
 		{
-			"name": "user-consumer",
-			"path": "user-consumer"
+			"path": "cart"
 		},
 		{
-			"name": "user",
-			"path": "user"
+			"path": "cms"
 		},
 		{
-			"name": "docs",
+			"path": "consumer-insert-address"
+		},
+		{
+			"path": "consumer-insert-cart"
+		},
+		{
+			"path": "consumer-insert-order"
+		},
+		{
+			"path": "consumer-insert-product"
+		},
+		{
+			"path": "consumer-insert-review"
+		},
+		{
+			"path": "consumer-insert-store"
+		},
+		{
+			"path": "consumer-insert-wishlist"
+		},
+		{
 			"path": "docs"
 		},
 		{
-			"name": "sql",
+			"path": "order"
+		},
+		{
+			"path": "payment"
+		},
+		{
+			"path": "product"
+		},
+		{
+			"path": "review"
+		},
+		{
+			"path": "splash-screen"
+		},
+		{
 			"path": "sql"
+		},
+		{
+			"path": "store"
+		},
+		{
+			"path": "user"
+		},
+		{
+			"path": "user-consumer"
+		},
+		{
+			"path": "voucher"
+		},
+		{
+			"path": "wishlist"
 		}
 	],
 	"settings": {}

@@ -1,0 +1,30 @@
+@startuml login
+title Login
+
+actor User
+participant "App" as A
+participant "Handler" as H
+participant "Service" as S
+participant "Repository" as R
+
+User -> A: Enter Details \n(username, password) \n on Login Form
+alt Details are Valid
+    A -> H: Request Login
+    H -> S: Call LoginByEmail()
+    S -> R: Call LoginByEmail()
+    R --> S: Return User Details
+    S -> S: Compare Passwords
+    alt Passwords Match
+        S --> H: Send Token
+        H --> A: Display OK
+        H --> A: Save Token into \ncookies and redis
+    else Passwords Do Not Match
+        S --> H: Send Error
+        H --> A: Display Error
+    end
+else Details are Invalid
+    A --> User: Show Invalid Error
+end
+User <-- A: Display Result
+
+@enduml

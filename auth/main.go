@@ -38,7 +38,11 @@ func main() {
 	logger.Debug().Msg("db connected")
 
 	// connect to redis using redis client
-	redisClient, errRedis := redisclient.NewRedisClient(config.Redis.Addr, config.Redis.Password, config.Redis.DB)
+	redisClient, errRedis := redisclient.NewRedisClient(
+		config.Redis.Addr, config.Redis.ClientName,
+		config.Redis.Username, config.Redis.Password,
+		config.Redis.DB,
+	)
 	if errDB != nil {
 		logger.Fatal().Err(errRedis).Msg("redis failed to connect")
 	}
@@ -76,7 +80,7 @@ func main() {
 	gauth := &oauth2.Config{
 		ClientID:     config.GoogleClientID,
 		ClientSecret: config.GoogleClientSecret,
-		RedirectURL:  "http://localhost:8081/auth/google/callback",
+		RedirectURL:  "http://localhost:" + config.Port + "/auth/google/callback",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
@@ -113,8 +117,11 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 	}
 
+	logger.Debug().Msgf("service will be start at port: %v", config.Port)
+
 	// run the ListenAndServe() of a server
 	if errSrv := server.Run(srv, logger); errSrv != nil {
 		logger.Fatal().Err(errSrv).Msg("server shutdown failed")
 	}
+
 }
