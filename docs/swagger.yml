@@ -1,11 +1,24 @@
 openapi: 3.0.3
 info:
-  title: Swagger E-Commerce
+  title: Swagger API Gateway E-Commerce
   description: |-
-    Swagger E-Commerce API Documentation
+    Swagger API Gateway E-Commerce API Documentation
   version: 1.0.0
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:5000
+  - url: http://localhost:5001
+  - url: http://localhost:5002
+  - url: http://localhost:5003
+  - url: http://localhost:5004
+  - url: http://localhost:5005
+  - url: http://localhost:5006
+  - url: http://localhost:5007
+  - url: http://localhost:5008
+  - url: http://localhost:5009
+  - url: http://localhost:5010
+  - url: http://localhost:5011
+  - url: http://localhost:5012
+  - url: http://localhost:5013
 tags:
   - name: address
     description: Address
@@ -40,9 +53,125 @@ paths:
         - address
       summary: Get Address by User ID
       parameters:
-        - name: user_id
+        - name: user-id
+          in: header
+          description: user-id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Address'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - address
+      summary: Insert Multiple Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/AddressRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Address'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - address
+      summary: Delete Address By Address ID
+      parameters:
+        - name: address_id
           in: query
-          description: user_id
+          description: address_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkDelete'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/HTdm6ZFo2Hd:
+    get:
+      tags:
+        - address
+      summary: Get Address by User ID
+      parameters:
+        - name: Authorization
+          in: header
+          description: Bearer Token
           required: true
           schema:
             type: string
@@ -266,48 +395,235 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /login:
-    post:
+  /v1/PLdKLnBBRbg:
+    get:
       tags:
-        - auth
-      summary: test
+        - cart
+      summary: Get Carts by User ID
+      parameters:
+        - name: Authorization
+          in: header
+          description: Bearer Token
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref:  '#/components/schemas/Cart'
         '400':
           description: Bad Request
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/BadRequest'
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
         '500':
           description: Internal Server Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  /login/cms:
     post:
       tags:
-        - cms
-      summary: test
+        - cart
+      summary: Insert Multiple Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CartRequest'
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref:  '#/components/schemas/Cart'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - cart
+      summary: Delete Cart by User ID
+      parameters:
+        - name: cart_id
+          in: query
+          description: cart_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref:  '#/components/schemas/OkDelete'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: User Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Created"
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        access_token:
+                          type: string
+                          format: string
+                          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNyIsInVzZXJfcm9sZSI6InVzZXIiLCJpc3MiOiJlY29tbWVyY2UiLCJleHAiOjE2ODU2MDc2OTgsIm5iZiI6MTY4NTUyMTI5OCwiaWF0IjoxNjg1NTIxMjk4fQ.OVfYs4l0anxgRDdHYVZHzgRsSboeqKqCnmRolB3GL0c
+                        refresh_token:
+                          type: string
+                          format: string
+                          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNyIsInVzZXJfcm9sZSI6InVzZXIiLCJpc3MiOiJlY29tbWVyY2UiLCJleHAiOjE2ODYxMjYwOTgsIm5iZiI6MTY4NTUyMTI5OCwiaWF0IjoxNjg1NTIxMjk4fQ.IfjZZj8OkzUJfiv0ktcZQNyIhiQyXfDUeA7dYHG7k2I
+                        user:
+                          type: array
+                          items:
+                            properties:
+                              age:
+                                type: string
+                                format: string
+                                example: 
+                              created_at:
+                                type: string
+                                format: string
+                                example: 2023-05-31T15:21:14.580489+07:00
+                              email:
+                                type: string
+                                format: string
+                                example: test@gmail.com
+                              id:
+                                type: integer
+                                format: integer
+                                example: 7
+                              full_name:
+                                type: string
+                                format: string
+                                example: adli
+                              image_url:
+                                type: string
+                                format: string
+                                example: www.phincon.com
+                              role:
+                                type: string
+                                format: string
+                                example: user
+                              updated_at:
+                                type: string
+                                format: string
+                                example: 2023-05-31T15:21:14.580489+07:00
+                              user_setting:
+                                type: array
+                                items:
+                                  properties:                                   
+                                    created_at:
+                                      type: string
+                                      format: string
+                                      example: 2023-05-31T15:21:14.580489+07:00
+                                    dark_mode:
+                                      type: string
+                                      format: string
+                                      example: null
+                                    id:
+                                      type: integer
+                                      format: integer
+                                      example: 1
+                                    language:
+                                      type: array
+                                      items:
+                                        properties:                          
+                                          created_at:
+                                            type: string
+                                            format: string
+                                            example: 2023-05-31T15:21:14.580489+07:00
+                                          id:
+                                            type: integer
+                                            format: integer
+                                            example: 1
+                                          name:
+                                            type: string
+                                            format: string
+                                          updated_at:
+                                            type: string
+                                            format: string
+                                            example: 2023-05-31T15:21:14.580489+07:00
+                              username:
+                                type: string
+                                format: string
+                                example: adli
+                              
         '400':
           description: Bad Request
           content:
@@ -327,18 +643,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /register:
+  /auth/register:
     post:
       tags:
         - auth
-      summary: test
+      summary: User Register
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Order'
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Created"
+                  data:
+                    type: integer
+                    format: integer
+                    example: 7
         '400':
           description: Bad Request
           content:
@@ -357,6 +685,182 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+
+  /v1/VIYMjjr4WBg:
+    post:
+      tags:
+        - auth
+      summary: User Login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Created"
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        access_token:
+                          type: string
+                          format: string
+                          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNyIsInVzZXJfcm9sZSI6InVzZXIiLCJpc3MiOiJlY29tbWVyY2UiLCJleHAiOjE2ODU2MDc2OTgsIm5iZiI6MTY4NTUyMTI5OCwiaWF0IjoxNjg1NTIxMjk4fQ.OVfYs4l0anxgRDdHYVZHzgRsSboeqKqCnmRolB3GL0c
+                        refresh_token:
+                          type: string
+                          format: string
+                          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNyIsInVzZXJfcm9sZSI6InVzZXIiLCJpc3MiOiJlY29tbWVyY2UiLCJleHAiOjE2ODYxMjYwOTgsIm5iZiI6MTY4NTUyMTI5OCwiaWF0IjoxNjg1NTIxMjk4fQ.IfjZZj8OkzUJfiv0ktcZQNyIhiQyXfDUeA7dYHG7k2I
+                        user:
+                          type: array
+                          items:
+                            properties:
+                              age:
+                                type: string
+                                format: string
+                                example: 
+                              created_at:
+                                type: string
+                                format: string
+                                example: 2023-05-31T15:21:14.580489+07:00
+                              email:
+                                type: string
+                                format: string
+                                example: test@gmail.com
+                              id:
+                                type: integer
+                                format: integer
+                                example: 7
+                              full_name:
+                                type: string
+                                format: string
+                                example: adli
+                              image_url:
+                                type: string
+                                format: string
+                                example: www.phincon.com
+                              role:
+                                type: string
+                                format: string
+                                example: user
+                              updated_at:
+                                type: string
+                                format: string
+                                example: 2023-05-31T15:21:14.580489+07:00
+                              user_setting:
+                                type: array
+                                items:
+                                  properties:                                   
+                                    created_at:
+                                      type: string
+                                      format: string
+                                      example: 2023-05-31T15:21:14.580489+07:00
+                                    dark_mode:
+                                      type: string
+                                      format: string
+                                      example: null
+                                    id:
+                                      type: integer
+                                      format: integer
+                                      example: 1
+                                    language:
+                                      type: array
+                                      items:
+                                        properties:                          
+                                          created_at:
+                                            type: string
+                                            format: string
+                                            example: 2023-05-31T15:21:14.580489+07:00
+                                          id:
+                                            type: integer
+                                            format: integer
+                                            example: 1
+                                          name:
+                                            type: string
+                                            format: string
+                                          updated_at:
+                                            type: string
+                                            format: string
+                                            example: 2023-05-31T15:21:14.580489+07:00
+                              username:
+                                type: string
+                                format: string
+                                example: adli
+                              
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/HTnbxUvQ2IE:
+    post:
+      tags:
+        - auth
+      summary: User Register
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Created"
+                  data:
+                    type: integer
+                    format: integer
+                    example: 7
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
   /products:
     get:
       tags:
@@ -400,6 +904,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+  
   /admin/products:
     post:
       tags:
@@ -494,6 +999,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+
   /products/details:
     get:
       tags:
@@ -525,8 +1031,146 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+  
+  /v1/EgJUGzdb5xZ:
+    get:
+      tags:
+        - product
+      summary: Get Products
+      parameters:
+        - name: Brand
+          in: query
+          description: Filter by brand
+          required: false
+          schema:
+            type: string
+        - name: Category
+          in: query
+          description: Filter by category
+          required: false
+          schema:
+            type: string
+        - name: Name
+          in: query
+          description: Filter by name
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductGet'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  /v1/PH5SXgIOCem:
+    get:
+      tags:
+        - product
+      summary: Get product detail by product ID
+      parameters:
+        - name: productID
+          in: query
+          description: product ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
 
   /profiles:
+    get:
+      tags:
+        - user
+      summary: Get Profile Detail By User ID
+      parameters:
+        - name: userID
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    patch:
+      tags:
+        - user
+      summary: Update User Profile By User ID
+      parameters:
+        - name: userID
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /v1/Q6koThB77Rb:
     get:
       tags:
         - user
@@ -647,23 +1291,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  /admin/orders:
-    patch:
+
+  /orders/stores:
+    get:
       tags:
-        - cms
-      summary: Update Customer Orders by order number
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrderUpdate'
+        - order
+      summary: Get list orders by store ID
+      parameters:
+        - name: store_id
+          in: query
+          description: Store ID
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderCreate'
+                $ref: '#/components/schemas/OrdersByStore'
         '400':
           description: Bad Request
           content:
@@ -676,6 +1323,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+
   /orders/details:
     get:
       tags:
@@ -701,6 +1349,166 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/QwFIk3OhORW:
+    get:
+      tags:
+        - order
+      summary: Get list orders by user ID
+      parameters:
+        - name: userID
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - order
+      summary: Insert new order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /v1/JaK5dI4I2rZ:
+    get:
+      tags:
+        - order
+      summary: Get list orders by store ID
+      parameters:
+        - name: store_id
+          in: query
+          description: Store ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersByStore'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/HuEWzeif1aB:
+    get:
+      tags:
+        - order
+      summary: Get orders detail by user ID by order ID
+      parameters:
+        - name: userID
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+        - name: order number
+          in: query
+          description: order number
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /admin/orders:
+    patch:
+      tags:
+        - cms
+      summary: Update Customer Orders by order number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdate'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreate'
         '400':
           description: Bad Request
           content:
@@ -790,7 +1598,84 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
- 
+
+  /v1/SFoRY4WeD2B:
+    get:
+      tags:
+        - payment
+      summary: Get Payment Detail in Midtrans
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref:  '#/components/schemas/MidtransCheckPaymentResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - payment
+      summary: Insert Payment to Midtrans
+      requestBody:
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MidtransPaymentRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref:  '#/components/schemas/MidtransInsertPaymentResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
   /splashscreens:
     get:
       tags:
@@ -899,8 +1784,226 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  
+
+  /v1/Q0S4sLEB1IT:
+    get:
+      tags:
+        - splash screen
+      summary: Get Splash Screen
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref:  '#/components/schemas/SplashScreen'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - splash screen
+      summary: Insert Multiple Splash Screen
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/SplashScreenRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SplashScreen'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - splash screen
+      summary: Delete Splash Screen by ID
+      parameters:
+        - name: splash_id
+          in: query
+          description: splash_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref:  '#/components/schemas/OkDelete'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
   /stores:
+    get:
+      tags:
+        - store
+      summary: Get All Store
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref:  '#/components/schemas/Store'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - store
+      summary: Insert Multiple Store Data
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items: 
+                $ref: '#/components/schemas/StoreRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref:  '#/components/schemas/Store'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - store
+      summary: Delete Store by ID
+      parameters:
+        - name: store_id
+          in: query
+          description: store_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkDelete'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /v1/PxtQZh61iap:
     get:
       tags:
         - store
@@ -1125,6 +2228,121 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
+  /V1/DS3EFeutzg5:
+    get:
+      tags:
+        - review
+      summary: Get review By Product ID
+      parameters:
+        - name: product_id
+          in: query
+          description: product_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref:  '#/components/schemas/OkDelete'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - review
+      summary: Insert Multiple Review by Product ID
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReviewRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - review
+      summary: Delete Review by ID
+      parameters:
+        - name: review_id
+          in: query
+          description: review_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkDelete'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /voucher:
     get:
@@ -1150,8 +2368,193 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  
+
   /admin/voucher:
+    post:
+      tags:
+        - cms
+      summary: Insert New Voucher
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoucherRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherGet'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - cms
+      summary: Delete Voucher
+      parameters:
+        - name: VoucherID
+          in: query
+          description: delete by voucher id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteRespon'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/Fhn92ztE9Ft:
+    post:
+      tags:
+        - cms
+      summary: Insert New Product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductGet'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    patch:
+      tags:
+        - cms
+      summary: Update Existing Product Information
+      parameters:
+        - name: user_id
+          in: query
+          description: user_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - cms
+      summary: Delete Product by id
+      parameters:
+        - name: ProductID
+          in: query
+          description: Delete by product id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteRespon'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/MwlSWpPmVEs:
+    patch:
+      tags:
+        - cms
+      summary: Update Customer Orders by order number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdate'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/DhNMctMv1Ql:
     post:
       tags:
         - cms
@@ -1242,15 +2645,189 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  /wishlist:
+
+  /V1/DhNMctMv1Ql:
+    get:
+      tags:
+        - voucher
+      summary: Get Voucher
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherGet'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/GRgffPBuLxu:
+    get:
+      tags:
+        - voucher
+      summary: Get Voucher Details By code Voucher
+      parameters:
+        - name: code
+          in: query
+          description: code voucher
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voucher'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /wishlists:
     get:
       tags:
         - wishlist
       summary: Get Wishlists by User ID
       parameters:
-        - name: user_id
+        - name: user-id
+          in: header
+          description: user-id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - wishlist
+      summary: Insert Multiple Wishlist
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/WishlistRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                properties:
+                  status:
+                    type: integer
+                    format: int
+                    example: 200
+                  message:
+                    type: string
+                    format: string
+                    example: "Ok"
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - wishlist
+      summary: Delete Wishlist by User ID
+      parameters:
+        - name: wishlist_id
           in: query
-          description: user_id
+          description: wishlist_id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OkDelete'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/CUbICN8VgNk:
+    get:
+      tags:
+        - wishlist
+      summary: Get Wishlists by User ID
+      parameters:
+        - name: Authorization
+          in: header
+          description: Bearer Token
           required: true
           schema:
             type: string
@@ -1433,6 +3010,32 @@ components:
           type: string
           format: string
           example: "some error"
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          format: string
+          example: adli
+        email:
+          type: integer
+          format: string
+          example: ghozian@test11.com
+        password:
+          type: string
+          format: string
+          example: 1221
+    Login:
+      type: object
+      properties:
+        email:
+          type: integer
+          format: string
+          example: ghozian@test11.com
+        password:
+          type: string
+          format: string
+          example: 1221
     VoucherGet:
       type: array
       items:
@@ -1545,19 +3148,19 @@ components:
           example: 1
         street:
           type: string
-          format: int
+          format: string
           example: Menteng Street
         city:
           type: string
-          format: int
+          format: string
           example: South Jakarta
         state:
           type: string
-          format: int
+          format: string
           example: Jakarta
         country:
           type: string
-          format: int
+          format: string
           example: Indonesia
         zipcode:
           type: integer
@@ -1747,23 +3350,23 @@ components:
           example: 1
         street:
           type: string
-          format: int
+          format: string
           example: Menteng Street
         city:
           type: string
-          format: int
+          format: string
           example: South Jakarta
         state:
           type: string
-          format: int
+          format: string
           example: Jakarta
         country:
           type: string
-          format: int
+          format: string
           example: Indonesia
         zipcode:
           type: integer
-          format: int
+          format: string
           example: 55555
         phone_number:
           type: integer
@@ -2130,6 +3733,51 @@ components:
             type: string
             format: date-time
             example: 2023-06-01T12:38:50.077582+07:00
+    OrdersByStore :
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int
+            example: 29 
+          user_id:
+            type: integer
+            format: int
+            example: 2
+          shipping_id:
+            type: integer
+            format: int
+            example: 3
+          status:
+            type: boolean
+            format: boolean
+            example: false
+          order_number: 
+            type: string
+            format: varchar(255)
+            example: mHAq33k3bq 
+          created_at: 
+            type: string
+            format: date-time
+            example: 2023-06-01T12:38:50.077582+07:00 
+          updated_at: 
+            type: string
+            format: date-time
+            example: 2023-06-01T12:38:50.077582+07:00
+          store_id:
+            type: integer
+            format: int
+            example: 1
+          quantity:
+            type: integer
+            format: int
+            example: 5
+          total_price:
+            type: integer
+            format: int
+            example: 100000
     OrderCreate :
         type: object
         properties:
@@ -2306,16 +3954,3 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/User'
-  securitySchemes:
-    petstore_auth:
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: https://petstore3.swagger.io/oauth/authorize
-          scopes:
-            write:pets: modify pets in your account
-            read:pets: read your pets
-    api_key:
-      type: apiKey
-      name: api_key
-      in: header

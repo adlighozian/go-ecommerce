@@ -46,6 +46,7 @@ func NewServer(hand handler.Handlerer, logger *zerolog.Logger) {
 	r.Use(middleware.Logger(logger))
 
 	r.GET("/orders", hand.GetOrders)
+	r.GET("/orders/stores", hand.GetOrdersByStoreID)
 	r.GET("/orders/details", hand.ShowOrders)
 	r.POST("/orders", hand.CreateOrders)
 	r.POST("/orders/item", hand.CreateOrders)
