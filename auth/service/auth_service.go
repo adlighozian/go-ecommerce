@@ -29,15 +29,17 @@ func (svc *AuthService) Create(registerReq *model.RegisterReq) (*model.User, err
 		Email:    registerReq.Email,
 		Password: hashedPassword,
 		Role:     "user",
+		Provider: "email",
 	}
 	return svc.repo.Create(newUser)
 }
 
-func (svc *AuthService) FirstOrCreate(userReq *model.UserReq) (*model.User, error) {
+func (svc *AuthService) FirstOrCreate(provider string, userReq *model.UserReq) (*model.User, error) {
 	newUser := &model.User{
 		Username: userReq.Username,
 		Email:    userReq.Email,
 		Role:     "user",
+		Provider: provider,
 		FullName: userReq.FullName,
 		ImageURL: userReq.ImageURL,
 	}

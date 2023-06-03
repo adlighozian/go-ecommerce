@@ -1,4 +1,4 @@
-@startuml
+@startuml e-commerce
 
 ' avoid problems with angled crows feet
 ' skinparam linetype ortho
@@ -11,13 +11,25 @@
 TABLE(api_managements, "api_managements") {
   PRIMARY_KEY(id)
   --
-  UNIQUE(api_name)
+  api_name
   service_name
   endpoint_url
   UNIQUE(hashed_endpoint_url)
   is_available
+  need_bypass
   created_at
   updated_at
+}
+
+TABLE(casbin_rule, "casbin_rule") {
+  PRIMARY_KEY(id)
+  --
+  ptype
+  v1
+  v2
+  v3
+  v4
+  v5
 }
 
 TABLE(languages, "languages") {
@@ -35,6 +47,7 @@ TABLE(users, "users") {
   UNIQUE(email)
   password
   role
+  provider
   full_name
   age
   image_url
@@ -160,7 +173,6 @@ TABLE(orders, "orders") {
   PRIMARY_KEY(id)
   --
   FOREIGN_KEY(user_id)
-  FOREIGN_KEY(payment_method_id)
   FOREIGN_KEY(shipping_id)
   total_price
   status
@@ -179,34 +191,10 @@ TABLE(order_items, "order_items") {
   updated_at
 }
 
-TABLE(payment_methods, "payment_methods") {
-  PRIMARY_KEY(id)
-  --
-  payment_gateway_id
-  name
-  created_at
-  updated_at
-}
-
 TABLE(shippings, "shippings") {
   PRIMARY_KEY(id)
   --
   receipt_number
-}
-
-TABLE(payment_logs, "payment_logs") {
-  PRIMARY_KEY(id)
-  --
-  FOREIGN_KEY(order_id)
-  FOREIGN_KEY(payment_method_id)
-  payment_status
-  transaction_id
-  transaction_time
-  transaction_status
-  gross_amount
-  debug_info
-  created_at
-  updated_at
 }
 
 TABLE(reviews, "reviews") {
@@ -220,33 +208,14 @@ TABLE(reviews, "reviews") {
   updated_at
 }
 
-TABLE(review_images, "review_images") {
-  PRIMARY_KEY(id)
-  --
-  FOREIGN_KEY(review_id)
-  image_url
-  created_at
-  updated_at
-}
-
 TABLE(promotions, "promotions") {
   PRIMARY_KEY(id)
   --
   FOREIGN_KEY(store_id)
   FOREIGN_KEY(product_id)
   FOREIGN_KEY(category_id)
-  discount_type
   discount_value
-  start_date
-  end_date
-  created_at
-  updated_at
-}
-
-TABLE(promotion_codes, "promotion_codes") {
-  PRIMARY_KEY(id)
-  --
-  FOREIGN_KEY(promotion_id)
+  name
   code
   created_at
   updated_at
@@ -267,19 +236,13 @@ wishlists }-- products : product_id
 carts }-- users : user_id
 carts }-- products : product_id
 orders }-- users : user_id
-orders }-- payment_methods : payment_method_id
 orders -- shippings : shipping_id
 order_items }-- orders : order_id
 order_items }-- products : product_id
-payment_methods }-- users : user_id
-payment_logs }-- orders : order_id
-payment_logs }-- payment_methods : payment_method_id
 reviews }-- users : user_id
 reviews }-- products : product_id
-review_images }-- reviews : review_id
 promotions }-- stores : store_id
 promotions }-- products : product_id
 promotions }-- categories : category_id
-promotion_codes }-- promotions : promotion_id
 
 @enduml

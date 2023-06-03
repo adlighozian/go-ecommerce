@@ -13,6 +13,13 @@ type JSONRes struct {
 	Data    any    `json:"data,omitempty"`
 }
 
+type JSONGatewayRes struct {
+	Status  int    `json:"status,omitempty"`
+	Message string `json:"message,omitempty"`
+	Error   string `json:"error,omitempty"`
+	Data    string `json:"data,omitempty"`
+}
+
 func NewJSONRes(c *gin.Context, statusCode int, message string, data any) {
 	if message == "" {
 		message = http.StatusText(statusCode)

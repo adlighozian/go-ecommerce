@@ -53,5 +53,5 @@ func NewServer(hand handler.Handlerer, logger *zerolog.Logger) {
 	admin := r.Group("/admin")
 	admin.PATCH("/orders", hand.UpdateOrders)
 
-	r.Run(conf.Port)
+	r.Run(":" + conf.Port)
 }

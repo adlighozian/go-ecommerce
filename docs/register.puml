@@ -1,0 +1,30 @@
+@startuml register
+title Register
+
+actor User
+participant "App" as A
+participant "Handler" as H
+participant "Service" as S
+participant "Repository" as R
+
+User -> A: Enter Details \n(username, email, password) \n on Registration Form
+alt Details are Valid
+    A -> H: Request Register
+    H -> S: Call Create()
+    S -> R: Call Create()
+    R -> R: Check Email Unique
+    alt Email is Unique
+        R --> S: Send OK
+        S --> H: Send OK
+        H --> A: Display Success
+    else Email is Not Unique
+        R --> S: Send Error
+        S --> H: Send Error
+        H --> A: Display Error
+    end
+else Details are Invalid
+    A --> User: Show Invalid Error
+end
+User <-- A: Display Result
+
+@enduml

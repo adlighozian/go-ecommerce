@@ -52,5 +52,5 @@ func NewServer(hand handler.Handlerer, logger *zerolog.Logger) {
 	admin.PATCH("/products", hand.UpdateProduct)
 	admin.DELETE("/products", hand.DeleteProduct)
 
-	r.Run(conf.Port)
+	r.Run(":" + conf.Port)
 }

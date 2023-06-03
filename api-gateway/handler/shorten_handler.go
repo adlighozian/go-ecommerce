@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -55,9 +54,6 @@ func (h *ShortenHandler) Get(ctx *gin.Context) {
 	// Copy the response headers to the gateway response
 	h.copyHeaders(ctx.Writer.Header(), resp.Header)
 
-	// Set the status code
-	ctx.Writer.WriteHeader(resp.StatusCode)
-
 	respBody, errRead := io.ReadAll(resp.Body)
 	if errRead != nil {
 		_ = ctx.Error(errRead)
@@ -65,20 +61,14 @@ func (h *ShortenHandler) Get(ctx *gin.Context) {
 		return
 	}
 
-	// if google oauth2 is called, return to []byte / html
-	if strings.Contains(url, "/google/") {
-		ctx.Data(http.StatusOK, "text/html; charset=UTF-8", respBody)
-		return
-	}
-
-	var jsonRes response.JSONRes
-	if errJSONUn := json.Unmarshal(respBody, &jsonRes); errJSONUn != nil {
+	var jsonGRes response.JSONGatewayRes
+	if errJSONUn := json.Unmarshal(respBody, &jsonGRes); errJSONUn != nil {
 		_ = ctx.Error(errJSONUn)
 		response.NewJSONResErr(ctx, http.StatusInternalServerError, "", errJSONUn.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, jsonRes)
+	ctx.JSON(resp.StatusCode, jsonGRes)
 }
 
 func (h *ShortenHandler) copyHeaders(dst http.Header, src http.Header) {
@@ -105,14 +95,3 @@ func (h *ShortenHandler) Shorten(ctx *gin.Context) {
 
 	response.NewJSONRes(ctx, http.StatusOK, "", apiManagement)
 }
-
-// credits: https://github.com/stripe/stripe-go/blob/cb7a4cc7ba3ad39fa36d6bfafc9e89b8e6350b05/stripe.go#L318
-// nopReadCloser's sole purpose is to give us a way to turn an `io.Reader` into
-// an `io.ReadCloser` by adding a no-op implementation of the `Closer`
-// interface. We need this because `http.Request`'s `Body` takes an
-// `io.ReadCloser` instead of a `io.Reader`.
-// type nopReadCloser struct {
-// 	io.Reader
-// }
-
-// func (nopReadCloser) Close() error { return nil }
