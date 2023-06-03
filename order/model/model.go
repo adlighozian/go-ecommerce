@@ -21,6 +21,19 @@ type OrderItem struct {
 	TotalPrice float64 `json:"total_price"`
 }
 
+type OrdersByStore struct {
+	Id            int       `json:"id"`
+	UserID        int       `json:"user_id"`
+	ShippingID    int       `json:"shipping_id"`
+	Status        bool      `json:"status"`
+	OrderNumber   string    `json:"order_number"`
+	CreatedAt     time.Time `json:"created_at"`
+	UpdatedAt     time.Time `json:"updated_at"`
+	StoreID		  int		`json:"store_id"`
+	Quantity      int       `json:"quantity"`
+	TotalPrice    int		`json:"total_price"`
+}
+
 type ResultOrders struct {
 	Id           int            `json:"id"`
 	UserID       int            `json:"user_id"`

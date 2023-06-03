@@ -999,6 +999,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+
   /products/details:
     get:
       tags:
@@ -1168,6 +1169,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+  
+  /v1/Q6koThB77Rb:
+    get:
+      tags:
+        - user
+      summary: Get Profile Detail By User ID
+      parameters:
+        - name: userID
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    patch:
+      tags:
+        - user
+      summary: Update User Profile By User ID
+      parameters:
+        - name: userID
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
 
   /orders:
     get:
@@ -1228,23 +1291,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  /admin/orders:
-    patch:
+
+  /orders/stores:
+    get:
       tags:
-        - cms
-      summary: Update Customer Orders by order number
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrderUpdate'
+        - order
+      summary: Get list orders by store ID
+      parameters:
+        - name: store_id
+          in: query
+          description: Store ID
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Ok
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OrderCreate'
+                $ref: '#/components/schemas/OrdersByStore'
         '400':
           description: Bad Request
           content:
@@ -1257,6 +1323,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
+
   /orders/details:
     get:
       tags:
@@ -1282,6 +1349,166 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/QwFIk3OhORW:
+    get:
+      tags:
+        - order
+      summary: Get list orders by user ID
+      parameters:
+        - name: userID
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    post:
+      tags:
+        - order
+      summary: Insert new order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+  
+  /v1/JaK5dI4I2rZ:
+    get:
+      tags:
+        - order
+      summary: Get list orders by store ID
+      parameters:
+        - name: store_id
+          in: query
+          description: Store ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrdersByStore'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/HuEWzeif1aB:
+    get:
+      tags:
+        - order
+      summary: Get orders detail by user ID by order ID
+      parameters:
+        - name: userID
+          in: query
+          description: User ID
+          required: true
+          schema:
+            type: string
+        - name: order number
+          in: query
+          description: order number
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetail'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /admin/orders:
+    patch:
+      tags:
+        - cms
+      summary: Update Customer Orders by order number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdate'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreate'
         '400':
           description: Bad Request
           content:
@@ -2141,8 +2368,193 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  
+
   /admin/voucher:
+    post:
+      tags:
+        - cms
+      summary: Insert New Voucher
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoucherRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherGet'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - cms
+      summary: Delete Voucher
+      parameters:
+        - name: VoucherID
+          in: query
+          description: delete by voucher id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteRespon'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/Fhn92ztE9Ft:
+    post:
+      tags:
+        - cms
+      summary: Insert New Product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductGet'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    patch:
+      tags:
+        - cms
+      summary: Update Existing Product Information
+      parameters:
+        - name: user_id
+          in: query
+          description: user_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductUpdate'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+    delete:
+      tags:
+        - cms
+      summary: Delete Product by id
+      parameters:
+        - name: ProductID
+          in: query
+          description: Delete by product id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteRespon'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/MwlSWpPmVEs:
+    patch:
+      tags:
+        - cms
+      summary: Update Customer Orders by order number
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderUpdate'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreate'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/DhNMctMv1Ql:
     post:
       tags:
         - cms
@@ -2233,7 +2645,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  
+
+  /V1/DhNMctMv1Ql:
+    get:
+      tags:
+        - voucher
+      summary: Get Voucher
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoucherGet'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /v1/GRgffPBuLxu:
+    get:
+      tags:
+        - voucher
+      summary: Get Voucher Details By code Voucher
+      parameters:
+        - name: code
+          in: query
+          description: code voucher
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Voucher'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
   /wishlists:
     get:
       tags:
@@ -3264,6 +3733,51 @@ components:
             type: string
             format: date-time
             example: 2023-06-01T12:38:50.077582+07:00
+    OrdersByStore :
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int
+            example: 29 
+          user_id:
+            type: integer
+            format: int
+            example: 2
+          shipping_id:
+            type: integer
+            format: int
+            example: 3
+          status:
+            type: boolean
+            format: boolean
+            example: false
+          order_number: 
+            type: string
+            format: varchar(255)
+            example: mHAq33k3bq 
+          created_at: 
+            type: string
+            format: date-time
+            example: 2023-06-01T12:38:50.077582+07:00 
+          updated_at: 
+            type: string
+            format: date-time
+            example: 2023-06-01T12:38:50.077582+07:00
+          store_id:
+            type: integer
+            format: int
+            example: 1
+          quantity:
+            type: integer
+            format: int
+            example: 5
+          total_price:
+            type: integer
+            format: int
+            example: 100000
     OrderCreate :
         type: object
         properties:
