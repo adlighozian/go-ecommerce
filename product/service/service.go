@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"product-go/helper/random"
 	"product-go/model"
 	"product-go/repository"
 )
@@ -57,27 +58,38 @@ func (svc *service) ShowProduct(id int) (model.Respon, error) {
 
 func (svc *service) CreateProduct(req []model.ProductReq) (model.Respon, error) {
 
-	var data []model.ProductReq
+	var data []model.Product
 
 	for _, v := range req {
 		if v.StoreID == 0 || v.CategoryID == 0 || v.SizeID == 0 || v.ColorID == 0 || v.Name == "" || v.Subtitle == "" || v.Description == "" || v.UnitPrice == 0 || v.Stock == 0 || v.Weight == 0 || v.Brand == "" {
 			continue
 		}
 
-		data = append(data, model.ProductReq{
-			StoreID:     v.StoreID,
-			CategoryID:  v.CategoryID,
-			SizeID:      v.SizeID,
-			ColorID:     v.ColorID,
-			Name:        v.Name,
-			Brand:       v.Brand,
-			Subtitle:    v.Subtitle,
-			Description: v.Description,
-			UnitPrice:   v.UnitPrice,
-			Stock:       v.Stock,
-			Weight:      v.Weight,
-		})
+		var mapImage = []model.ProductImage{}
 
+		for _, vm := range v.ProductImage {
+			mapImage = append(mapImage, model.ProductImage{
+				Name:     v.Name,
+				ImageURL: vm.ImageURL,
+			})
+		}
+
+		data = append(data, model.Product{
+			StoreID:      v.StoreID,
+			CategoryID:   v.CategoryID,
+			SizeID:       v.SizeID,
+			ColorID:      v.ColorID,
+			Name:         v.Name,
+			Brand:        v.Brand,
+			Subtitle:     v.Subtitle,
+			Description:  v.Description,
+			UnitPrice:    v.UnitPrice,
+			Status:       false,
+			Stock:        v.Stock,
+			Sku:          random.NewRandom().RandomString(),
+			Weight:       v.Weight,
+			ProductImage: mapImage,
+		})
 	}
 
 	if data == nil {
