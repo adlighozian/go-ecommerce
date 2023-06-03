@@ -39,6 +39,28 @@ func (svc *service) GetOrders(idUser int) (model.Respon, error) {
 	}, nil
 }
 
+func (svc *service) GetOrdersByStoreID(storeID int) (model.Respon, error) {
+	if storeID <= 0 {
+		return model.Respon{
+			Status: http.StatusBadRequest,
+			Data:   nil,
+		}, errors.New("invalid input id")
+	}
+
+	// start
+	res, err := svc.repo.GetOrdersByStoreID(storeID)
+	if err != nil {
+		return model.Respon{
+			Status: http.StatusInternalServerError,
+			Data:   nil,
+		}, err
+	}
+	return model.Respon{
+		Status: http.StatusOK,
+		Data:   res,
+	}, nil
+}
+
 func (svc *service) CreateOrders(req model.GetOrders) (model.Respon, error) {
 	var check int
 

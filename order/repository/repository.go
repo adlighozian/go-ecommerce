@@ -45,6 +45,28 @@ func (repo *repository) GetOrders(userID int) ([]model.Orders, error) {
 	return data, nil
 }
 
+func (repo *repository) GetOrdersByStoreID(storeID int) ([]model.OrdersByStore, error) {
+	ctx, cancel := timeout.NewCtxTimeout()
+	defer cancel()
+
+	querySelect := `select o.id, o.user_id, o.shipping_id, o.status, o.created_at, o.updated_at, o.order_number, oi.quantity, oi.total_price, p.store_id from orders o inner join order_items oi on o.id = oi.order_id inner join products p on oi.product_id = p.id where p.store_id=$1`
+
+	result, err := repo.db.QueryContext(ctx, querySelect, storeID)
+	if err != nil {
+		return []model.OrdersByStore{}, errors.New("error get data")
+	}
+
+	var data = []model.OrdersByStore{}
+
+	for result.Next() {
+		var temp model.OrdersByStore
+		result.Scan(&temp.Id, &temp.UserID, &temp.ShippingID, &temp.Status, &temp.CreatedAt, &temp.UpdatedAt, &temp.OrderNumber, &temp.Quantity, &temp.TotalPrice, &temp.StoreID)
+		data = append(data, temp)
+	}
+
+	return data, nil
+}
+
 func (repo *repository) ShowOrders(req model.OrderItems) (model.ResultOrders, error) {
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
