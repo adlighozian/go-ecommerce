@@ -78,12 +78,7 @@ func (repo *AuthRepository) Create(user *model.User) (*model.User, error) {
 
 	time.Sleep(3 * time.Second)
 
-	user, errGetByEmail := repo.LoginByEmail(user.Email)
-	if errGetByEmail != nil {
-		return nil, errGetByEmail
-	}
-
-	return user, nil
+	return repo.LoginByEmail(user.Email)
 }
 
 func (repo *AuthRepository) FirstOrCreate(user *model.User) (*model.User, error) {
@@ -100,11 +95,7 @@ func (repo *AuthRepository) FirstOrCreate(user *model.User) (*model.User, error)
 }
 
 func (repo *AuthRepository) getDataFromCache(key string) (string, error) {
-	cachedData, errGet := repo.redis.Get(context.Background(), key).Result()
-	if errGet != nil {
-		return "", errGet
-	}
-	return cachedData, nil
+	return repo.redis.Get(context.Background(), key).Result()
 }
 
 func (repo *AuthRepository) LoginByEmail(email string) (*model.User, error) {
@@ -112,8 +103,8 @@ func (repo *AuthRepository) LoginByEmail(email string) (*model.User, error) {
 	defer cancel()
 
 	sqlQuery := `
-	SELECT id, username, email, password, role, full_name, 
-	    	 provider, age, image_url, created_at, updated_at
+	SELECT id, username, email, password, role, provider,
+	    	  full_name, age, image_url, created_at, updated_at
 	FROM users 
 	WHERE email = $1
 	LIMIT 1
@@ -127,8 +118,8 @@ func (repo *AuthRepository) LoginByEmail(email string) (*model.User, error) {
 	user := new(model.User)
 	row := stmt.QueryRowContext(ctx, email)
 	scanErr := row.Scan(
-		&user.ID, &user.Username, &user.Email, &user.Password, &user.Role,
-		&user.Provider, &user.FullName, &user.Age, &user.ImageURL,
+		&user.ID, &user.Username, &user.Email, &user.Password, &user.Role, &user.Provider,
+		&user.FullName, &user.Age, &user.ImageURL,
 		&user.CreatedAt, &user.UpdatedAt,
 	)
 	if scanErr != nil {
@@ -138,17 +129,14 @@ func (repo *AuthRepository) LoginByEmail(email string) (*model.User, error) {
 	return user, nil
 }
 
-func (repo *AuthRepository) SetRefreshToken(refreshToken string, dataByte []byte, refreshTokenDur time.Duration) error {
-	errSetCache := repo.redis.Set(context.Background(), refreshToken, dataByte, refreshTokenDur).Err()
-	if errSetCache != nil {
-		return errSetCache
-	}
-	return nil
+func (repo *AuthRepository) SetRefreshToken(token string, dataByte []byte, refreshTokenDur time.Duration) error {
+	return repo.redis.Set(context.Background(), "refresh_token:"+token, dataByte, refreshTokenDur).Err()
 }
+
 func (repo *AuthRepository) GetByRefreshToken(token string) (*model.RefreshToken, error) {
 	refreshToken := new(model.RefreshToken)
 
-	cachedData, errGetCache := repo.getDataFromCache(token)
+	cachedData, errGetCache := repo.getDataFromCache("refresh_token:" + token)
 	if errGetCache != nil {
 		return nil, errGetCache
 	}

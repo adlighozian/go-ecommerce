@@ -118,7 +118,7 @@ func (s *ShortenRepoSuite) TestShortenRepo_Get() {
 				}
 
 				data, _ := json.Marshal(apiManagement)
-				r.ExpectGet(key).SetVal(string(data))
+				r.ExpectGet("hashed_path:" + key).SetVal(string(data))
 			},
 			want: &model.APIManagement{
 				ID:                1,
@@ -150,7 +150,7 @@ func (s *ShortenRepoSuite) TestShortenRepo_Get() {
 					UpdatedAt:         time.Date(2023, 6, 6, 10, 20, 0, 0, time.Local),
 				}
 
-				r.ExpectGet(key).SetErr(errors.New("redis error"))
+				r.ExpectGet("hashed_path:" + key).SetErr(errors.New("redis error"))
 
 				row := s.NewRows(
 					[]string{
@@ -170,7 +170,7 @@ func (s *ShortenRepoSuite) TestShortenRepo_Get() {
 					WillReturnRows(row)
 
 				data, _ := json.Marshal(apiManagement)
-				r.ExpectSet(key, data, 10*time.Minute).SetVal("OK")
+				r.ExpectSet("hashed_path:"+key, data, 10*time.Minute).SetVal("OK")
 			},
 			want: &model.APIManagement{
 				ID:                1,
@@ -190,7 +190,7 @@ func (s *ShortenRepoSuite) TestShortenRepo_Get() {
 				hashedURL: "hashedURL1",
 			},
 			beforeTest: func(s sqlmock.Sqlmock, r redismock.ClientMock, key string) {
-				r.ExpectGet(key).SetErr(errors.New("redis error"))
+				r.ExpectGet("hashed_path:" + key).SetErr(errors.New("redis error"))
 
 				s.ExpectPrepare("SELECT .* FROM api_managements .*").
 					WillReturnError(errors.New("prepare stmt error"))
@@ -214,7 +214,7 @@ func (s *ShortenRepoSuite) TestShortenRepo_Get() {
 					UpdatedAt:         time.Date(2023, 6, 6, 10, 20, 0, 0, time.Local),
 				}
 
-				r.ExpectGet(key).SetErr(errors.New("redis error"))
+				r.ExpectGet("hashed_path:" + key).SetErr(errors.New("redis error"))
 
 				row := s.NewRows(
 					[]string{
@@ -254,7 +254,7 @@ func (s *ShortenRepoSuite) TestShortenRepo_Get() {
 					UpdatedAt:         time.Date(2023, 6, 6, 10, 20, 0, 0, time.Local),
 				}
 
-				r.ExpectGet(key).SetErr(errors.New("redis error"))
+				r.ExpectGet("hashed_path:" + key).SetErr(errors.New("redis error"))
 
 				row := s.NewRows(
 					[]string{
@@ -274,7 +274,7 @@ func (s *ShortenRepoSuite) TestShortenRepo_Get() {
 					WillReturnRows(row)
 
 				data, _ := json.Marshal(apiManagement)
-				r.ExpectSet(key, data, 10*time.Minute).SetErr(errors.New("redis error"))
+				r.ExpectSet("hashed_path:"+key, data, 10*time.Minute).SetErr(errors.New("redis error"))
 			},
 			wantErr: true,
 		},

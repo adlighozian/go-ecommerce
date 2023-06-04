@@ -1,18 +1,13 @@
+//go:generate mockery --output=../../mocks --name RabbitMQClient
 package rmq
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"sync"
 
 	"github.com/rabbitmq/amqp091-go"
 )
-
-type Response struct {
-	*sync.RWMutex
-	Map map[string]chan string
-}
 
 type RabbitMQClient interface {
 	Publish(ctx context.Context, exchangeName, exchangeType, contentType, routingKeyPub string, dataBytes []byte) error

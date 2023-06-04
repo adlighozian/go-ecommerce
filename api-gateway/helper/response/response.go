@@ -1,6 +1,7 @@
 package response
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,10 +15,10 @@ type JSONRes struct {
 }
 
 type JSONGatewayRes struct {
-	Status  int    `json:"status,omitempty"`
-	Message string `json:"message,omitempty"`
-	Error   string `json:"error,omitempty"`
-	Data    string `json:"data,omitempty"`
+	Status  int             `json:"status,omitempty"`
+	Message string          `json:"message,omitempty"`
+	Error   string          `json:"error,omitempty"`
+	Data    json.RawMessage `json:"data,omitempty"`
 }
 
 func NewJSONRes(c *gin.Context, statusCode int, message string, data any) {

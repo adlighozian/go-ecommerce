@@ -30,7 +30,10 @@ func NewUserSettingRepository(db *sql.DB, redis *redis.Client, rmq rmq.RabbitMQC
 func (repo *UserSettingRepository) UpdateByUserID(newSetting *model.UserSetting) (*model.User, error) {
 	userID := newSetting.UserID
 
-	errCache := repo.redis.Del(context.Background(), strconv.FormatUint(uint64(userID), 10)).Err()
+	errCache := repo.redis.Del(
+		context.Background(),
+		"user_id:"+strconv.FormatUint(uint64(userID), 10),
+	).Err()
 	if errCache != nil {
 		return nil, errCache
 	}
@@ -55,20 +58,17 @@ func (repo *UserSettingRepository) UpdateByUserID(newSetting *model.UserSetting)
 		return nil, errPub
 	}
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(3 * time.Second)
 
-	user, errGetByID := repo.getByID(userID)
-	if errGetByID != nil {
-		return nil, errGetByID
-	}
-
-	return user, nil
+	return repo.getByID(userID)
 }
 
 func (repo *UserSettingRepository) getByID(userID uint) (*model.User, error) {
 	user := new(model.User)
 
-	cachedData, errGetCache := repo.getDataFromCache(strconv.FormatUint(uint64(userID), 10))
+	cachedData, errGetCache := repo.getDataFromCache(
+		"user_id:" + strconv.FormatUint(uint64(userID), 10),
+	)
 	if errGetCache != nil {
 		data, errGetDB := repo.getByUserIDFromDatabase(userID)
 		if errGetDB != nil {
@@ -83,7 +83,7 @@ func (repo *UserSettingRepository) getByID(userID uint) (*model.User, error) {
 		// Store the data in the cache for future reads
 		errSetCache := repo.redis.Set(
 			context.Background(),
-			strconv.FormatUint(uint64(userID), 10), dataByte, 10*time.Minute,
+			"user_id:"+strconv.FormatUint(uint64(userID), 10), dataByte, 10*time.Minute,
 		).Err()
 		if errSetCache != nil {
 			return nil, errSetCache
@@ -101,11 +101,7 @@ func (repo *UserSettingRepository) getByID(userID uint) (*model.User, error) {
 }
 
 func (repo *UserSettingRepository) getDataFromCache(key string) (string, error) {
-	cachedData, errGet := repo.redis.Get(context.Background(), key).Result()
-	if errGet != nil {
-		return "", errGet
-	}
-	return cachedData, nil
+	return repo.redis.Get(context.Background(), key).Result()
 }
 
 func (repo *UserSettingRepository) getByUserIDFromDatabase(userID uint) (*model.User, error) {
@@ -113,8 +109,8 @@ func (repo *UserSettingRepository) getByUserIDFromDatabase(userID uint) (*model.
 	defer cancel()
 
 	sqlQuery := `
-	SELECT users.id, users.username, users.email, users.role, users.full_name, 
-	    	 users.age, users.image_url, users.created_at, users.updated_at, 
+	SELECT users.id, users.username, users.email, users.role, users.provider,
+				 users.full_name, users.age, users.image_url, users.created_at, users.updated_at, 
 				 user_settings.notification, user_settings.dark_mode, 
 				 languages.name AS language
 	FROM users 
@@ -132,8 +128,8 @@ func (repo *UserSettingRepository) getByUserIDFromDatabase(userID uint) (*model.
 	user := new(model.User)
 	row := stmt.QueryRowContext(ctx, userID)
 	scanErr := row.Scan(
-		&user.ID, &user.Username, &user.Email, &user.Role, &user.FullName,
-		&user.Age, &user.ImageURL, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.Username, &user.Email, &user.Role, &user.Provider,
+		&user.FullName, &user.Age, &user.ImageURL, &user.CreatedAt, &user.UpdatedAt,
 		&user.UserSetting.Notification, &user.UserSetting.DarkMode,
 		&user.UserSetting.Language.Name,
 	)
