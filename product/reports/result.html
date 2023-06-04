@@ -1,0 +1,1162 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>config: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">product-go/config/config.go (0.0%)</option>
+				
+				<option value="file1">product-go/handler/handler.go (0.0%)</option>
+				
+				<option value="file2">product-go/helper/failerror/failerror.go (0.0%)</option>
+				
+				<option value="file3">product-go/helper/logging/logging.go (0.0%)</option>
+				
+				<option value="file4">product-go/helper/middleware/middleware.go (0.0%)</option>
+				
+				<option value="file5">product-go/helper/random/random.go (0.0%)</option>
+				
+				<option value="file6">product-go/helper/response/response.go (0.0%)</option>
+				
+				<option value="file7">product-go/helper/timeout/timeout.go (0.0%)</option>
+				
+				<option value="file8">product-go/main.go (0.0%)</option>
+				
+				<option value="file9">product-go/mocks/service.go (42.9%)</option>
+				
+				<option value="file10">product-go/package/db/db.go (0.0%)</option>
+				
+				<option value="file11">product-go/publisher/publisher.go (0.0%)</option>
+				
+				<option value="file12">product-go/repository/repository.go (0.0%)</option>
+				
+				<option value="file13">product-go/service/service.go (43.6%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package config
+
+import (
+        "github.com/spf13/viper"
+)
+
+type Config struct {
+        Database       string `mapstructure:"DATABASE"`
+        DatabaseDriver string `mapstructure:"DATABASE_DRIVER"`
+        DatabaseURL    string `mapstructure:"DATABASE_URL"`
+        PgDatabase     string `mapstructure:"PGDATABASE"`
+        PgHost         string `mapstructure:"PGHOST"`
+        PgPassword     string `mapstructure:"PGPASSWORD"`
+        PgPort         string `mapstructure:"PGPORT"`
+        PgUser         string `mapstructure:"PGUSER"`
+        Port           string `mapstructure:"PORT"`
+        Debug          bool   `mapstructure:"DEBUG"`
+        RabbitMQ       string `mapstructure:"RABBITMQ"`
+}
+
+func LoadConfig() (*Config, error) <span class="cov0" title="0">{
+        viper.SetConfigFile(".env")
+
+        errRead := viper.ReadInConfig()
+        if errRead != nil </span><span class="cov0" title="0">{
+                return nil, errRead
+        }</span>
+
+        <span class="cov0" title="0">config := new(Config)
+        errUn := viper.Unmarshal(&amp;config)
+        if errUn != nil </span><span class="cov0" title="0">{
+                return nil, errUn
+        }</span>
+        <span class="cov0" title="0">return config, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package handler
+
+import (
+        "fmt"
+        "product-go/helper/failerror"
+        "product-go/helper/response"
+        "product-go/model"
+        "product-go/service"
+        "strconv"
+
+        "github.com/gin-gonic/gin"
+)
+
+type handler struct {
+        svc service.Servicer
+}
+
+func NewHandler(svc service.Servicer) Handlerer <span class="cov0" title="0">{
+        return &amp;handler{
+                svc: svc,
+        }
+}</span>
+
+func (h *handler) GetProduct(ctx *gin.Context) <span class="cov0" title="0">{
+        brand := ctx.Query("brand")
+        category := ctx.Query("category")
+        name := ctx.Query("name")
+
+        teste := ctx.GetHeader("user-id")
+        fmt.Println(teste)
+
+        data := model.ProductSearch{
+                Brand:    brand,
+                Category: category,
+                Name:     name,
+        }
+
+        res, err := h.svc.GetProduct(data)
+        if err != nil </span><span class="cov0" title="0">{
+                response.ResponseError(ctx, res.Status, err)
+        }</span> else<span class="cov0" title="0"> {
+                response.ResponseSuccess(ctx, res.Status, res.Data)
+        }</span>
+
+}
+
+func (h *handler) ShowProduct(ctx *gin.Context) <span class="cov0" title="0">{
+        id := ctx.Query("id")
+        var numi int
+
+        if id != "" </span><span class="cov0" title="0">{
+                num, err := strconv.Atoi(id)
+                failerror.FailError(err, "error convert to int")
+                numi = num
+        }</span>
+
+        <span class="cov0" title="0">res, err := h.svc.ShowProduct(numi)
+        if err != nil </span><span class="cov0" title="0">{
+                response.ResponseError(ctx, res.Status, err)
+        }</span> else<span class="cov0" title="0"> {
+                response.ResponseSuccess(ctx, res.Status, res.Data)
+        }</span>
+}
+
+func (h *handler) CreateProduct(ctx *gin.Context) <span class="cov0" title="0">{
+        var data []model.ProductReq
+
+        err := ctx.ShouldBindJSON(&amp;data)
+        failerror.FailError(err, "error bind json")
+
+        res, err := h.svc.CreateProduct(data)
+        if err != nil </span><span class="cov0" title="0">{
+                response.ResponseError(ctx, res.Status, err)
+        }</span> else<span class="cov0" title="0"> {
+                response.ResponseSuccess(ctx, res.Status, res.Data)
+        }</span>
+}
+
+func (h *handler) UpdateProduct(ctx *gin.Context) <span class="cov0" title="0">{
+        idProduct := ctx.Query("product_id")
+        var data model.ProductUpd
+
+        err := ctx.ShouldBindJSON(&amp;data)
+        failerror.FailError(err, "error bind json")
+
+        var numi int
+        if idProduct != "" </span><span class="cov0" title="0">{
+                num, err := strconv.Atoi(idProduct)
+                failerror.FailError(err, "error convert to int")
+                numi = num
+        }</span>
+
+        <span class="cov0" title="0">res, err := h.svc.UpdateProduct(data, numi)
+        if err != nil </span><span class="cov0" title="0">{
+                response.ResponseError(ctx, res.Status, err)
+        }</span> else<span class="cov0" title="0"> {
+                response.ResponseSuccess(ctx, res.Status, res.Data)
+        }</span>
+}
+
+func (h *handler) DeleteProduct(ctx *gin.Context) <span class="cov0" title="0">{
+        id := ctx.Query("product_id")
+        var numi int
+
+        if id != "" </span><span class="cov0" title="0">{
+                num, err := strconv.Atoi(id)
+                failerror.FailError(err, "error convert to int")
+                numi = num
+        }</span>
+
+        <span class="cov0" title="0">res, err := h.svc.DeleteProduct(numi)
+        if err != nil </span><span class="cov0" title="0">{
+                response.ResponseError(ctx, res.Status, err)
+        }</span> else<span class="cov0" title="0"> {
+                response.ResponseSuccess(ctx, res.Status, res.Data)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package failerror
+
+import "log"
+
+func FailError(err error, msg string) <span class="cov0" title="0">{
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println(err, msg)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package logging
+
+import (
+        "os"
+        "time"
+
+        "github.com/rs/zerolog"
+)
+
+func New(isDebug bool) *zerolog.Logger <span class="cov0" title="0">{
+        logLvl := zerolog.InfoLevel
+        if isDebug </span><span class="cov0" title="0">{
+                logLvl = zerolog.TraceLevel
+        }</span>
+
+        <span class="cov0" title="0">zerolog.SetGlobalLevel(logLvl)
+        output := zerolog.ConsoleWriter{
+                Out:        os.Stderr,
+                TimeFormat: time.RFC3339,
+                NoColor:    false,
+        }
+        logger := zerolog.New(output).With().Timestamp().Logger()
+        return &amp;logger</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package middleware
+
+import (
+        "net/http"
+        "time"
+
+        "github.com/gin-gonic/gin"
+        "github.com/rs/zerolog"
+)
+
+func Logger(logger *zerolog.Logger) gin.HandlerFunc <span class="cov0" title="0">{
+        return func(c *gin.Context) </span><span class="cov0" title="0">{
+                start := time.Now()
+                path := c.Request.URL.Path
+                raw := c.Request.URL.RawQuery
+                if raw != "" </span><span class="cov0" title="0">{
+                        path = path + "?" + raw
+                }</span>
+
+                <span class="cov0" title="0">c.Next()
+
+                latency := time.Since(start)
+                statusCode := c.Writer.Status()
+
+                msg := "Request"
+                if len(c.Errors) &gt; 0 </span><span class="cov0" title="0">{
+                        msg = c.Errors.String()
+                }</span>
+
+                <span class="cov0" title="0">logger := logger.With().
+                        Str("method", c.Request.Method).
+                        Str("path", path).
+                        Str("client_id", c.ClientIP()).
+                        Str("user_agent", c.Request.UserAgent()).
+                        Int("status_code", statusCode).
+                        Int("body_size", c.Writer.Size()).
+                        Dur("latency", latency).
+                        Logger()
+
+                switch </span>{
+                case statusCode &gt;= http.StatusInternalServerError:<span class="cov0" title="0">
+                        logger.WithLevel(zerolog.ErrorLevel).Msg(msg)</span>
+                case statusCode &gt;= http.StatusBadRequest &amp;&amp; statusCode &lt; http.StatusInternalServerError:<span class="cov0" title="0">
+                        logger.WithLevel(zerolog.WarnLevel).Msg(msg)</span>
+                default:<span class="cov0" title="0">
+                        logger.WithLevel(zerolog.InfoLevel).Msg(msg)</span>
+                }
+        }
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package random
+
+import (
+        "math/rand"
+        "time"
+)
+
+type random struct {
+}
+
+func NewRandom() *random <span class="cov0" title="0">{
+        return &amp;random{}
+}</span>
+
+type Random interface {
+        RandomString() (int, error)
+}
+
+func (r *random) RandomString() string <span class="cov0" title="0">{
+        time.Sleep(500 * time.Millisecond)
+        randomizer := rand.New(rand.NewSource(time.Now().Unix()))
+        letters := []rune("qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM")
+
+        b := make([]rune, 10)
+        for i := range b </span><span class="cov0" title="0">{
+                b[i] = letters[randomizer.Intn(len(letters))]
+        }</span>
+
+        <span class="cov0" title="0">return string(b)</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package response
+
+import (
+        "net/http"
+        "product-go/model"
+
+        "github.com/gin-gonic/gin"
+)
+
+func ResponseSuccess(ctx *gin.Context, status int, data any) <span class="cov0" title="0">{
+        ctx.JSON(status, model.ResponSuccess{
+                Status:  status,
+                Message: http.StatusText(status),
+                Data:    data,
+        })
+}</span>
+
+func ResponseError(ctx *gin.Context, status int, err error) <span class="cov0" title="0">{
+        ctx.JSON(status, model.ResponError{
+                Status:  status,
+                Message: http.StatusText(status),
+                Error:   err.Error(),
+        })
+}</span>
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package timeout
+
+import (
+        "context"
+        "time"
+)
+
+func NewCtxTimeout() (context.Context, context.CancelFunc) <span class="cov0" title="0">{
+        ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+        return ctx, cancel
+}</span>
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package main
+
+import (
+        "product-go/config"
+        "product-go/handler"
+        "product-go/helper/failerror"
+        "product-go/helper/logging"
+        "product-go/helper/middleware"
+        "product-go/package/db"
+        "product-go/publisher"
+        "product-go/repository"
+        "product-go/service"
+
+        "github.com/gin-gonic/gin"
+        "github.com/rs/zerolog"
+)
+
+func main() <span class="cov0" title="0">{
+
+        conf, err := config.LoadConfig()
+        failerror.FailError(err, "error loadconfig")
+
+        logger := logging.New(conf.Debug)
+
+        db, err := db.NewGormDB(conf.Debug, conf.DatabaseDriver, conf.DatabaseURL)
+        failerror.FailError(err, "error new gorm")
+        logger.Debug().Msg("DB Connected")
+
+        pub := publisher.NewPublisher()
+
+        repoProduct := repository.NewRepository(db.SQLDB, pub)
+        product := service.NewService(repoProduct)
+        Handler := handler.NewHandler(product)
+
+        NewServer(Handler, logger)
+}</span>
+
+func NewServer(hand handler.Handlerer, logger *zerolog.Logger) <span class="cov0" title="0">{
+        conf, err := config.LoadConfig()
+        failerror.FailError(err, "error loadconfig")
+        // server
+        r := gin.New()
+
+        // middleware
+        r.Use(middleware.Logger(logger))
+
+        r.GET("/products", hand.GetProduct)
+        r.GET("/products/details", hand.ShowProduct)
+
+        admin := r.Group("/admin")
+        admin.POST("/products", hand.CreateProduct)
+        admin.PATCH("/products", hand.UpdateProduct)
+        admin.DELETE("/products", hand.DeleteProduct)
+
+        r.Run(":" + conf.Port)
+}</span>
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package mocks
+
+import (
+        "product-go/model"
+
+        "github.com/stretchr/testify/mock"
+)
+
+type ServiceMock struct {
+        mock.Mock
+}
+
+func NewServiceMock() *ServiceMock <span class="cov8" title="1">{
+        return &amp;ServiceMock{}
+}</span>
+
+func (m *ServiceMock) GetProduct(req model.ProductSearch) ([]model.Product, error) <span class="cov8" title="1">{
+        ret := m.Called(req)
+        result := ret.Get(0).([]model.Product)
+        err := ret.Error(1)
+        return result, err
+}</span>
+func (m *ServiceMock) ShowProduct(id int) (model.Product, error) <span class="cov8" title="1">{
+        ret := m.Called(id)
+        result := ret.Get(0).(model.Product)
+        err := ret.Error(1)
+        return result, err
+}</span>
+
+func (m *ServiceMock) CreateProduct(req []model.Product) ([]model.Product, error) <span class="cov0" title="0">{
+        ret := m.Called(req)
+        result := ret.Get(0).([]model.Product)
+        err := ret.Error(1)
+        return result, err
+}</span>
+func (m *ServiceMock) UpdateProduct(req model.ProductUpd) (model.Product, error) <span class="cov0" title="0">{
+        ret := m.Called(req)
+        result := ret.Get(0).(model.Product)
+        err := ret.Error(1)
+        return result, err
+}</span>
+func (m *ServiceMock) DeleteProduct(id int) (int, error) <span class="cov0" title="0">{
+        ret := m.Called(id)
+        result := ret.Get(0).(int)
+        err := ret.Error(1)
+        return result, err
+}</span>
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package db
+
+import (
+        "database/sql"
+        "errors"
+        "log"
+        "product-go/helper/timeout"
+        "time"
+
+        "gorm.io/driver/postgres"
+        "gorm.io/gorm"
+        "gorm.io/gorm/logger"
+)
+
+type GormDB struct {
+        SQLDB *sql.DB
+}
+
+func GetConnection() *gorm.DB <span class="cov0" title="0">{
+        // config := config.LoadConfig()
+
+        dsn := "host=localhost user=postgres password=admin dbname=go-inventory port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+        db, err := gorm.Open(postgres.Open(dsn), &amp;gorm.Config{})
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+
+        <span class="cov0" title="0">return db</span>
+}
+
+func NewGormDB(debug bool, driver string, url string) (*GormDB, error) <span class="cov0" title="0">{
+        if url == "" </span><span class="cov0" title="0">{
+                return nil, errors.New("no database url")
+        }</span>
+
+        <span class="cov0" title="0">gormDB := new(GormDB)
+        err := gormDB.init(debug, driver, url)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Println("error init")
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return gormDB, nil</span>
+}
+
+func (g *GormDB) init(debug bool, driver string, url string) error <span class="cov0" title="0">{
+        var gormLogger logger.Interface
+        gormLogger = logger.Default.LogMode(logger.Silent)
+        if debug </span><span class="cov0" title="0">{
+                gormLogger = logger.Default.LogMode(logger.Info)
+        }</span>
+
+        <span class="cov0" title="0">gormConf := new(gorm.Config)
+        gormConf.Logger = gormLogger
+        gormConf.PrepareStmt = true
+        gormConf.SkipDefaultTransaction = true
+
+        ctx, cancel := timeout.NewCtxTimeout()
+        defer cancel()
+
+        var dialector gorm.Dialector
+        if driver == "postgres" </span><span class="cov0" title="0">{
+                dialector = postgres.Open(url)
+        }</span>
+
+        <span class="cov0" title="0">db, err := gorm.Open(dialector, gormConf)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">SqlDB, err := db.DB()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">SqlDB.SetMaxIdleConns(10)
+        SqlDB.SetMaxOpenConns(100)
+        SqlDB.SetConnMaxIdleTime(5 * time.Minute)
+        SqlDB.SetConnMaxLifetime(60 * time.Minute)
+
+        if err = SqlDB.PingContext(ctx); err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">g.SQLDB = SqlDB
+        return nil</span>
+}
+
+func (g *GormDB) Close() error <span class="cov0" title="0">{
+        return g.SQLDB.Close()
+}</span>
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package publisher
+
+import (
+        "encoding/json"
+        "log"
+        "product-go/config"
+        "product-go/helper/failerror"
+        "product-go/helper/timeout"
+
+        amqp "github.com/rabbitmq/amqp091-go"
+)
+
+type publisher struct{}
+
+func NewPublisher() Publisher <span class="cov0" title="0">{
+        return &amp;publisher{}
+}</span>
+
+func (p publisher) Public(req any, queueName string) error <span class="cov0" title="0">{
+        ctx, cancel := timeout.NewCtxTimeout()
+        defer cancel()
+
+        config, err := config.LoadConfig()
+        failerror.FailError(err, "error config")
+
+        conn, err := amqp.Dial(config.RabbitMQ)
+        failerror.FailError(err, "error connect to rabbitmq")
+        defer conn.Close()
+
+        ch, err := conn.Channel()
+        failerror.FailError(err, "failed to open a channel")
+
+        q, err := ch.QueueDeclare(
+                queueName, // queue name
+                true,      // durable
+                false,     // auto delete queue when unused
+                false,     // exclusive
+                false,     // no-wait
+                nil,       // arguments
+        )
+        failerror.FailError(err, "failed to declare queue")
+
+        // marshal data to jsonByte
+        jsonByte, err := json.Marshal(req)
+        failerror.FailError(err, "failed to marshaling")
+
+        err = ch.PublishWithContext(ctx,
+                "",     // exchange
+                q.Name, // routing key
+                false,  // mandatory
+                false,  // immediate
+                amqp.Publishing{
+                        DeliveryMode: amqp.Persistent,
+                        ContentType:  "text/plain",
+                        Body:         jsonByte,
+                })
+        failerror.FailError(err, "failed to publish message")
+
+        log.Printf(" [x] Sent %s", req)
+
+        return nil
+}</span>
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package repository
+
+import (
+        "database/sql"
+        "errors"
+        "log"
+        "product-go/helper/failerror"
+        "product-go/helper/timeout"
+        "product-go/model"
+        "product-go/publisher"
+        "time"
+)
+
+type repository struct {
+        db   *sql.DB
+        sent publisher.Publisher
+}
+
+func NewRepository(db *sql.DB, sent publisher.Publisher) Repositorier <span class="cov0" title="0">{
+        return &amp;repository{
+                db:   db,
+                sent: sent,
+        }
+}</span>
+
+func (repo *repository) GetProduct(req model.ProductSearch) ([]model.Product, error) <span class="cov0" title="0">{
+        ctx, cancel := timeout.NewCtxTimeout()
+        defer cancel()
+
+        querySearchProduct := `select p.id, p.store_id, p.category_id, p.size_id, p.color_id ,p.name, p.brand, p.subtitle, p.description ,p.unit_price ,p.status ,p.stock ,p.sku ,p.weight ,p.created_at ,p.updated_at from products p  join categories c on c.id = p.category_id join product_sizes s on s.id = p.size_id join product_colors co on co.id = p.color_id where c.name like '%' || $1 || '%' and p.name like '%' || $2 || '%' and p.brand like '%' || $3 || '%'`
+
+        result, err := repo.db.QueryContext(ctx, querySearchProduct, req.Category, req.Name, req.Brand)
+        failerror.FailError(err, "error query")
+
+        var data = []model.Product{}
+
+        for result.Next() </span><span class="cov0" title="0">{
+                var temp model.ProductResult
+                result.Scan(&amp;temp.Id, &amp;temp.StoreID, &amp;temp.CategoryID, &amp;temp.SizeID, &amp;temp.ColorID, &amp;temp.Name, &amp;temp.Brand, &amp;temp.Subtitle, &amp;temp.Description, &amp;temp.UnitPrice, &amp;temp.Status, &amp;temp.Stock, &amp;temp.Sku, &amp;temp.Weight, &amp;temp.Created_at, &amp;temp.Update_at)
+
+                queryImage := `select i.name, i.image_url from image i join image_products ip on ip.image_id = i.id join products p on p.id  = ip.product_id  where ip.product_id  = $1`
+
+                rows, err := repo.db.QueryContext(ctx, queryImage, temp.Id)
+                failerror.FailError(err, "error query")
+
+                var imageProduct = []model.ProductImage{}
+                for rows.Next() </span><span class="cov0" title="0">{
+                        var images model.ProductImage
+                        err := rows.Scan(&amp;images.Name, &amp;images.ImageURL)
+                        failerror.FailError(err, "error scan")
+                        imageProduct = append(imageProduct, images)
+                }</span>
+
+                <span class="cov0" title="0">data = append(data, model.Product{
+                        Id:           temp.Id,
+                        StoreID:      temp.StoreID,
+                        CategoryID:   temp.CategoryID,
+                        SizeID:       temp.SizeID,
+                        ColorID:      temp.ColorID,
+                        Name:         temp.Name,
+                        Brand:        temp.Brand,
+                        Subtitle:     temp.Subtitle,
+                        Description:  temp.Description,
+                        UnitPrice:    temp.UnitPrice,
+                        Status:       temp.Status,
+                        Stock:        temp.Stock,
+                        Sku:          temp.Sku,
+                        Weight:       temp.Weight,
+                        ProductImage: imageProduct,
+                        Created_at:   temp.Created_at,
+                        Update_at:    temp.Update_at,
+                })</span>
+        }
+
+        <span class="cov0" title="0">return data, nil</span>
+}
+
+func (repo *repository) ShowProduct(id int) (model.Product, error) <span class="cov0" title="0">{
+        ctx, cancel := timeout.NewCtxTimeout()
+        defer cancel()
+
+        // var data = model.Product{}
+
+        query := `select  id, store_id, category_id, size_id, color_id , name,brand, subtitle , description , unit_price , status , stock ,sku , weight , created_at , updated_at from products p where id = $1`
+
+        result, err := repo.db.QueryContext(ctx, query, id)
+        failerror.FailError(err, "error prepare")
+
+        var temp = model.Product{}
+        for result.Next() </span><span class="cov0" title="0">{
+                result.Scan(&amp;temp.Id, &amp;temp.StoreID, &amp;temp.CategoryID, &amp;temp.SizeID, &amp;temp.ColorID, &amp;temp.Name, &amp;temp.Brand, &amp;temp.Subtitle, &amp;temp.Description, &amp;temp.UnitPrice, &amp;temp.Status, &amp;temp.Stock, &amp;temp.Sku, &amp;temp.Weight, &amp;temp.Created_at, &amp;temp.Update_at)
+        }</span>
+
+        <span class="cov0" title="0">if temp.Id &lt;= 0 </span><span class="cov0" title="0">{
+                return temp, errors.New("product not found")
+        }</span>
+
+        <span class="cov0" title="0">queryImage := `select i.name, i.image_url from image i join image_products ip on ip.image_id = i.id join products p on p.id  = ip.product_id  where ip.product_id  = $1`
+
+        rows, err := repo.db.QueryContext(ctx, queryImage, temp.Id)
+        failerror.FailError(err, "error query")
+
+        var imageProduct = []model.ProductImage{}
+        for rows.Next() </span><span class="cov0" title="0">{
+                var images model.ProductImage
+                err := rows.Scan(&amp;images.Name, &amp;images.ImageURL)
+                failerror.FailError(err, "error scan")
+                imageProduct = append(imageProduct, images)
+        }</span>
+
+        <span class="cov0" title="0">data := model.Product{
+                Id:           temp.Id,
+                StoreID:      temp.StoreID,
+                CategoryID:   temp.CategoryID,
+                SizeID:       temp.SizeID,
+                ColorID:      temp.ColorID,
+                Name:         temp.Name,
+                Brand:        temp.Brand,
+                Subtitle:     temp.Subtitle,
+                Description:  temp.Description,
+                UnitPrice:    temp.UnitPrice,
+                Status:       temp.Status,
+                Stock:        temp.Stock,
+                Sku:          temp.Sku,
+                Weight:       temp.Weight,
+                ProductImage: imageProduct,
+                Created_at:   temp.Created_at,
+                Update_at:    temp.Update_at,
+        }
+
+        return data, nil</span>
+}
+
+func (repo *repository) CreateProduct(req []model.Product) ([]model.Product, error) <span class="cov0" title="0">{
+        ctx, cancel := timeout.NewCtxTimeout()
+        defer cancel()
+
+        err := repo.sent.Public(req, "create_product")
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, errors.New("failed publisher")
+        }</span>
+
+        <span class="cov0" title="0">time.Sleep(3 * time.Second)
+
+        var result []model.Product
+
+        for _, v := range req </span><span class="cov0" title="0">{
+
+                queryImage := `select i.name, i.image_url from image i join image_products ip on ip.image_id = i.id join products p on p.id  = ip.product_id  where sku = $1`
+
+                rows, err := repo.db.QueryContext(ctx, queryImage, v.Sku)
+                failerror.FailError(err, "error query")
+
+                var imageProduct = []model.ProductImage{}
+                for rows.Next() </span><span class="cov0" title="0">{
+                        var images model.ProductImage
+                        err := rows.Scan(&amp;images.Name, &amp;images.ImageURL)
+                        failerror.FailError(err, "error scan")
+                        imageProduct = append(imageProduct, images)
+                }</span>
+
+                <span class="cov0" title="0">queryProduct := `select  id, store_id, category_id, size_id, color_id , name, brand,subtitle , description , unit_price , status , stock ,sku , weight , created_at , updated_at from products p where sku = $1`
+
+                rowsProduct, err := repo.db.QueryContext(ctx, queryProduct, v.Sku)
+                failerror.FailError(err, "error prepare")
+
+                var temp model.ProductResult
+                for rowsProduct.Next() </span><span class="cov0" title="0">{
+                        rowsProduct.Scan(&amp;temp.Id, &amp;temp.StoreID, &amp;temp.CategoryID, &amp;temp.SizeID, &amp;temp.ColorID, &amp;temp.Name, &amp;temp.Brand, &amp;temp.Subtitle, &amp;temp.Description, &amp;temp.UnitPrice, &amp;temp.Status, &amp;temp.Stock, &amp;temp.Sku, &amp;temp.Weight, &amp;temp.Created_at, &amp;temp.Update_at)
+                }</span>
+                <span class="cov0" title="0">if temp.Id == 0 </span><span class="cov0" title="0">{
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">result = append(result, model.Product{
+                        Id:           temp.Id,
+                        StoreID:      temp.StoreID,
+                        CategoryID:   temp.CategoryID,
+                        SizeID:       temp.SizeID,
+                        ColorID:      temp.ColorID,
+                        Name:         temp.Name,
+                        Brand:        temp.Brand,
+                        Subtitle:     temp.Subtitle,
+                        Description:  temp.Description,
+                        UnitPrice:    temp.UnitPrice,
+                        Status:       temp.Status,
+                        Stock:        temp.Stock,
+                        Sku:          temp.Sku,
+                        Weight:       temp.Weight,
+                        ProductImage: imageProduct,
+                        Created_at:   temp.Created_at,
+                        Update_at:    temp.Update_at,
+                })</span>
+        }
+
+        <span class="cov0" title="0">if result == nil </span><span class="cov0" title="0">{
+                return []model.Product{}, errors.New("error create product")
+        }</span>
+
+        <span class="cov0" title="0">return result, nil</span>
+}
+
+func (repo *repository) UpdateProduct(req model.ProductUpd) (model.Product, error) <span class="cov0" title="0">{
+        ctx, cancel := timeout.NewCtxTimeout()
+        defer cancel()
+
+        err := repo.sent.Public(req, "update_product")
+        if err != nil </span><span class="cov0" title="0">{
+                return model.Product{}, errors.New("failed publisher")
+        }</span>
+
+        <span class="cov0" title="0">log.Println(req)
+        time.Sleep(1 * time.Second)
+
+        query := `select id, store_id, category_id, size_id, color_id , name, brand,subtitle , description , unit_price , status , stock ,sku , weight , created_at , updated_at from products p where id = $1`
+
+        result, err := repo.db.QueryContext(ctx, query, req.Id)
+        failerror.FailError(err, "error prepare")
+
+        var temp model.Product
+        for result.Next() </span><span class="cov0" title="0">{
+                result.Scan(&amp;temp.Id, &amp;temp.StoreID, &amp;temp.CategoryID, &amp;temp.SizeID, &amp;temp.ColorID, &amp;temp.Name, &amp;temp.Brand, &amp;temp.Subtitle, &amp;temp.Description, &amp;temp.UnitPrice, &amp;temp.Status, &amp;temp.Stock, &amp;temp.Sku, &amp;temp.Weight, &amp;temp.Created_at, &amp;temp.Update_at)
+        }</span>
+
+        <span class="cov0" title="0">if temp.Id == 0 </span><span class="cov0" title="0">{
+                return model.Product{}, errors.New("error create product")
+        }</span>
+
+        <span class="cov0" title="0">return temp, nil</span>
+}
+
+func (repo *repository) DeleteProduct(id int) (int, error) <span class="cov0" title="0">{
+        ctx, cancel := timeout.NewCtxTimeout()
+        defer cancel()
+
+        var idCheck int
+        queryCheck := `select id from products where id = $1`
+        err := repo.db.QueryRowContext(ctx, queryCheck, id).Scan(&amp;idCheck)
+        failerror.FailError(err, "error exec")
+
+        if idCheck == 0 </span><span class="cov0" title="0">{
+                return 0, errors.New("product tidak ditemukan")
+        }</span>
+
+        <span class="cov0" title="0">var arrImg []int
+        queryImage := `select image_id from image_products where product_id = $1`
+        rows, err := repo.db.QueryContext(ctx, queryImage, idCheck)
+        failerror.FailError(err, "error query")
+
+        for rows.Next() </span><span class="cov0" title="0">{
+                var imageID int
+                err := rows.Scan(&amp;imageID)
+                failerror.FailError(err, "error scan")
+                arrImg = append(arrImg, imageID)
+        }</span>
+
+        <span class="cov0" title="0">queryMapping := `delete from image_products where product_id = $1`
+        _, err = repo.db.ExecContext(ctx, queryMapping, idCheck)
+        failerror.FailError(err, "")
+
+        query := `DELETE FROM products WHERE id = $1`
+        _, err = repo.db.ExecContext(ctx, query, idCheck)
+        failerror.FailError(err, "")
+
+        for _, v := range arrImg </span><span class="cov0" title="0">{
+                if v != 0 </span><span class="cov0" title="0">{
+                        queryDeleteIMG := `delete from image where id = $1`
+                        _, err := repo.db.ExecContext(ctx, queryDeleteIMG, v)
+                        failerror.FailError(err, "")
+                }</span>
+                <span class="cov0" title="0">continue</span>
+        }
+
+        <span class="cov0" title="0">return idCheck, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package service
+
+import (
+        "errors"
+        "log"
+        "net/http"
+        "product-go/helper/random"
+        "product-go/model"
+        "product-go/repository"
+)
+
+type service struct {
+        repo repository.Repositorier
+}
+
+func NewService(repo repository.Repositorier) Servicer <span class="cov8" title="1">{
+        return &amp;service{
+                repo: repo,
+        }
+}</span>
+
+func (svc *service) GetProduct(req model.ProductSearch) (model.Respon, error) <span class="cov8" title="1">{
+        res, err := svc.repo.GetProduct(req)
+        if err != nil </span><span class="cov8" title="1">{
+                return model.Respon{
+                        Status: http.StatusInternalServerError,
+                        Data:   nil,
+                }, err
+        }</span>
+        <span class="cov8" title="1">return model.Respon{
+                Status: http.StatusOK,
+                Data:   res,
+        }, nil</span>
+}
+
+func (svc *service) ShowProduct(id int) (model.Respon, error) <span class="cov8" title="1">{
+
+        if id &lt;= 0 </span><span class="cov8" title="1">{
+                return model.Respon{
+                        Status: http.StatusBadRequest,
+                        Data:   nil,
+                }, errors.New("invalid id product")
+        }</span>
+
+        // start
+        <span class="cov8" title="1">res, err := svc.repo.ShowProduct(id)
+        if err != nil </span><span class="cov8" title="1">{
+                return model.Respon{
+                        Status: http.StatusInternalServerError,
+                        Data:   nil,
+                }, err
+        }</span>
+        <span class="cov8" title="1">return model.Respon{
+                Status: http.StatusOK,
+                Data:   res,
+        }, nil</span>
+}
+
+func (svc *service) CreateProduct(req []model.ProductReq) (model.Respon, error) <span class="cov8" title="1">{
+
+        var data []model.Product
+
+        for _, v := range req </span><span class="cov8" title="1">{
+                if v.StoreID == 0 || v.CategoryID == 0 || v.ColorID == 0 || v.Name == "" || v.Subtitle == "" || v.Description == "" || v.UnitPrice == 0 || v.Stock == 0 || v.Weight == 0 || v.Brand == "" </span><span class="cov8" title="1">{
+                        continue</span>
+                }
+
+                <span class="cov0" title="0">var mapImage = []model.ProductImage{}
+
+                for _, vm := range v.ProductImage </span><span class="cov0" title="0">{
+                        mapImage = append(mapImage, model.ProductImage{
+                                Name:     v.Name,
+                                ImageURL: vm.ImageURL,
+                        })
+                }</span>
+
+                <span class="cov0" title="0">data = append(data, model.Product{
+                        StoreID:      v.StoreID,
+                        CategoryID:   v.CategoryID,
+                        SizeID:       v.SizeID,
+                        ColorID:      v.ColorID,
+                        Name:         v.Name,
+                        Brand:        v.Brand,
+                        Subtitle:     v.Subtitle,
+                        Description:  v.Description,
+                        UnitPrice:    v.UnitPrice,
+                        Status:       false,
+                        Stock:        v.Stock,
+                        Sku:          random.NewRandom().RandomString(),
+                        Weight:       v.Weight,
+                        ProductImage: mapImage,
+                })</span>
+        }
+
+        <span class="cov8" title="1">if data == nil </span><span class="cov8" title="1">{
+                return model.Respon{
+                        Status: http.StatusBadRequest,
+                        Data:   nil,
+                }, errors.New("error input")
+        }</span>
+
+        // start
+        <span class="cov0" title="0">res, err := svc.repo.CreateProduct(data)
+        if err != nil </span><span class="cov0" title="0">{
+                return model.Respon{
+                        Status: http.StatusInternalServerError,
+                        Data:   nil,
+                }, err
+        }</span>
+        <span class="cov0" title="0">return model.Respon{
+                Status: http.StatusOK,
+                Data:   res,
+        }, nil</span>
+}
+
+func (svc *service) UpdateProduct(req model.ProductUpd, id int) (model.Respon, error) <span class="cov0" title="0">{
+
+        log.Println(id, req)
+
+        if id &lt;= 0 || req.Id != 0 </span><span class="cov0" title="0">{
+                return model.Respon{
+                        Status: http.StatusBadRequest,
+                        Data:   nil,
+                }, errors.New("invalid input")
+        }</span>
+
+        <span class="cov0" title="0">data := model.ProductUpd{
+                Id:          id,
+                StoreID:     req.StoreID,
+                CategoryID:  req.CategoryID,
+                SizeID:      req.SizeID,
+                ColorID:     req.ColorID,
+                Name:        req.Name,
+                Brand:       req.Brand,
+                Subtitle:    req.Subtitle,
+                Description: req.Description,
+                UnitPrice:   req.UnitPrice,
+                Stock:       req.Stock,
+                Weight:      req.Weight,
+                Status:      req.Status,
+        }
+
+        // start
+        res, err := svc.repo.UpdateProduct(data)
+        if err != nil </span><span class="cov0" title="0">{
+                return model.Respon{
+                        Status: http.StatusInternalServerError,
+                        Data:   nil,
+                }, err
+        }</span>
+        <span class="cov0" title="0">return model.Respon{
+                Status: http.StatusOK,
+                Data:   res,
+        }, nil</span>
+}
+
+func (svc *service) DeleteProduct(id int) (model.Respon, error) <span class="cov0" title="0">{
+        if id &lt;= 0 </span><span class="cov0" title="0">{
+                return model.Respon{
+                        Status: http.StatusBadRequest,
+                        Data:   nil,
+                }, errors.New("error invalid id")
+        }</span>
+
+        // start
+        <span class="cov0" title="0">res, err := svc.repo.DeleteProduct(id)
+        if err != nil </span><span class="cov0" title="0">{
+                return model.Respon{
+                        Status: http.StatusInternalServerError,
+                        Data:   nil,
+                }, err
+        }</span>
+        <span class="cov0" title="0">return model.Respon{
+                Status: http.StatusOK,
+                Data:   res,
+        }, nil</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

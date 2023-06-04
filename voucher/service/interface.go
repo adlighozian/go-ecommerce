@@ -1,3 +1,5 @@
+//go:generate mockery --output=../mocks --name service
+
 package service
 
 import "voucher-go/model"

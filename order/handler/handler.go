@@ -22,13 +22,19 @@ func NewHandler(svc service.Servicer) Handlerer {
 
 func (h *handler) GetOrders(ctx *gin.Context) {
 
+	userIDString := ctx.GetHeader("user-id")
 	idUser := ctx.Query("user_id")
 	var numi int
-
 	if idUser != "" {
-		num, err := strconv.Atoi(idUser)
-		failerror.FailError(err, "error convert to int")
-		numi = num
+		if userIDString != "" {
+			num, err := strconv.Atoi(userIDString)
+			failerror.FailError(err, "error convert to int")
+			numi = num
+		} else {
+			num, err := strconv.Atoi(idUser)
+			failerror.FailError(err, "error convert to int")
+			numi = num
+		}
 	}
 
 	res, err := h.svc.GetOrders(numi)
@@ -61,14 +67,22 @@ func (h *handler) GetOrdersByStoreID(ctx *gin.Context) {
 }
 
 func (h *handler) ShowOrders(ctx *gin.Context) {
-	idUser := ctx.Query("user_id")
 	orderNumber := ctx.Query("order_number")
 
+	userIDString := ctx.GetHeader("user-id")
+	idUser := ctx.Query("user_id")
 	var numi int
+	
 	if idUser != "" {
-		num, err := strconv.Atoi(idUser)
-		failerror.FailError(err, "error convert to int")
-		numi = num
+		if userIDString != "" {
+			num, err := strconv.Atoi(userIDString)
+			failerror.FailError(err, "error convert to int")
+			numi = num
+		} else {
+			num, err := strconv.Atoi(idUser)
+			failerror.FailError(err, "error convert to int")
+			numi = num
+		}
 	}
 
 	var data model.OrderItems = model.OrderItems{
