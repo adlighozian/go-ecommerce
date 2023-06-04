@@ -57,20 +57,17 @@ func main() {
 
 	// closing all connection after get interrupt signal
 	defer func() {
-		errDBC := sqlDB.Close()
-		if errDBC != nil {
+		if errDBC := sqlDB.Close(); errDBC != nil {
 			logger.Fatal().Err(errDBC).Msg("db failed to closed")
 		}
 		logger.Debug().Msg("db closed")
 
-		errRedisC := redisClient.Close()
-		if errRedisC != nil {
+		if errRedisC := redisClient.Close(); errRedisC != nil {
 			logger.Fatal().Err(errRedisC).Msg("redis failed to closed")
 		}
 		logger.Debug().Msg("redis closed")
 
-		errRmqC := rmq.Shutdown()
-		if errRmqC != nil {
+		if errRmqC := rmq.Shutdown(); errRmqC != nil {
 			logger.Fatal().Err(errRmqC).Msg("rabbitmq failed to closed")
 		}
 		logger.Debug().Msg("rabbitmq closed")
@@ -123,5 +120,4 @@ func main() {
 	if errSrv := server.Run(srv, logger); errSrv != nil {
 		logger.Fatal().Err(errSrv).Msg("server shutdown failed")
 	}
-
 }

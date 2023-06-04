@@ -71,7 +71,12 @@
 		},
 		{
 			"path": "wishlist"
+		},
+		{
+			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "ecommerce"
+	}
 }
