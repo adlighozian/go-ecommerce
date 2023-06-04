@@ -27,7 +27,7 @@ func (repo *ShortenRepo) Get(hashedURL string) (*model.APIManagement, error) {
 	apiManagement := new(model.APIManagement)
 
 	// note: implemetation of cache aside of read cache strategy
-	cachedData, errGetCache := repo.getDataFromCache(hashedURL)
+	cachedData, errGetCache := repo.getDataFromCache("hashed_path:" + hashedURL)
 	if errGetCache != nil {
 		data, errGetDB := repo.getHashURLFromDatabase(hashedURL)
 		if errGetDB != nil {
@@ -40,7 +40,7 @@ func (repo *ShortenRepo) Get(hashedURL string) (*model.APIManagement, error) {
 		}
 
 		// Store the data in the cache for future reads
-		errSetCache := repo.redis.Set(context.Background(), hashedURL, dataByte, 10*time.Minute).Err()
+		errSetCache := repo.redis.Set(context.Background(), "hashed_path:"+hashedURL, dataByte, 10*time.Minute).Err()
 		if errSetCache != nil {
 			return nil, errSetCache
 		}
@@ -57,11 +57,7 @@ func (repo *ShortenRepo) Get(hashedURL string) (*model.APIManagement, error) {
 }
 
 func (repo *ShortenRepo) getDataFromCache(key string) (string, error) {
-	cachedData, errGet := repo.redis.Get(context.Background(), key).Result()
-	if errGet != nil {
-		return "", errGet
-	}
-	return cachedData, nil
+	return repo.redis.Get(context.Background(), key).Result()
 }
 
 func (repo *ShortenRepo) getHashURLFromDatabase(hashedURL string) (*model.APIManagement, error) {

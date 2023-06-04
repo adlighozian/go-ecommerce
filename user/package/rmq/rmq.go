@@ -1,3 +1,4 @@
+//go:generate mockery --output=../../mocks --name RabbitMQClient
 package rmq
 
 import (
