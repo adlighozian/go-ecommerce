@@ -3,10 +3,10 @@ package repository
 import (
 	"database/sql"
 	"errors"
-	"shippings-go/helper/failerror"
-	"shippings-go/helper/timeout"
-	"shippings-go/model"
-	"shippings-go/publisher"
+	"size-go/helper/failerror"
+	"size-go/helper/timeout"
+	"size-go/model"
+	"size-go/publisher"
 	"time"
 )
 
@@ -22,18 +22,18 @@ func NewRepository(db *sql.DB, sent publisher.Publisher) Repositorier {
 	}
 }
 
-func (repo *repository) GetShipping() ([]model.Shipping, error) {
+func (repo *repository) GetSize() ([]model.Size, error) {
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
-	query := `select * from Shippings`
+	query := `select * from product_sizes`
 
 	result, err := repo.db.QueryContext(ctx, query)
 	failerror.FailError(err, "fail query")
 
-	var data = []model.Shipping{}
+	var data = []model.Size{}
 	for result.Next() {
-		var temp model.Shipping
+		var temp model.Size
 		result.Scan(&temp.Id, &temp.Name, &temp.Created_at, &temp.Update_at)
 		data = append(data, temp)
 	}
@@ -41,13 +41,13 @@ func (repo *repository) GetShipping() ([]model.Shipping, error) {
 	return data, nil
 }
 
-func (repo *repository) CreateShipping(sent []model.ShippingReq) ([]model.Shipping, error) {
+func (repo *repository) CreateSize(sent []model.SizeReq) ([]model.Size, error) {
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
 	for _, v := range sent {
 		var idCheck int
-		queryCheck := `select id from Shippings where name = $1`
+		queryCheck := `select id from product_sizes where name = $1`
 		err := repo.db.QueryRowContext(ctx, queryCheck, v.Name).Scan(&idCheck)
 		failerror.FailError(err, "error exec")
 
@@ -56,15 +56,15 @@ func (repo *repository) CreateShipping(sent []model.ShippingReq) ([]model.Shippi
 		}
 	}
 
-	err := repo.sent.Public(sent, "create_shipping")
+	err := repo.sent.Public(sent, "create_size")
 	if err != nil {
 		return nil, errors.New("failed publisher")
 	}
 
 	time.Sleep(1 * time.Second)
 
-	var resultss []model.Shipping
-	query := `select * from Shippings where name = $1`
+	var resultss []model.Size
+	query := `select * from product_sizes where name = $1`
 
 	stmt, err := repo.db.PrepareContext(ctx, query)
 	failerror.FailError(err, "error prepare")
@@ -74,7 +74,7 @@ func (repo *repository) CreateShipping(sent []model.ShippingReq) ([]model.Shippi
 		result, err := stmt.QueryContext(ctx, v.Name)
 		failerror.FailError(err, "error prepare")
 
-		var temp model.Shipping
+		var temp model.Size
 		for result.Next() {
 			result.Scan(&temp.Id, &temp.Name, &temp.Created_at, &temp.Update_at)
 		}
@@ -91,26 +91,26 @@ func (repo *repository) CreateShipping(sent []model.ShippingReq) ([]model.Shippi
 	return resultss, nil
 }
 
-func (repo *repository) DeleteShipping(id int) (int, error) {
+func (repo *repository) DeleteSize(id int) (int, error) {
 
 	ctx, cancel := timeout.NewCtxTimeout()
 	defer cancel()
 
 	var idCheck int
-	queryCheck := `select id from Shippings where id = $1`
+	queryCheck := `select id from product_sizes where id = $1`
 	err := repo.db.QueryRowContext(ctx, queryCheck, id).Scan(&idCheck)
 	failerror.FailError(err, "error exec")
 
 	if idCheck == 0 {
-		return 0, errors.New("shipping not found")
+		return 0, errors.New("size not found")
 	}
 
-	query := `DELETE FROM Shippings WHERE id = $1`
+	query := `DELETE FROM product_sizes WHERE id = $1`
 	_, err = repo.db.ExecContext(ctx, query, idCheck)
 	failerror.FailError(err, "error exec")
 
 	var idCheckDelete int
-	queryCheckDelete := `select id from Shippings where id = $1`
+	queryCheckDelete := `select id from product_sizes where id = $1`
 	err = repo.db.QueryRowContext(ctx, queryCheckDelete, idCheck).Scan(&idCheckDelete)
 	failerror.FailError(err, "error exec")
 
